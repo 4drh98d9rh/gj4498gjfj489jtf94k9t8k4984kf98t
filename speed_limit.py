@@ -1,7 +1,7 @@
 import asyncio
 import time
 
-from app import LINKS
+from main import LINKS
 
 _buckets: dict = {}
 _lock = asyncio.Lock()

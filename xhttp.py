@@ -7,7 +7,7 @@ from datetime import datetime
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import StreamingResponse
 
-from app import (
+from main import (
     LINKS,
     LINKS_LOCK,
     stats,

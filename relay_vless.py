@@ -4,7 +4,7 @@ from datetime import datetime
 
 from fastapi import WebSocket, WebSocketDisconnect
 
-from app import (
+from main import (
     LINKS,
     LINKS_LOCK,
     stats,
