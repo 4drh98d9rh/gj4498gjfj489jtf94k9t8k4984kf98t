@@ -274,7 +274,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         <div class="flex items-center space-x-3">
             <p>MX-UI v1.0.0</p>
             <span class="text-[9px] font-mono font-bold tracking-widest text-slate-400 border border-slate-800 px-1.5 py-0.5 rounded bg-slate-900/60 select-none">
-                Muvixo
+                Created by Muvixo
             </span>
         </div>
         <div class="flex items-center space-x-4">
