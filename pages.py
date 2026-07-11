@@ -779,7 +779,6 @@ setInterval(loadConfigs, 15000);
 </script>
 </body>
 </html>"""
-
 SUB_INFO_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
