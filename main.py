@@ -490,10 +490,9 @@ async def api_login(request: Request):
         httponly=True,
         samesite="lax",
         path="/",
-        secure=secure,
+        secure=secure,   # <-- critical for HTTPS
     )
     return resp
-
 @app.post("/api/logout")
 async def api_logout(request: Request):
     await destroy_session(request.cookies.get(SESSION_COOKIE))
