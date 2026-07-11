@@ -12,7 +12,7 @@ from collections import deque, defaultdict
 from pathlib import Path
 
 import psutil
-
+from typing import Optional
 from fastapi import FastAPI, Request, HTTPException, WebSocket, WebSocketDisconnect, Depends, Query
 from fastapi.responses import Response, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -191,7 +191,8 @@ async def shutdown():
         await http_client.aclose()
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
-def get_host(request: Request | None = None) -> str:
+
+def get_host(request: Optional[Request] = None) -> str:
     if request is not None:
         h = request.headers.get("x-forwarded-host") or request.headers.get("host")
         if h:
@@ -479,10 +480,15 @@ async def api_login(request: Request):
     if hash_password(str(body.get("password", ""))) != AUTH["password_hash"]:
         log_activity("auth", f"Failed login from {ip}", "err")
         raise HTTPException(status_code=401, detail="Wrong password")
+    
     token = await create_session()
     log_activity("auth", f"Successful login from {ip}", "ok")
+    
+    # Determine if the original request was HTTPS (honor X-Forwarded-Proto)
+    forwarded_proto = request.headers.get("x-forwarded-proto", "").lower()
+    secure = (forwarded_proto == "https") or (request.url.scheme == "https")
+    
     resp = JSONResponse({"ok": True})
-    secure = request.url.scheme == "https"
     resp.set_cookie(
         SESSION_COOKIE,
         token,
@@ -492,8 +498,9 @@ async def api_login(request: Request):
         path="/",
         secure=secure,
     )
+    # Add a small debug log (optional)
+    logger.info(f"Login cookie set: secure={secure}, scheme={request.url.scheme}, forwarded_proto={forwarded_proto}")
     return resp
-
 @app.post("/api/logout")
 async def api_logout(request: Request):
     await destroy_session(request.cookies.get(SESSION_COOKIE))
@@ -828,10 +835,13 @@ async def login_page(request: Request):
     if await is_valid_session(request.cookies.get(SESSION_COOKIE)):
         return RedirectResponse(url="/dashboard")
     return HTMLResponse(content=LOGIN_HTML)
-
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request):
-    if not await is_valid_session(request.cookies.get(SESSION_COOKIE)):
+    token = request.cookies.get(SESSION_COOKIE)
+    logger.info(f"Dashboard cookie: {token}")
+    valid = await is_valid_session(token)
+    logger.info(f"Dashboard session valid: {valid}")
+    if not valid:
         return RedirectResponse(url="/login")
     await ensure_default_link()
     return HTMLResponse(content=DASHBOARD_HTML)
