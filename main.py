@@ -11,6 +11,8 @@ from urllib.parse import quote
 from collections import deque, defaultdict
 from pathlib import Path
 
+import psutil
+
 from fastapi import FastAPI, Request, HTTPException, WebSocket, WebSocketDisconnect, Depends
 from fastapi.responses import Response, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -470,18 +472,32 @@ async def api_change_password(request: Request, token=Depends(require_auth)):
 async def get_stats(_=Depends(require_auth)):
     async with LINKS_LOCK:
         snap = dict(LINKS)
+    # System stats
+    cpu_percent = psutil.cpu_percent(interval=0.1)
+    ram = psutil.virtual_memory()
+    ram_percent = ram.percent
+    ram_used_mb = ram.used // (1024 * 1024)
+
+    total_links = len(snap)
+    active_links = sum(1 for l in snap.values() if is_link_allowed(l))
+    total_traffic_mb = round(stats["total_bytes"] / (1024 ** 2), 2)
+
     return {
         "active_connections": len(connections),
-        "total_traffic_mb": round(stats["total_bytes"] / (1024 ** 2), 2),
+        "total_traffic_mb": total_traffic_mb,
         "total_requests": stats["total_requests"],
         "total_errors": stats["total_errors"],
         "uptime": uptime(),
         "timestamp": datetime.now().isoformat(),
         "hourly": dict(hourly_traffic),
         "recent_errors": list(error_logs)[-10:],
-        "links_count": len(snap),
-        "active_links": sum(1 for l in snap.values() if is_link_allowed(l)),
+        "links_count": total_links,
+        "active_links": active_links,
         "expired_links": sum(1 for l in snap.values() if is_link_expired(l)),
+        "cpu_percent": round(cpu_percent, 1),
+        "ram_percent": ram_percent,
+        "ram_used_mb": ram_used_mb,
+        "ram_total_mb": ram.total // (1024 * 1024),
     }
 
 @app.get("/api/activity")
@@ -773,4 +789,4 @@ async def dashboard(request: Request):
     return HTMLResponse(content=DASHBOARD_HTML)
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=CONFIG["port"], log_level="info", workers=1)
+    uvicorn.run("main:app", host="0.0.0.0", port=CONFIG["port"], log_level="info", workers=1)
