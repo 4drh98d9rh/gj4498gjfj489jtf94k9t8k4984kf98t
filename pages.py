@@ -797,7 +797,8 @@ async function saveEdit() {
 }
 
 async function deleteConfig(uuid) {
-    if (!confirm('Delete this configuration?')) return;
+      const ok = await customConfirm('Delete this configuration?. This action cannot be undone.');
+      if (!ok) return;
     try {
         const res = await fetch('/api/links/' + uuid, { method: 'DELETE' });
         if (!res.ok) throw new Error('Failed');
