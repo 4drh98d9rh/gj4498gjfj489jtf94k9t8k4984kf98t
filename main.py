@@ -382,40 +382,6 @@ async def health():
     return {"status": "ok", "connections": len(connections), "uptime": uptime()}
 
 # ── Subscription (single link) ────────────────────────────────────────────────
-@app.get("/sub/{uuid}")
-async def subscription_single(uuid: str, request: Request):
-    import base64
-    async with LINKS_LOCK:
-        link = LINKS.get(uuid)
-    if not link or not is_link_allowed(link):
-        raise HTTPException(status_code=404, detail="not found or inactive")
-    host = get_host(request)
-    vless = vless_link_for_link(link, uuid, host)
-    content = base64.b64encode(vless.encode()).decode()
-    return Response(content=content, media_type="text/plain",
-                    headers={"profile-title": quote(link["label"]), "support-url": "https://t.me/Farajian2004f"})
-
-@app.get("/sub/{uuid}/info", response_class=HTMLResponse)
-async def subscription_info(uuid: str, request: Request):
-    from pages import SUB_INFO_HTML
-    async with LINKS_LOCK:
-        link = LINKS.get(uuid)
-    if not link:
-        raise HTTPException(status_code=404, detail="not found")
-    host = get_host(request)
-    return HTMLResponse(content=SUB_INFO_HTML.format(
-        uuid=uuid,
-        label=link.get("label", "Unknown"),
-        used_fmt=fmt_bytes(link.get("used_bytes", 0)),
-        limit_fmt="∞" if link.get("limit_bytes", 0) == 0 else fmt_bytes(link["limit_bytes"]),
-        expires_at=link.get("expires_at", "No expiry"),
-        active=link.get("active", True),
-        vless_link=vless_link_for_link(link, uuid, host),
-        sub_url=f"https://{host}/sub/{uuid}",
-        watermark="Created by Muvixo"
-    ))
-
-# ── NEW: Public subscription details page ──────────────────────────────────
 @app.get("/sub/user")
 async def subscription_user(request: Request, uuid: str = Query(...)):
     from pages import SUB_USER_HTML
@@ -459,6 +425,40 @@ async def subscription_user(request: Request, uuid: str = Query(...)):
         watermark="Created by Muvixo"
     ))
 
+@app.get("/sub/{uuid}")
+async def subscription_single(uuid: str, request: Request):
+    import base64
+    async with LINKS_LOCK:
+        link = LINKS.get(uuid)
+    if not link or not is_link_allowed(link):
+        raise HTTPException(status_code=404, detail="not found or inactive")
+    host = get_host(request)
+    vless = vless_link_for_link(link, uuid, host)
+    content = base64.b64encode(vless.encode()).decode()
+    return Response(content=content, media_type="text/plain",
+                    headers={"profile-title": quote(link["label"]), "support-url": "https://t.me/Farajian2004f"})
+
+@app.get("/sub/{uuid}/info", response_class=HTMLResponse)
+async def subscription_info(uuid: str, request: Request):
+    from pages import SUB_INFO_HTML
+    async with LINKS_LOCK:
+        link = LINKS.get(uuid)
+    if not link:
+        raise HTTPException(status_code=404, detail="not found")
+    host = get_host(request)
+    return HTMLResponse(content=SUB_INFO_HTML.format(
+        uuid=uuid,
+        label=link.get("label", "Unknown"),
+        used_fmt=fmt_bytes(link.get("used_bytes", 0)),
+        limit_fmt="∞" if link.get("limit_bytes", 0) == 0 else fmt_bytes(link["limit_bytes"]),
+        expires_at=link.get("expires_at", "No expiry"),
+        active=link.get("active", True),
+        vless_link=vless_link_for_link(link, uuid, host),
+        sub_url=f"https://{host}/sub/{uuid}",
+        watermark="Created by Muvixo"
+    ))
+
+# ── NEW: Public subscription details page ──────────────────────────────────
 @app.get("/sub-all")
 async def subscription_all(request: Request, _=Depends(require_auth)):
     import base64
