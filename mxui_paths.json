@@ -1,5 +1,0 @@
-{
-  "login": "/auth",
-  "dashboard": "/dash",
-  "sub": "/subs"
-}
