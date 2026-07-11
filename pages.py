@@ -178,6 +178,9 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 Node Gateway Online
             </span>
+            <button onclick="toggleModal('settingsModal', true)" class="text-slate-400 hover:text-slate-200 text-sm font-medium flex items-center gap-1.5">
+                  <i data-lucide="settings" class="w-4 h-4"></i> Settings
+              </button>
             <button onclick="logout()" class="text-slate-400 hover:text-slate-200 text-sm font-medium flex items-center gap-1.5">
                 <i data-lucide="log-out" class="w-4 h-4"></i> Logout
             </button>
@@ -491,6 +494,41 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
       </div>
   </div>
 
+  <!-- ===== MODAL: SETTINGS (Change Password) ===== -->
+  <div id="settingsModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75">
+      <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl overflow-hidden modal-glow">
+          <div class="p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40">
+              <div class="flex items-center space-x-3">
+                  <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20"><i data-lucide="settings" class="w-5 h-5"></i></div>
+                  <div>
+                      <h3 class="text-lg font-bold text-slate-100">Settings</h3>
+                      <p class="text-xs text-slate-400">Change your dashboard password.</p>
+                  </div>
+              </div>
+              <button onclick="toggleModal('settingsModal', false)" class="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+          </div>
+          <div class="p-6 space-y-4">
+              <div>
+                  <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Current Password</label>
+                  <input type="password" id="settings-current-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition" placeholder="Enter current password">
+              </div>
+              <div>
+                  <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">New Password</label>
+                  <input type="password" id="settings-new-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition" placeholder="At least 4 characters">
+              </div>
+              <div>
+                  <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Confirm New Password</label>
+                  <input type="password" id="settings-confirm-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition" placeholder="Repeat new password">
+              </div>
+              <div id="settingsError" class="text-xs text-red-400 hidden"></div>
+          </div>
+          <div class="p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end space-x-3">
+              <button onclick="toggleModal('settingsModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-xl transition">Cancel</button>
+              <button onclick="changePassword()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition shadow-lg shadow-blue-600/10">Update Password</button>
+          </div>
+      </div>
+  </div>
+
   <!-- ===== ALERT ===== -->
 <div id="customAlert" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80">
     <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden modal-glow p-6 text-center space-y-4">
@@ -591,6 +629,51 @@ async function logout() {
     await fetch('/api/logout', { method: 'POST' });
     location.href = '/login';
 }
+
+  // ---- Settings: change password ----
+  async function changePassword() {
+      const cur = document.getElementById('settings-current-pw').value;
+      const nw = document.getElementById('settings-new-pw').value;
+      const confirmPw = document.getElementById('settings-confirm-pw').value;
+      const errEl = document.getElementById('settingsError');
+      errEl.classList.add('hidden');
+
+      if (!cur || !nw || !confirmPw) {
+          errEl.textContent = 'All fields are required.';
+          errEl.classList.remove('hidden');
+          return;
+      }
+      if (nw.length < 4) {
+          errEl.textContent = 'New password must be at least 4 characters.';
+          errEl.classList.remove('hidden');
+          return;
+      }
+      if (nw !== confirmPw) {
+          errEl.textContent = 'New password and confirmation do not match.';
+          errEl.classList.remove('hidden');
+          return;
+      }
+
+      try {
+          const res = await fetch('/api/change-password', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ current_password: cur, new_password: nw })
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.detail || 'Failed to update password');
+
+          toggleModal('settingsModal', false);
+          document.getElementById('settings-current-pw').value = '';
+          document.getElementById('settings-new-pw').value = '';
+          document.getElementById('settings-confirm-pw').value = '';
+          triggerAlert('Password Updated', 'Your dashboard password has been changed successfully.', 'check-circle');
+      } catch (e) {
+          errEl.textContent = e.message;
+          errEl.classList.remove('hidden');
+      }
+  }
+
 
 // Fetch and render configs
 async function loadConfigs() {
