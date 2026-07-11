@@ -11,75 +11,7 @@ LOGIN_HTML = r"""<!DOCTYPE html>
 <title>Login · MX-UI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com">
-    // ---- Path Settings ----
-    async function updatePaths() {
-        const login = document.getElementById('path-login').value.trim() || '/login';
-        const dashboard = document.getElementById('path-dashboard').value.trim() || '/dashboard';
-        const sub = document.getElementById('path-sub').value.trim() || '/sub';
-        const errEl = document.getElementById('pathSettingsError');
-        const successEl = document.getElementById('pathSettingsSuccess');
-        errEl.classList.add('hidden');
-        successEl.classList.add('hidden');
-        
-        // اعتبارسنجی
-        if (!login.startsWith('/') || !dashboard.startsWith('/') || !sub.startsWith('/')) {
-            errEl.textContent = 'All paths must start with "/"';
-            errEl.classList.remove('hidden');
-            return;
-        }
-        
-        try {
-            const res = await fetch('/api/update-paths', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ login_path: login, dashboard_path: dashboard, sub_path: sub })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(data.detail || 'Failed to update paths');
-            
-            successEl.textContent = 'Paths updated. Restarting server...';
-            successEl.classList.remove('hidden');
-            
-            // بعد از 2 ثانیه صفحه را رفرش کن
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-            
-        } catch (e) {
-            errEl.textContent = e.message;
-            errEl.classList.remove('hidden');
-        }
-    }
-    
-    // بارگذاری مسیرهای فعلی
-    async function loadCurrentPaths() {
-        try {
-            const res = await fetch('/api/current-paths');
-            const data = await res.json();
-            document.getElementById('path-login').value = data.login_path || '/login';
-            document.getElementById('path-dashboard').value = data.dashboard_path || '/dashboard';
-            document.getElementById('path-sub').value = data.sub_path || '/sub';
-        } catch(e) {
-            console.error('Failed to load paths:', e);
-        }
-    }
-    
-    // بارگذاری هنگام باز شدن مدال
-    document.addEventListener('DOMContentLoaded', function() {
-        // وقتی مدال باز میشه، مسیرها رو بارگذاری کن
-        const modal = document.getElementById('pathSettingsModal');
-        if (modal) {
-            const observer = new MutationObserver(function(mutations) {
-                if (modal.classList.contains('active')) {
-                    loadCurrentPaths();
-                }
-            });
-            observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
-        }
-    });
-    
-</script>
+<script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
     theme: {
@@ -91,74 +23,6 @@ tailwind.config = {
         }
     }
 }
-
-    // ---- Path Settings ----
-    async function updatePaths() {
-        const login = document.getElementById('path-login').value.trim() || '/login';
-        const dashboard = document.getElementById('path-dashboard').value.trim() || '/dashboard';
-        const sub = document.getElementById('path-sub').value.trim() || '/sub';
-        const errEl = document.getElementById('pathSettingsError');
-        const successEl = document.getElementById('pathSettingsSuccess');
-        errEl.classList.add('hidden');
-        successEl.classList.add('hidden');
-        
-        // اعتبارسنجی
-        if (!login.startsWith('/') || !dashboard.startsWith('/') || !sub.startsWith('/')) {
-            errEl.textContent = 'All paths must start with "/"';
-            errEl.classList.remove('hidden');
-            return;
-        }
-        
-        try {
-            const res = await fetch('/api/update-paths', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ login_path: login, dashboard_path: dashboard, sub_path: sub })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(data.detail || 'Failed to update paths');
-            
-            successEl.textContent = 'Paths updated. Restarting server...';
-            successEl.classList.remove('hidden');
-            
-            // بعد از 2 ثانیه صفحه را رفرش کن
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-            
-        } catch (e) {
-            errEl.textContent = e.message;
-            errEl.classList.remove('hidden');
-        }
-    }
-    
-    // بارگذاری مسیرهای فعلی
-    async function loadCurrentPaths() {
-        try {
-            const res = await fetch('/api/current-paths');
-            const data = await res.json();
-            document.getElementById('path-login').value = data.login_path || '/login';
-            document.getElementById('path-dashboard').value = data.dashboard_path || '/dashboard';
-            document.getElementById('path-sub').value = data.sub_path || '/sub';
-        } catch(e) {
-            console.error('Failed to load paths:', e);
-        }
-    }
-    
-    // بارگذاری هنگام باز شدن مدال
-    document.addEventListener('DOMContentLoaded', function() {
-        // وقتی مدال باز میشه، مسیرها رو بارگذاری کن
-        const modal = document.getElementById('pathSettingsModal');
-        if (modal) {
-            const observer = new MutationObserver(function(mutations) {
-                if (modal.classList.contains('active')) {
-                    loadCurrentPaths();
-                }
-            });
-            observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
-        }
-    });
-    
 </script>
 <style>
 body { background-color: #070a13; }
@@ -226,74 +90,6 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Sign In';
     }
 });
-
-    // ---- Path Settings ----
-    async function updatePaths() {
-        const login = document.getElementById('path-login').value.trim() || '/login';
-        const dashboard = document.getElementById('path-dashboard').value.trim() || '/dashboard';
-        const sub = document.getElementById('path-sub').value.trim() || '/sub';
-        const errEl = document.getElementById('pathSettingsError');
-        const successEl = document.getElementById('pathSettingsSuccess');
-        errEl.classList.add('hidden');
-        successEl.classList.add('hidden');
-        
-        // اعتبارسنجی
-        if (!login.startsWith('/') || !dashboard.startsWith('/') || !sub.startsWith('/')) {
-            errEl.textContent = 'All paths must start with "/"';
-            errEl.classList.remove('hidden');
-            return;
-        }
-        
-        try {
-            const res = await fetch('/api/update-paths', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ login_path: login, dashboard_path: dashboard, sub_path: sub })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(data.detail || 'Failed to update paths');
-            
-            successEl.textContent = 'Paths updated. Restarting server...';
-            successEl.classList.remove('hidden');
-            
-            // بعد از 2 ثانیه صفحه را رفرش کن
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-            
-        } catch (e) {
-            errEl.textContent = e.message;
-            errEl.classList.remove('hidden');
-        }
-    }
-    
-    // بارگذاری مسیرهای فعلی
-    async function loadCurrentPaths() {
-        try {
-            const res = await fetch('/api/current-paths');
-            const data = await res.json();
-            document.getElementById('path-login').value = data.login_path || '/login';
-            document.getElementById('path-dashboard').value = data.dashboard_path || '/dashboard';
-            document.getElementById('path-sub').value = data.sub_path || '/sub';
-        } catch(e) {
-            console.error('Failed to load paths:', e);
-        }
-    }
-    
-    // بارگذاری هنگام باز شدن مدال
-    document.addEventListener('DOMContentLoaded', function() {
-        // وقتی مدال باز میشه، مسیرها رو بارگذاری کن
-        const modal = document.getElementById('pathSettingsModal');
-        if (modal) {
-            const observer = new MutationObserver(function(mutations) {
-                if (modal.classList.contains('active')) {
-                    loadCurrentPaths();
-                }
-            });
-            observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
-        }
-    });
-    
 </script>
 </body>
 </html>"""
@@ -305,144 +101,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MX-UI v1.0.0</title>
-    <script src="https://cdn.tailwindcss.com">
-    // ---- Path Settings ----
-    async function updatePaths() {
-        const login = document.getElementById('path-login').value.trim() || '/login';
-        const dashboard = document.getElementById('path-dashboard').value.trim() || '/dashboard';
-        const sub = document.getElementById('path-sub').value.trim() || '/sub';
-        const errEl = document.getElementById('pathSettingsError');
-        const successEl = document.getElementById('pathSettingsSuccess');
-        errEl.classList.add('hidden');
-        successEl.classList.add('hidden');
-        
-        // اعتبارسنجی
-        if (!login.startsWith('/') || !dashboard.startsWith('/') || !sub.startsWith('/')) {
-            errEl.textContent = 'All paths must start with "/"';
-            errEl.classList.remove('hidden');
-            return;
-        }
-        
-        try {
-            const res = await fetch('/api/update-paths', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ login_path: login, dashboard_path: dashboard, sub_path: sub })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(data.detail || 'Failed to update paths');
-            
-            successEl.textContent = 'Paths updated. Restarting server...';
-            successEl.classList.remove('hidden');
-            
-            // بعد از 2 ثانیه صفحه را رفرش کن
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-            
-        } catch (e) {
-            errEl.textContent = e.message;
-            errEl.classList.remove('hidden');
-        }
-    }
-    
-    // بارگذاری مسیرهای فعلی
-    async function loadCurrentPaths() {
-        try {
-            const res = await fetch('/api/current-paths');
-            const data = await res.json();
-            document.getElementById('path-login').value = data.login_path || '/login';
-            document.getElementById('path-dashboard').value = data.dashboard_path || '/dashboard';
-            document.getElementById('path-sub').value = data.sub_path || '/sub';
-        } catch(e) {
-            console.error('Failed to load paths:', e);
-        }
-    }
-    
-    // بارگذاری هنگام باز شدن مدال
-    document.addEventListener('DOMContentLoaded', function() {
-        // وقتی مدال باز میشه، مسیرها رو بارگذاری کن
-        const modal = document.getElementById('pathSettingsModal');
-        if (modal) {
-            const observer = new MutationObserver(function(mutations) {
-                if (modal.classList.contains('active')) {
-                    loadCurrentPaths();
-                }
-            });
-            observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
-        }
-    });
-    
-</script>
-    <script src="https://unpkg.com/lucide@latest">
-    // ---- Path Settings ----
-    async function updatePaths() {
-        const login = document.getElementById('path-login').value.trim() || '/login';
-        const dashboard = document.getElementById('path-dashboard').value.trim() || '/dashboard';
-        const sub = document.getElementById('path-sub').value.trim() || '/sub';
-        const errEl = document.getElementById('pathSettingsError');
-        const successEl = document.getElementById('pathSettingsSuccess');
-        errEl.classList.add('hidden');
-        successEl.classList.add('hidden');
-        
-        // اعتبارسنجی
-        if (!login.startsWith('/') || !dashboard.startsWith('/') || !sub.startsWith('/')) {
-            errEl.textContent = 'All paths must start with "/"';
-            errEl.classList.remove('hidden');
-            return;
-        }
-        
-        try {
-            const res = await fetch('/api/update-paths', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ login_path: login, dashboard_path: dashboard, sub_path: sub })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(data.detail || 'Failed to update paths');
-            
-            successEl.textContent = 'Paths updated. Restarting server...';
-            successEl.classList.remove('hidden');
-            
-            // بعد از 2 ثانیه صفحه را رفرش کن
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-            
-        } catch (e) {
-            errEl.textContent = e.message;
-            errEl.classList.remove('hidden');
-        }
-    }
-    
-    // بارگذاری مسیرهای فعلی
-    async function loadCurrentPaths() {
-        try {
-            const res = await fetch('/api/current-paths');
-            const data = await res.json();
-            document.getElementById('path-login').value = data.login_path || '/login';
-            document.getElementById('path-dashboard').value = data.dashboard_path || '/dashboard';
-            document.getElementById('path-sub').value = data.sub_path || '/sub';
-        } catch(e) {
-            console.error('Failed to load paths:', e);
-        }
-    }
-    
-    // بارگذاری هنگام باز شدن مدال
-    document.addEventListener('DOMContentLoaded', function() {
-        // وقتی مدال باز میشه، مسیرها رو بارگذاری کن
-        const modal = document.getElementById('pathSettingsModal');
-        if (modal) {
-            const observer = new MutationObserver(function(mutations) {
-                if (modal.classList.contains('active')) {
-                    loadCurrentPaths();
-                }
-            });
-            observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
-        }
-    });
-    
-</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -457,75 +117,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 }
             }
         }
-    
-    // ---- Path Settings ----
-    async function updatePaths() {
-        const login = document.getElementById('path-login').value.trim() || '/login';
-        const dashboard = document.getElementById('path-dashboard').value.trim() || '/dashboard';
-        const sub = document.getElementById('path-sub').value.trim() || '/sub';
-        const errEl = document.getElementById('pathSettingsError');
-        const successEl = document.getElementById('pathSettingsSuccess');
-        errEl.classList.add('hidden');
-        successEl.classList.add('hidden');
-        
-        // اعتبارسنجی
-        if (!login.startsWith('/') || !dashboard.startsWith('/') || !sub.startsWith('/')) {
-            errEl.textContent = 'All paths must start with "/"';
-            errEl.classList.remove('hidden');
-            return;
-        }
-        
-        try {
-            const res = await fetch('/api/update-paths', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ login_path: login, dashboard_path: dashboard, sub_path: sub })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(data.detail || 'Failed to update paths');
-            
-            successEl.textContent = 'Paths updated. Restarting server...';
-            successEl.classList.remove('hidden');
-            
-            // بعد از 2 ثانیه صفحه را رفرش کن
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-            
-        } catch (e) {
-            errEl.textContent = e.message;
-            errEl.classList.remove('hidden');
-        }
-    }
-    
-    // بارگذاری مسیرهای فعلی
-    async function loadCurrentPaths() {
-        try {
-            const res = await fetch('/api/current-paths');
-            const data = await res.json();
-            document.getElementById('path-login').value = data.login_path || '/login';
-            document.getElementById('path-dashboard').value = data.dashboard_path || '/dashboard';
-            document.getElementById('path-sub').value = data.sub_path || '/sub';
-        } catch(e) {
-            console.error('Failed to load paths:', e);
-        }
-    }
-    
-    // بارگذاری هنگام باز شدن مدال
-    document.addEventListener('DOMContentLoaded', function() {
-        // وقتی مدال باز میشه، مسیرها رو بارگذاری کن
-        const modal = document.getElementById('pathSettingsModal');
-        if (modal) {
-            const observer = new MutationObserver(function(mutations) {
-                if (modal.classList.contains('active')) {
-                    loadCurrentPaths();
-                }
-            });
-            observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
-        }
-    });
-    
-</script>
+    </script>
     <style>
         body { background-color: #070a13; }
         .glow-effect { box-shadow: 0 0 25px rgba(59, 130, 246, 0.12); }
@@ -586,11 +178,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 Node Gateway Online
             </span>
-            <button onclick="toggleModal('pathSettingsModal', true)" class="text-slate-400 hover:text-slate-200 text-sm font-medium flex items-center gap-1.5">
-                    <i data-lucide="folder-edit" class="w-4 h-4"></i> Paths
-                </button>
-                
-              <button onclick="toggleModal('settingsModal', true)" class="text-slate-400 hover:text-slate-200 text-sm font-medium flex items-center gap-1.5">
+            <button onclick="toggleModal('settingsModal', true)" class="text-slate-400 hover:text-slate-200 text-sm font-medium flex items-center gap-1.5">
                   <i data-lucide="settings" class="w-4 h-4"></i> Settings
               </button>
             <button onclick="logout()" class="text-slate-400 hover:text-slate-200 text-sm font-medium flex items-center gap-1.5">
@@ -906,44 +494,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
       </div>
   </div>
 
-  
-    <!-- ===== MODAL: PATH SETTINGS ===== -->
-    <div id="pathSettingsModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl overflow-hidden modal-glow">
-            <div class="p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40">
-                <div class="flex items-center space-x-3">
-                    <div class="p-2 bg-purple-500/10 rounded-lg text-purple-400 border border-purple-500/20"><i data-lucide="folder-edit" class="w-5 h-5"></i></div>
-                    <div>
-                        <h3 class="text-lg font-bold text-slate-100">Path Settings</h3>
-                        <p class="text-xs text-slate-400">Change dashboard URLs (requires restart)</p>
-                    </div>
-                </div>
-                <button onclick="toggleModal('pathSettingsModal', false)" class="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Login Path</label>
-                    <input type="text" id="path-login" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-purple-500 transition" placeholder="/login">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dashboard Path</label>
-                    <input type="text" id="path-dashboard" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-purple-500 transition" placeholder="/dashboard">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Subscription Path</label>
-                    <input type="text" id="path-sub" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-purple-500 transition" placeholder="/sub">
-                </div>
-                <div id="pathSettingsError" class="text-xs text-red-400 hidden"></div>
-                <div id="pathSettingsSuccess" class="text-xs text-emerald-400 hidden"></div>
-            </div>
-            <div class="p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end space-x-3">
-                <button onclick="toggleModal('pathSettingsModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-xl transition">Cancel</button>
-                <button onclick="updatePaths()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">Save & Restart</button>
-            </div>
-        </div>
-    </div>
-    
-
   <!-- ===== MODAL: SETTINGS (Change Password) ===== -->
   <div id="settingsModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75">
       <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl overflow-hidden modal-glow">
@@ -1186,7 +736,7 @@ async function loadConfigs() {
                             <button onclick="copyLink('uri-${l.uuid}')" class="absolute right-2 top-1.5 p-1 text-slate-500 hover:text-slate-300 transition" title="Copy URI"><i data-lucide="copy" class="w-4 h-4"></i></button>
                         </div>
                         <button onclick="openQrModal('${label}', '${l.vless_link}')" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="QR"><i data-lucide="qr-code" class="w-4 h-4"></i></button>
-                          <button onclick="window.open('/sub/user?uuid=${l.uuid}', '_blank')" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Subscription Page"><i data-lucide="external-link" class="w-4 h-4"></i></button>
+                          <button onclick="window.open('/subs/user?uuid=${l.uuid}', '_blank')" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Subscription Page"><i data-lucide="external-link" class="w-4 h-4"></i></button>
                         <button onclick="openEditModal('${label}','${proto}','${l.fingerprint||'chrome'}','${l.alpn||''}',${l.limit_bytes ? (l.limit_bytes / 1024 / 1024) : 0},${l.expires_at ? Math.ceil((new Date(l.expires_at) - Date.now()) / (86400000)) : 0},${l.ip_limit||0},${l.speed_limit_bytes ? (l.speed_limit_bytes * 8 / 1024 / 1024) : 0},'${l.speed_limit_unit || 'MBIT'}','${l.uuid}')" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Edit"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
                         <button onclick="deleteConfig('${l.uuid}')" class="p-2 bg-red-800/20 hover:bg-red-800/40 border border-red-700/30 text-red-300 rounded-xl transition" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                     </div>
@@ -1347,74 +897,6 @@ loadConfigs();
 setInterval(updateStats, 5000);
 setInterval(loadConfigs, 15000);
 
-
-    // ---- Path Settings ----
-    async function updatePaths() {
-        const login = document.getElementById('path-login').value.trim() || '/login';
-        const dashboard = document.getElementById('path-dashboard').value.trim() || '/dashboard';
-        const sub = document.getElementById('path-sub').value.trim() || '/sub';
-        const errEl = document.getElementById('pathSettingsError');
-        const successEl = document.getElementById('pathSettingsSuccess');
-        errEl.classList.add('hidden');
-        successEl.classList.add('hidden');
-        
-        // اعتبارسنجی
-        if (!login.startsWith('/') || !dashboard.startsWith('/') || !sub.startsWith('/')) {
-            errEl.textContent = 'All paths must start with "/"';
-            errEl.classList.remove('hidden');
-            return;
-        }
-        
-        try {
-            const res = await fetch('/api/update-paths', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ login_path: login, dashboard_path: dashboard, sub_path: sub })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(data.detail || 'Failed to update paths');
-            
-            successEl.textContent = 'Paths updated. Restarting server...';
-            successEl.classList.remove('hidden');
-            
-            // بعد از 2 ثانیه صفحه را رفرش کن
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-            
-        } catch (e) {
-            errEl.textContent = e.message;
-            errEl.classList.remove('hidden');
-        }
-    }
-    
-    // بارگذاری مسیرهای فعلی
-    async function loadCurrentPaths() {
-        try {
-            const res = await fetch('/api/current-paths');
-            const data = await res.json();
-            document.getElementById('path-login').value = data.login_path || '/login';
-            document.getElementById('path-dashboard').value = data.dashboard_path || '/dashboard';
-            document.getElementById('path-sub').value = data.sub_path || '/sub';
-        } catch(e) {
-            console.error('Failed to load paths:', e);
-        }
-    }
-    
-    // بارگذاری هنگام باز شدن مدال
-    document.addEventListener('DOMContentLoaded', function() {
-        // وقتی مدال باز میشه، مسیرها رو بارگذاری کن
-        const modal = document.getElementById('pathSettingsModal');
-        if (modal) {
-            const observer = new MutationObserver(function(mutations) {
-                if (modal.classList.contains('active')) {
-                    loadCurrentPaths();
-                }
-            });
-            observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
-        }
-    });
-    
 </script>
 </body>
 </html>"""
@@ -1428,75 +910,7 @@ SUB_INFO_HTML = r"""<!DOCTYPE html>
 <title>Subscription Info · MX-UI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com">
-    // ---- Path Settings ----
-    async function updatePaths() {
-        const login = document.getElementById('path-login').value.trim() || '/login';
-        const dashboard = document.getElementById('path-dashboard').value.trim() || '/dashboard';
-        const sub = document.getElementById('path-sub').value.trim() || '/sub';
-        const errEl = document.getElementById('pathSettingsError');
-        const successEl = document.getElementById('pathSettingsSuccess');
-        errEl.classList.add('hidden');
-        successEl.classList.add('hidden');
-        
-        // اعتبارسنجی
-        if (!login.startsWith('/') || !dashboard.startsWith('/') || !sub.startsWith('/')) {
-            errEl.textContent = 'All paths must start with "/"';
-            errEl.classList.remove('hidden');
-            return;
-        }
-        
-        try {
-            const res = await fetch('/api/update-paths', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ login_path: login, dashboard_path: dashboard, sub_path: sub })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(data.detail || 'Failed to update paths');
-            
-            successEl.textContent = 'Paths updated. Restarting server...';
-            successEl.classList.remove('hidden');
-            
-            // بعد از 2 ثانیه صفحه را رفرش کن
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-            
-        } catch (e) {
-            errEl.textContent = e.message;
-            errEl.classList.remove('hidden');
-        }
-    }
-    
-    // بارگذاری مسیرهای فعلی
-    async function loadCurrentPaths() {
-        try {
-            const res = await fetch('/api/current-paths');
-            const data = await res.json();
-            document.getElementById('path-login').value = data.login_path || '/login';
-            document.getElementById('path-dashboard').value = data.dashboard_path || '/dashboard';
-            document.getElementById('path-sub').value = data.sub_path || '/sub';
-        } catch(e) {
-            console.error('Failed to load paths:', e);
-        }
-    }
-    
-    // بارگذاری هنگام باز شدن مدال
-    document.addEventListener('DOMContentLoaded', function() {
-        // وقتی مدال باز میشه، مسیرها رو بارگذاری کن
-        const modal = document.getElementById('pathSettingsModal');
-        if (modal) {
-            const observer = new MutationObserver(function(mutations) {
-                if (modal.classList.contains('active')) {
-                    loadCurrentPaths();
-                }
-            });
-            observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
-        }
-    });
-    
-</script>
+<script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {{
     theme: {{
@@ -1508,74 +922,6 @@ tailwind.config = {{
         }}
     }}
 }}
-
-    // ---- Path Settings ----
-    async function updatePaths() {
-        const login = document.getElementById('path-login').value.trim() || '/login';
-        const dashboard = document.getElementById('path-dashboard').value.trim() || '/dashboard';
-        const sub = document.getElementById('path-sub').value.trim() || '/sub';
-        const errEl = document.getElementById('pathSettingsError');
-        const successEl = document.getElementById('pathSettingsSuccess');
-        errEl.classList.add('hidden');
-        successEl.classList.add('hidden');
-        
-        // اعتبارسنجی
-        if (!login.startsWith('/') || !dashboard.startsWith('/') || !sub.startsWith('/')) {
-            errEl.textContent = 'All paths must start with "/"';
-            errEl.classList.remove('hidden');
-            return;
-        }
-        
-        try {
-            const res = await fetch('/api/update-paths', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ login_path: login, dashboard_path: dashboard, sub_path: sub })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(data.detail || 'Failed to update paths');
-            
-            successEl.textContent = 'Paths updated. Restarting server...';
-            successEl.classList.remove('hidden');
-            
-            // بعد از 2 ثانیه صفحه را رفرش کن
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-            
-        } catch (e) {
-            errEl.textContent = e.message;
-            errEl.classList.remove('hidden');
-        }
-    }
-    
-    // بارگذاری مسیرهای فعلی
-    async function loadCurrentPaths() {
-        try {
-            const res = await fetch('/api/current-paths');
-            const data = await res.json();
-            document.getElementById('path-login').value = data.login_path || '/login';
-            document.getElementById('path-dashboard').value = data.dashboard_path || '/dashboard';
-            document.getElementById('path-sub').value = data.sub_path || '/sub';
-        } catch(e) {
-            console.error('Failed to load paths:', e);
-        }
-    }
-    
-    // بارگذاری هنگام باز شدن مدال
-    document.addEventListener('DOMContentLoaded', function() {
-        // وقتی مدال باز میشه، مسیرها رو بارگذاری کن
-        const modal = document.getElementById('pathSettingsModal');
-        if (modal) {
-            const observer = new MutationObserver(function(mutations) {
-                if (modal.classList.contains('active')) {
-                    loadCurrentPaths();
-                }
-            });
-            observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
-        }
-    });
-    
 </script>
 <style>
 body {{ background-color: #070a13; }}
@@ -1655,75 +1001,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
 <title>Subscription · MX-UI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com">
-    // ---- Path Settings ----
-    async function updatePaths() {
-        const login = document.getElementById('path-login').value.trim() || '/login';
-        const dashboard = document.getElementById('path-dashboard').value.trim() || '/dashboard';
-        const sub = document.getElementById('path-sub').value.trim() || '/sub';
-        const errEl = document.getElementById('pathSettingsError');
-        const successEl = document.getElementById('pathSettingsSuccess');
-        errEl.classList.add('hidden');
-        successEl.classList.add('hidden');
-        
-        // اعتبارسنجی
-        if (!login.startsWith('/') || !dashboard.startsWith('/') || !sub.startsWith('/')) {
-            errEl.textContent = 'All paths must start with "/"';
-            errEl.classList.remove('hidden');
-            return;
-        }
-        
-        try {
-            const res = await fetch('/api/update-paths', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ login_path: login, dashboard_path: dashboard, sub_path: sub })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(data.detail || 'Failed to update paths');
-            
-            successEl.textContent = 'Paths updated. Restarting server...';
-            successEl.classList.remove('hidden');
-            
-            // بعد از 2 ثانیه صفحه را رفرش کن
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-            
-        } catch (e) {
-            errEl.textContent = e.message;
-            errEl.classList.remove('hidden');
-        }
-    }
-    
-    // بارگذاری مسیرهای فعلی
-    async function loadCurrentPaths() {
-        try {
-            const res = await fetch('/api/current-paths');
-            const data = await res.json();
-            document.getElementById('path-login').value = data.login_path || '/login';
-            document.getElementById('path-dashboard').value = data.dashboard_path || '/dashboard';
-            document.getElementById('path-sub').value = data.sub_path || '/sub';
-        } catch(e) {
-            console.error('Failed to load paths:', e);
-        }
-    }
-    
-    // بارگذاری هنگام باز شدن مدال
-    document.addEventListener('DOMContentLoaded', function() {
-        // وقتی مدال باز میشه، مسیرها رو بارگذاری کن
-        const modal = document.getElementById('pathSettingsModal');
-        if (modal) {
-            const observer = new MutationObserver(function(mutations) {
-                if (modal.classList.contains('active')) {
-                    loadCurrentPaths();
-                }
-            });
-            observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
-        }
-    });
-    
-</script>
+<script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {{
     theme: {{
@@ -1735,74 +1013,6 @@ tailwind.config = {{
         }}
     }}
 }}
-
-    // ---- Path Settings ----
-    async function updatePaths() {
-        const login = document.getElementById('path-login').value.trim() || '/login';
-        const dashboard = document.getElementById('path-dashboard').value.trim() || '/dashboard';
-        const sub = document.getElementById('path-sub').value.trim() || '/sub';
-        const errEl = document.getElementById('pathSettingsError');
-        const successEl = document.getElementById('pathSettingsSuccess');
-        errEl.classList.add('hidden');
-        successEl.classList.add('hidden');
-        
-        // اعتبارسنجی
-        if (!login.startsWith('/') || !dashboard.startsWith('/') || !sub.startsWith('/')) {
-            errEl.textContent = 'All paths must start with "/"';
-            errEl.classList.remove('hidden');
-            return;
-        }
-        
-        try {
-            const res = await fetch('/api/update-paths', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ login_path: login, dashboard_path: dashboard, sub_path: sub })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(data.detail || 'Failed to update paths');
-            
-            successEl.textContent = 'Paths updated. Restarting server...';
-            successEl.classList.remove('hidden');
-            
-            // بعد از 2 ثانیه صفحه را رفرش کن
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-            
-        } catch (e) {
-            errEl.textContent = e.message;
-            errEl.classList.remove('hidden');
-        }
-    }
-    
-    // بارگذاری مسیرهای فعلی
-    async function loadCurrentPaths() {
-        try {
-            const res = await fetch('/api/current-paths');
-            const data = await res.json();
-            document.getElementById('path-login').value = data.login_path || '/login';
-            document.getElementById('path-dashboard').value = data.dashboard_path || '/dashboard';
-            document.getElementById('path-sub').value = data.sub_path || '/sub';
-        } catch(e) {
-            console.error('Failed to load paths:', e);
-        }
-    }
-    
-    // بارگذاری هنگام باز شدن مدال
-    document.addEventListener('DOMContentLoaded', function() {
-        // وقتی مدال باز میشه، مسیرها رو بارگذاری کن
-        const modal = document.getElementById('pathSettingsModal');
-        if (modal) {
-            const observer = new MutationObserver(function(mutations) {
-                if (modal.classList.contains('active')) {
-                    loadCurrentPaths();
-                }
-            });
-            observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
-        }
-    });
-    
 </script>
 <style>
 body {{ background-color: #070a13; }}

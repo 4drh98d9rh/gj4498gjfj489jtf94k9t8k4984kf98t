@@ -382,7 +382,7 @@ async def health():
     return {"status": "ok", "connections": len(connections), "uptime": uptime()}
 
 # ── Subscription (single link) ────────────────────────────────────────────────
-@app.get("/sub/user")
+@app.get("/subs/user")
 async def subscription_user(request: Request, uuid: str = Query(...)):
     from pages import SUB_USER_HTML
     async with LINKS_LOCK:
@@ -427,7 +427,7 @@ async def subscription_user(request: Request, uuid: str = Query(...)):
         watermark="Created by Muvixo"
     ))
 
-@app.get("/sub/{uuid}")
+@app.get("/subs/{uuid}")
 async def subscription_single(uuid: str, request: Request):
     import base64
     async with LINKS_LOCK:
@@ -440,7 +440,7 @@ async def subscription_single(uuid: str, request: Request):
     return Response(content=content, media_type="text/plain",
                     headers={"profile-title": quote(link["label"]), "support-url": "https://t.me/Farajian2004f"})
 
-@app.get("/sub/{uuid}/info", response_class=HTMLResponse)
+@app.get("/subs/{uuid}/info", response_class=HTMLResponse)
 async def subscription_info(uuid: str, request: Request):
     from pages import SUB_INFO_HTML
     async with LINKS_LOCK:
@@ -456,12 +456,12 @@ async def subscription_info(uuid: str, request: Request):
         expires_at=link.get("expires_at", "No expiry"),
         active=link.get("active", True),
         vless_link=vless_link_for_link(link, uuid, host),
-        sub_url=f"https://{host}/sub/{uuid}",
+        sub_url=f"https://{host}/subs/{uuid}",
         watermark="Created by Muvixo"
     ))
 
 # ── NEW: Public subscription details page ──────────────────────────────────
-@app.get("/sub-all")
+@app.get("/subs-all")
 async def subscription_all(request: Request, _=Depends(require_auth)):
     import base64
     host = get_host(request)
@@ -756,8 +756,8 @@ async def create_link(request: Request, _=Depends(require_auth)):
         **link,
         "expired": False,
         "vless_link": vless_link_for_link(link, uid, host),
-        "sub_url": f"https://{host}/sub/{uid}",
-        "info_url": f"https://{host}/sub/{uid}/info",
+        "sub_url": f"https://{host}/subs/{uid}",
+        "info_url": f"https://{host}/subs/{uid}/info",
     }
 
 @app.get("/api/links")
@@ -774,8 +774,8 @@ async def list_links(request: Request, _=Depends(require_auth)):
             "protocol": proto,
             "expired": is_link_expired(d),
             "vless_link": vless_link_for_link(d, uid, host),
-            "sub_url": f"https://{host}/sub/{uid}",
-            "info_url": f"https://{host}/sub/{uid}/info",
+            "sub_url": f"https://{host}/subs/{uid}",
+            "info_url": f"https://{host}/subs/{uid}/info",
             "connected_ips": len(unique_ips_for_uuid(uid)),
         })
     result.sort(key=lambda x: x["created_at"], reverse=True)
