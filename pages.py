@@ -474,7 +474,24 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     </div>
 </div>
 
-<!-- ===== ALERT ===== -->
+<!-- ===== MODAL: CONFIRM (custom, no browser confirm()) ===== -->
+  <div id="confirmModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80">
+      <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden modal-glow p-6 text-center space-y-4">
+          <div class="mx-auto w-12 h-12 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
+              <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+          </div>
+          <div class="space-y-1">
+              <h3 class="text-base font-bold text-slate-100">Confirm Action</h3>
+              <p id="confirmMessage" class="text-xs text-slate-400 leading-relaxed px-2">Are you sure?</p>
+          </div>
+          <div class="flex gap-3">
+              <button onclick="_confirmNo()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition">Cancel</button>
+              <button onclick="_confirmYes()" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-xl transition">Delete</button>
+          </div>
+      </div>
+  </div>
+
+  <!-- ===== ALERT ===== -->
 <div id="customAlert" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80">
     <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden modal-glow p-6 text-center space-y-4">
         <div class="mx-auto w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/30 fill-none flex items-center justify-center text-blue-400">
@@ -490,6 +507,25 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
 <script>
 lucide.createIcons();
+
+  // ---- Custom confirm (replaces window.confirm) ----
+  let _confirmResolve = null;
+  function customConfirm(message) {
+      document.getElementById('confirmMessage').textContent = message;
+      toggleModal('confirmModal', true);
+      return new Promise((resolve) => { _confirmResolve = resolve; });
+  }
+  function _confirmYes() {
+      toggleModal('confirmModal', false);
+      if (_confirmResolve) _confirmResolve(true);
+      _confirmResolve = null;
+  }
+  function _confirmNo() {
+      toggleModal('confirmModal', false);
+      if (_confirmResolve) _confirmResolve(false);
+      _confirmResolve = null;
+  }
+
 
 // Modal toggles
 function toggleModal(modalId, show) {
@@ -854,14 +890,14 @@ body {{ background-color: #070a13; }}
             <p class="text-xs text-slate-400 mb-2">VLESS Link (copy to client):</p>
             <div class="flex items-center gap-2">
                 <input type="text" readonly value="{vless_link}" class="flex-1 bg-slate-950 border border-slate-800/80 rounded-xl px-3 py-2 text-xs font-mono text-slate-400 focus:outline-none select-all truncate">
-                <button onclick="navigator.clipboard.writeText('{vless_link}').then(()=>alert('Copied!'))" class="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+                <button onclick="copyToClipboard('{vless_link}')" class="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
             </div>
         </div>
         <div class="mt-4 p-4 bg-slate-950/60 border border-slate-800/60 rounded-xl">
             <p class="text-xs text-slate-400 mb-2">Subscription URL (for clients):</p>
             <div class="flex items-center gap-2">
                 <input type="text" readonly value="{sub_url}" class="flex-1 bg-slate-950 border border-slate-800/80 rounded-xl px-3 py-2 text-xs font-mono text-slate-400 focus:outline-none select-all truncate">
-                <button onclick="navigator.clipboard.writeText('{sub_url}').then(()=>alert('Copied!'))" class="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+                <button onclick="copyToClipboard('{sub_url}')" class="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
             </div>
         </div>
         <div class="mt-8 text-center text-xs text-slate-500 border-t border-slate-800/60 pt-4">
@@ -982,7 +1018,7 @@ body {{ background-color: #070a13; }}
             <p class="text-xs text-slate-400 mb-2">VLESS Link:</p>
             <div class="flex items-center gap-2">
                 <input type="text" readonly value="{vless_link}" class="flex-1 bg-slate-950 border border-slate-800/80 rounded-xl px-3 py-2 text-xs font-mono text-slate-400 focus:outline-none select-all truncate">
-                <button onclick="navigator.clipboard.writeText('{vless_link}').then(()=>alert('Copied!'))" class="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+                <button onclick="copyToClipboard('{vless_link}')" class="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
             </div>
         </div>
 
