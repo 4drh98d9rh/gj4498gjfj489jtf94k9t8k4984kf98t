@@ -842,11 +842,11 @@ body {{ background-color: #070a13; }}
             </div>
             <div class="flex justify-between border-b border-slate-800/60 pb-2">
                 <span class="text-slate-400">Expiry</span>
-                <span class="font-mono text-slate-200">{expires_at}</span>
+                <span class="font-mono text-rose-300">{expires_at}</span>
             </div>
             <div class="flex justify-between border-b border-slate-800/60 pb-2">
                 <span class="text-slate-400">Status</span>
-                <span class="font-mono text-slate-200">{'Active' if active else 'Inactive'}</span>
+                <span class="font-mono">{'Active' if active else 'Inactive'}</span>
             </div>
         </div>
 
@@ -930,19 +930,19 @@ body {{ background-color: #070a13; }}
             </div>
             <div class="flex justify-between border-b border-slate-800/60 pb-2">
                 <span class="text-slate-400">Status</span>
-                <span class="font-mono text-slate-200">{status}</span>
+                <span class="font-mono">{status}</span>
             </div>
             <div class="flex justify-between border-b border-slate-800/60 pb-2">
                 <span class="text-slate-400">Downloaded</span>
-                <span class="font-mono text-slate-200">{downloaded}</span>
+                <span class="font-mono text-blue-300">{downloaded}</span>
             </div>
             <div class="flex justify-between border-b border-slate-800/60 pb-2">
                 <span class="text-slate-400">Uploaded</span>
-                <span class="font-mono text-slate-200">{uploaded}</span>
+                <span class="font-mono text-purple-300">{uploaded}</span>
             </div>
             <div class="flex justify-between border-b border-slate-800/60 pb-2">
                 <span class="text-slate-400">Usage</span>
-                <span class="font-mono text-slate-200">{usage} / {total_quota}</span>
+                <span class="font-mono text-amber-300">{usage} / {total_quota}</span>
             </div>
             <div class="flex justify-between border-b border-slate-800/60 pb-2">
                 <span class="text-slate-400">Total quota</span>
@@ -950,19 +950,19 @@ body {{ background-color: #070a13; }}
             </div>
             <div class="flex justify-between border-b border-slate-800/60 pb-2">
                 <span class="text-slate-400">Remained</span>
-                <span class="font-mono text-slate-200">{remained}</span>
+                <span class="font-mono text-emerald-300">{remained}</span>
             </div>
             <div class="flex justify-between border-b border-slate-800/60 pb-2">
                 <span class="text-slate-400">Last Online</span>
-                <span class="font-mono text-slate-200">{last_online}</span>
+                <span class="font-mono text-slate-300">{last_online}</span>
             </div>
             <div class="flex justify-between border-b border-slate-800/60 pb-2">
                 <span class="text-slate-400">Expiry</span>
-                <span class="font-mono text-slate-200">{expiry}</span>
+                <span class="font-mono text-rose-300">{expiry}</span>
             </div>
             <div class="flex justify-between border-b border-slate-800/60 pb-2">
                 <span class="text-slate-400">IP(s) connected</span>
-                <span class="font-mono text-slate-200">{ips}</span>
+                <span class="font-mono text-cyan-300">{ips}</span>
             </div>
         </div>
 
