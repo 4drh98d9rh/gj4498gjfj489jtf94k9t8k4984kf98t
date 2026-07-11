@@ -399,6 +399,8 @@ async def subscription_user(request: Request, uuid: str = Query(...)):
     ips = unique_ips_for_uuid(uuid)
     ip_display = ", ".join(ips) if ips else "No active connections"
     status_text = "Active" if active else "Inactive"
+    status_color = "text-emerald-400" if active else "text-red-400"
+    status_html = f'<span class="{status_color} font-semibold">{status_text}</span>'
     quota_str = "∞" if limit == 0 else fmt_bytes(limit)
     remained = "∞" if limit == 0 else fmt_bytes(max(0, limit - used))
     usage_pct = 0 if limit == 0 else min(100, (used / limit) * 100)
@@ -410,7 +412,7 @@ async def subscription_user(request: Request, uuid: str = Query(...)):
         label=link.get("label", "Unknown"),
         vless_link=vless,
         qr_url=qr_url,
-        status=status_text,
+        status=status_html,
         downloaded=downloaded,
         uploaded=uploaded,
         usage=fmt_bytes(used),
