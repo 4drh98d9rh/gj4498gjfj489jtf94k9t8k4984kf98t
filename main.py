@@ -482,7 +482,7 @@ async def api_login(request: Request):
     token = await create_session()
     log_activity("auth", f"Successful login from {ip}", "ok")
     resp = JSONResponse({"ok": True})
-    # Force secure=True because Railway uses HTTPS
+    secure = request.url.scheme == "https"
     resp.set_cookie(
         SESSION_COOKIE,
         token,
@@ -490,10 +490,10 @@ async def api_login(request: Request):
         httponly=True,
         samesite="lax",
         path="/",
-        secure=True,   # <-- hardcoded for HTTPS
+        secure=secure,
     )
-    
     return resp
+
 @app.post("/api/logout")
 async def api_logout(request: Request):
     await destroy_session(request.cookies.get(SESSION_COOKIE))
