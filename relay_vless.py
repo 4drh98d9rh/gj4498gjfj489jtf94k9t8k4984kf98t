@@ -60,6 +60,7 @@ async def check_and_use(uid: str, n: int) -> bool:
         if not is_link_allowed(link):
             return False
         link["used_bytes"] += n
+        link["last_used"] = datetime.now().isoformat()
         stats["total_bytes"] += n
         hourly_traffic[now_ir().strftime("%H:00")] += n
     return True

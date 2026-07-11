@@ -6,12 +6,11 @@ Modern VLESS/XHTTP tunnel gateway with a beautiful dashboard, per‑config subsc
 
 - VLESS over WebSocket and XHTTP (packet‑up, stream‑up)
 - HTTP proxy
-- Full management dashboard with live stats, hourly traffic charts, active connections, error logs
+- Full management dashboard with live system stats (CPU, RAM, Swap, Storage)
 - Unlimited configs with per‑link traffic, speed, IP limit, expiry, and active/inactive toggle
 - QR code for each link and subscription
 - Fingerprint (uTLS) and ALPN per config
-- Customisable port per config
-- Subscription info page per config (shows volume, UUID, usage, expiry)
+- Public subscription info page: `/sub/user?uuid=<uuid>` shows detailed usage, QR, and IPs
 - Persistent state on disk (requires a persistent volume for `/data`)
 
 ## Deploy
@@ -34,7 +33,7 @@ Modern VLESS/XHTTP tunnel gateway with a beautiful dashboard, per‑config subsc
 - Dashboard: `https://your‑domain/dashboard`
 - Login with password `MUVIXO` (or your custom one)
 - Create configs, copy their subscription links, view usage, and manage them via the UI.
-
+- End users can view their subscription info at: `https://your‑domain/sub/user?uuid=<uuid>`
 
 ---
 

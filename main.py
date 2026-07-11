@@ -7,13 +7,13 @@ import time
 import aiofiles
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-from urllib.parse import quote
+from urllib.parse import quote, parse_qs
 from collections import deque, defaultdict
 from pathlib import Path
 
 import psutil
 
-from fastapi import FastAPI, Request, HTTPException, WebSocket, WebSocketDisconnect, Depends
+from fastapi import FastAPI, Request, HTTPException, WebSocket, WebSocketDisconnect, Depends, Query
 from fastapi.responses import Response, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -119,8 +119,7 @@ DEFAULT_ALPN_BY_PROTOCOL = {
     "xhttp-packet-up": "h2,http/1.1",
     "xhttp-stream-up": "h2,http/1.1",
 }
-DEFAULT_PORT = 443
-MIN_PORT, MAX_PORT = 1, 65535
+DEFAULT_PORT = 443  # fixed, not changeable
 DEFAULT_SPEED_LIMIT = 0
 
 def log_activity(kind: str, message: str, level: str = "info"):
@@ -215,15 +214,13 @@ def generate_vless_link(
     protocol: str = DEFAULT_PROTOCOL,
     fingerprint: str | None = None,
     alpn: str | None = None,
-    port: int | None = None,
+    port: int = DEFAULT_PORT,  # always 443
 ) -> str:
     fp = (fingerprint or DEFAULT_FINGERPRINT).strip() or DEFAULT_FINGERPRINT
     if fp not in FINGERPRINTS:
         fp = DEFAULT_FINGERPRINT
     alpn_val = (alpn or "").strip() or DEFAULT_ALPN_BY_PROTOCOL.get(protocol, "http/1.1")
-    port_val = port or DEFAULT_PORT
-    if not (MIN_PORT <= port_val <= MAX_PORT):
-        port_val = DEFAULT_PORT
+    port_val = DEFAULT_PORT  # fixed
 
     if protocol == "vless-ws":
         path = f"/ws/{uuid}"
@@ -262,7 +259,6 @@ def vless_link_for_link(link: dict, uid: str, host: str) -> str:
         protocol=proto,
         fingerprint=link.get("fingerprint"),
         alpn=link.get("alpn"),
-        port=link.get("port"),
     )
 
 def uptime() -> str:
@@ -316,6 +312,12 @@ def fmt_bytes(b: int) -> str:
     if b < 1024**3: return f"{b/1024**2:.2f} MB"
     return f"{b/1024**3:.2f} GB"
 
+def fmt_bytes_short(b: int) -> str:
+    if b < 1024: return f"{b} B"
+    if b < 1024**2: return f"{b/1024:.0f} KB"
+    if b < 1024**3: return f"{b/1024**2:.0f} MB"
+    return f"{b/1024**3:.2f} GB"
+
 def unique_ips_for_uuid(uuid: str) -> set:
     return {c.get("ip") for c in connections.values() if c.get("uuid") == uuid and c.get("ip")}
 
@@ -363,9 +365,9 @@ async def ensure_default_link():
                     "protocol": DEFAULT_PROTOCOL,
                     "fingerprint": DEFAULT_FINGERPRINT,
                     "alpn": "",
-                    "port": DEFAULT_PORT,
                     "ip_limit": 0,
                     "speed_limit_bytes": DEFAULT_SPEED_LIMIT,
+                    "last_used": None,
                 }
                 asyncio.create_task(save_state())
         _default_link_created = True
@@ -410,6 +412,52 @@ async def subscription_info(uuid: str, request: Request):
         active=link.get("active", True),
         vless_link=vless_link_for_link(link, uuid, host),
         sub_url=f"https://{host}/sub/{uuid}",
+        watermark="Created by Muvixo"
+    ))
+
+# ── NEW: Public subscription details page ──────────────────────────────────
+@app.get("/sub/user")
+async def subscription_user(request: Request, uuid: str = Query(...)):
+    from pages import SUB_USER_HTML
+    async with LINKS_LOCK:
+        link = LINKS.get(uuid)
+    if not link:
+        raise HTTPException(status_code=404, detail="not found")
+    host = get_host(request)
+    vless = vless_link_for_link(link, uuid, host)
+    used = link.get("used_bytes", 0)
+    limit = link.get("limit_bytes", 0)
+    active = is_link_allowed(link)
+    expiry = link.get("expires_at", "No expiry")
+    last_online = link.get("last_used", "Never")
+    ips = unique_ips_for_uuid(uuid)
+    ip_display = ", ".join(ips) if ips else "No active connections"
+    status_text = "Active" if active else "Inactive"
+    quota_str = "∞" if limit == 0 else fmt_bytes(limit)
+    remained = "∞" if limit == 0 else fmt_bytes(max(0, limit - used))
+    usage_pct = 0 if limit == 0 else min(100, (used / limit) * 100)
+    # For "Downloaded" and "Uploaded" we only track total, so we show total as downloaded, uploaded as 0
+    downloaded = fmt_bytes(used)
+    uploaded = "0 B"  # could be extended later
+    # QR code link
+    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={quote(vless)}"
+    return HTMLResponse(content=SUB_USER_HTML.format(
+        uuid=uuid,
+        label=link.get("label", "Unknown"),
+        vless_link=vless,
+        qr_url=qr_url,
+        status=status_text,
+        downloaded=downloaded,
+        uploaded=uploaded,
+        usage=fmt_bytes(used),
+        total_quota=quota_str,
+        remained=remained,
+        last_online=last_online,
+        expiry=expiry,
+        ips=ip_display,
+        usage_pct=round(usage_pct, 1),
+        used_fmt=fmt_bytes(used),
+        limit_fmt=quota_str,
         watermark="Created by Muvixo"
     ))
 
@@ -474,10 +522,10 @@ async def get_stats(_=Depends(require_auth)):
         snap = dict(LINKS)
     # System stats
     cpu_percent = psutil.cpu_percent(interval=0.1)
+    cpu_count = psutil.cpu_count(logical=True)
     ram = psutil.virtual_memory()
-    ram_percent = ram.percent
-    ram_used_mb = ram.used // (1024 * 1024)
-
+    swap = psutil.swap_memory()
+    disk = psutil.disk_usage('/')
     total_links = len(snap)
     active_links = sum(1 for l in snap.values() if is_link_allowed(l))
     total_traffic_mb = round(stats["total_bytes"] / (1024 ** 2), 2)
@@ -495,9 +543,16 @@ async def get_stats(_=Depends(require_auth)):
         "active_links": active_links,
         "expired_links": sum(1 for l in snap.values() if is_link_expired(l)),
         "cpu_percent": round(cpu_percent, 1),
-        "ram_percent": ram_percent,
-        "ram_used_mb": ram_used_mb,
+        "cpu_cores": cpu_count,
+        "ram_used_mb": ram.used // (1024 * 1024),
         "ram_total_mb": ram.total // (1024 * 1024),
+        "ram_percent": ram.percent,
+        "swap_used_mb": swap.used // (1024 * 1024),
+        "swap_total_mb": swap.total // (1024 * 1024),
+        "swap_percent": swap.percent,
+        "disk_used_gb": round(disk.used / (1024**3), 2),
+        "disk_total_gb": round(disk.total / (1024**3), 2),
+        "disk_percent": disk.percent,
     }
 
 @app.get("/api/activity")
@@ -564,7 +619,6 @@ async def make_link(
     protocol: str = DEFAULT_PROTOCOL,
     fingerprint: str = DEFAULT_FINGERPRINT,
     alpn: str = "",
-    port: int = DEFAULT_PORT,
     ip_limit: int = 0,
     speed_limit_bytes: int = 0,
 ) -> tuple[str, dict]:
@@ -573,8 +627,6 @@ async def make_link(
     fingerprint = (fingerprint or DEFAULT_FINGERPRINT).strip().lower()
     if fingerprint not in FINGERPRINTS:
         fingerprint = DEFAULT_FINGERPRINT
-    if not (MIN_PORT <= port <= MAX_PORT):
-        port = DEFAULT_PORT
     uid = generate_uuid()
     async with LINKS_LOCK:
         LINKS[uid] = {
@@ -589,9 +641,9 @@ async def make_link(
             "protocol": protocol,
             "fingerprint": fingerprint,
             "alpn": (alpn or "").strip()[:100],
-            "port": port,
             "ip_limit": max(0, ip_limit),
             "speed_limit_bytes": max(0, speed_limit_bytes),
+            "last_used": None,
         }
     asyncio.create_task(save_state())
     log_activity("link", f"Config «{LINKS[uid]['label']}» created", "ok")
@@ -626,16 +678,12 @@ async def create_link(request: Request, _=Depends(require_auth)):
     exp_days = int(body.get("expires_days") or 0)
     expires_at = (datetime.now() + timedelta(days=exp_days)).isoformat() if exp_days > 0 else None
     try:
-        port = int(body.get("port") or DEFAULT_PORT)
-    except (TypeError, ValueError):
-        port = DEFAULT_PORT
-    try:
         ip_limit = int(body.get("ip_limit") or 0)
     except (TypeError, ValueError):
         ip_limit = 0
 
     sv = float(body.get("speed_limit_value") or 0)
-    su = body.get("speed_limit_unit") or "MBIT"
+    su = body.get("speed_limit_unit") or "MBIT"  # can be KB, MB, MBIT
     speed_limit_bytes = 0 if sv <= 0 else parse_speed_to_bytes(sv, su)
 
     uid, link = await make_link(
@@ -646,7 +694,6 @@ async def create_link(request: Request, _=Depends(require_auth)):
         protocol=body.get("protocol") or DEFAULT_PROTOCOL,
         fingerprint=body.get("fingerprint") or DEFAULT_FINGERPRINT,
         alpn=body.get("alpn") or "",
-        port=port,
         ip_limit=ip_limit,
         speed_limit_bytes=speed_limit_bytes,
     )
@@ -712,12 +759,6 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
             link["fingerprint"] = fp if fp in FINGERPRINTS else DEFAULT_FINGERPRINT
         if "alpn" in body:
             link["alpn"] = str(body.get("alpn") or "").strip()[:100]
-        if "port" in body:
-            try:
-                p = int(body.get("port") or DEFAULT_PORT)
-            except (TypeError, ValueError):
-                p = DEFAULT_PORT
-            link["port"] = p if (MIN_PORT <= p <= MAX_PORT) else DEFAULT_PORT
         if "ip_limit" in body:
             try:
                 il = int(body.get("ip_limit") or 0)
@@ -730,7 +771,7 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
             link["speed_limit_bytes"] = 0 if sv <= 0 else parse_speed_to_bytes(sv, su)
             from speed_limit import reset_bucket
             reset_bucket(uid)
-        if any(k in body for k in ("label", "note", "limit_value", "expires_days", "fingerprint", "alpn", "port", "ip_limit", "speed_limit_value")):
+        if any(k in body for k in ("label", "note", "limit_value", "expires_days", "fingerprint", "alpn", "ip_limit", "speed_limit_value")):
             log_activity("link", f"Config «{link['label']}» updated", "info")
     asyncio.create_task(save_state())
     return {"ok": True}
@@ -743,7 +784,7 @@ async def delete_link(uid: str, _=Depends(require_auth)):
     return {"ok": True, "deleted": uid}
 
 # ── VLESS Relay ──────────────────────────────────────────────────────────────
-from relay_vless import websocket_tunnel
+from relay_vless import websocket_tunnel, check_and_use as relay_check_and_use
 app.add_api_websocket_route("/ws/{uuid}", websocket_tunnel)
 
 # ── XHTTP ─────────────────────────────────────────────────────────────────────
