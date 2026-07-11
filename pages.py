@@ -869,9 +869,6 @@ body {{ background-color: #070a13; }}
         </div>
     </div>
 </div>
-<footer class="border-t border-slate-800/60 bg-slate-950 py-3 text-center text-xs text-slate-500">
-    {watermark}
-</footer>
 </body>
 </html>"""
 
@@ -994,8 +991,5 @@ body {{ background-color: #070a13; }}
         </div>
     </div>
 </div>
-<footer class="border-t border-slate-800/60 bg-slate-950 py-3 text-center text-xs text-slate-500">
-    {watermark}
-</footer>
 </body>
 </html>"""
