@@ -13,20 +13,20 @@ LOGIN_HTML = r"""<!DOCTYPE html>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
-tailwind.config = {{
-    theme: {{
-        extend: {{
-            fontFamily: {{
+tailwind.config = {
+    theme: {
+        extend: {
+            fontFamily: {
                 sans: ['Inter', 'sans-serif'],
                 mono: ['JetBrains Mono', 'monospace'],
-            }}
-        }}
-    }}
-}}
+            }
+        }
+    }
+}
 </script>
 <style>
-body {{ background-color: #070a13; }}
-.glow-effect {{ box-shadow: 0 0 25px rgba(59, 130, 246, 0.12); }}
+body { background-color: #070a13; }
+.glow-effect { box-shadow: 0 0 25px rgba(59, 130, 246, 0.12); }
 </style>
 </head>
 <body class="font-sans text-slate-200 min-h-screen flex items-center justify-center bg-[#070a13] relative antialiased tracking-tight p-4">
@@ -65,31 +65,31 @@ body {{ background-color: #070a13; }}
     </div>
 </div>
 <script>
-document.getElementById('loginForm').addEventListener('submit', async (e) => {{
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
     const err = document.getElementById('errorMsg');
     err.classList.add('hidden');
     btn.disabled = true;
     btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Signing in...';
-    try {{
-        const res = await fetch('/api/login', {{
+    try {
+        const res = await fetch('/api/login', {
             method: 'POST',
-            headers: {{ 'Content-Type': 'application/json' }},
-            body: JSON.stringify({{ password: document.getElementById('pw').value }})
-        }});
-        if (!res.ok) {{
-            const data = await res.json().catch(() => ({{}}));
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: document.getElementById('pw').value })
+        });
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
             throw new Error(data.detail || 'Invalid password');
-        }}
+        }
         location.href = '/dashboard';
-    }} catch (e) {{
+    } catch (e) {
         err.textContent = e.message;
         err.classList.remove('hidden');
         btn.disabled = false;
         btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Sign In';
-    }}
-}});
+    }
+});
 </script>
 </body>
 </html>"""
@@ -107,34 +107,34 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script>
-        tailwind.config = {{
-            theme: {{
-                extend: {{
-                    fontFamily: {{
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
-                    }}
-                }}
-            }}
-        }}
+                    }
+                }
+            }
+        }
     </script>
     <style>
-        body {{ background-color: #070a13; }}
-        .glow-effect {{ box-shadow: 0 0 25px rgba(59, 130, 246, 0.12); }}
-        .modal-glow {{ box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 50px rgba(59, 130, 246, 0.05); }}
-        .circle-chart {{ transition: stroke-dasharray 0.35s ease; transform: rotate(-90deg); transform-origin: 50% 50%; }}
-        .custom-modal-overlay {{
+        body { background-color: #070a13; }
+        .glow-effect { box-shadow: 0 0 25px rgba(59, 130, 246, 0.12); }
+        .modal-glow { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 50px rgba(59, 130, 246, 0.05); }
+        .circle-chart { transition: stroke-dasharray 0.35s ease; transform: rotate(-90deg); transform-origin: 50% 50%; }
+        .custom-modal-overlay {
             transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s, visibility 0.2s;
             visibility: hidden;
             opacity: 0;
             backdrop-filter: blur(0px);
-        }}
-        .custom-modal-overlay.active {{
+        }
+        .custom-modal-overlay.active {
             visibility: visible;
             opacity: 1;
             backdrop-filter: blur(12px);
-        }}
-        .toast {{
+        }
+        .toast {
             position: fixed;
             bottom: 20px;
             left: 50%;
@@ -151,10 +151,10 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             z-index: 9999;
             pointer-events: none;
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }}
-        .toast.show {{ opacity: 1; transform: translateX(-50%) translateY(0); }}
-        .toast.success {{ border-color: #22c55e; color: #86efac; }}
-        .toast.error {{ border-color: #ef4444; color: #fca5a5; }}
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.success { border-color: #22c55e; color: #86efac; }
+        .toast.error { border-color: #ef4444; color: #fca5a5; }
     </style>
 </head>
 <body class="font-sans text-slate-200 min-h-screen flex flex-col justify-between relative antialiased tracking-tight">
@@ -492,50 +492,50 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 lucide.createIcons();
 
 // Modal toggles
-function toggleModal(modalId, show) {{
+function toggleModal(modalId, show) {
     const target = document.getElementById(modalId);
     if (show) target.classList.add('active');
     else target.classList.remove('active');
-}}
+}
 
 // Toast
-function toast(msg, type='') {{
+function toast(msg, type='') {
     const el = document.getElementById('toast');
     el.textContent = msg;
     el.className = 'toast show' + (type ? ' ' + type : '');
     clearTimeout(el._timeout);
     el._timeout = setTimeout(() => el.classList.remove('show'), 2500);
-}}
+}
 
 // Copy
-function copyLink(inputId) {{
+function copyLink(inputId) {
     const inp = document.getElementById(inputId);
     inp.select();
     navigator.clipboard.writeText(inp.value);
     triggerAlert('Token Copied', 'Configuration token copied to clipboard.', 'check-circle');
-}}
+}
 
 // Alert
-function triggerAlert(title, message, iconName) {{
+function triggerAlert(title, message, iconName) {
     document.getElementById('alertTitle').textContent = title;
     document.getElementById('alertMessage').textContent = message;
     const icon = document.getElementById('alertIcon');
     icon.setAttribute('data-lucide', iconName);
     lucide.createIcons();
     toggleModal('customAlert', true);
-}}
+}
 
 // QR
-function openQrModal(label, uriPayload) {{
+function openQrModal(label, uriPayload) {
     document.getElementById('qrTargetLabel').textContent = label;
     document.getElementById('qrTextPayload').textContent = uriPayload;
     const qrImg = document.getElementById('qrImage');
     qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(uriPayload);
     toggleModal('qrModal', true);
-}}
+}
 
 // Edit modal
-function openEditModal(label, protocol, fingerprint, alpn, limit, expiry, iplimit, speed, unit, uuid) {{
+function openEditModal(label, protocol, fingerprint, alpn, limit, expiry, iplimit, speed, unit, uuid) {
     document.getElementById('editNodeTitle').textContent = label;
     document.getElementById('edit-uuid').value = uuid;
     document.getElementById('edit-label').value = label;
@@ -548,32 +548,32 @@ function openEditModal(label, protocol, fingerprint, alpn, limit, expiry, iplimi
     document.getElementById('edit-speed').value = speed;
     document.getElementById('edit-speed-unit').value = unit || 'MBIT';
     toggleModal('editModal', true);
-}}
+}
 
 // Logout
-async function logout() {{
-    await fetch('/api/logout', {{ method: 'POST' }});
+async function logout() {
+    await fetch('/api/logout', { method: 'POST' });
     location.href = '/login';
-}}
+}
 
 // Fetch and render configs
-async function loadConfigs() {{
-    try {{
+async function loadConfigs() {
+    try {
         const res = await fetch('/api/links');
         if (!res.ok) throw new Error('Unauthorized');
         const data = await res.json();
         const links = data.links || [];
         const container = document.getElementById('config-list');
-        if (!links.length) {{
+        if (!links.length) {
             container.innerHTML = '<div class="p-6 text-center text-slate-400">No configurations yet.</div>';
             return;
-        }}
-        container.innerHTML = links.map(l => {{
-            const protoLabels = {{
+        }
+        container.innerHTML = links.map(l => {
+            const protoLabels = {
                 'vless-ws': 'VLESS',
                 'xhttp-packet-up': 'XHTTP (packet-up)',
                 'xhttp-stream-up': 'XHTTP (stream-up)'
-            }};
+            };
             const proto = l.protocol || 'vless-ws';
             const label = l.label || 'Unnamed';
             const active = l.active && !l.expired;
@@ -582,64 +582,64 @@ async function loadConfigs() {{
             const pct = l.limit_bytes === 0 ? 0 : Math.min(100, (l.used_bytes / l.limit_bytes) * 100);
             const color = pct > 90 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#3b82f6';
             let speedDisplay = '∞';
-            if (l.speed_limit_bytes && l.speed_limit_bytes > 0) {{
+            if (l.speed_limit_bytes && l.speed_limit_bytes > 0) {
                 speedDisplay = (l.speed_limit_bytes * 8 / 1024 / 1024).toFixed(1) + ' Mbps';
-            }}
+            }
             return `
             <div class="p-6 hover:bg-slate-800/10 transition duration-150">
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                     <div class="flex items-start space-x-4">
-                        <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wide mt-1 font-mono">${{protoLabels[proto] || proto}}</span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wide mt-1 font-mono">${protoLabels[proto] || proto}</span>
                         <div>
                             <div class="flex items-center space-x-2">
-                                <h3 class="text-base font-semibold text-slate-200">${{label}}</h3>
-                                <span class="text-[10px] px-1.5 py-0.5 text-emerald-400 bg-emerald-500/5 rounded border border-emerald-500/20 font-medium ${{active ? '' : 'hidden'}}">Active</span>
-                                <span class="text-[10px] px-1.5 py-0.5 text-red-400 bg-red-500/5 rounded border border-red-500/20 font-medium ${{active ? 'hidden' : ''}}">Inactive</span>
+                                <h3 class="text-base font-semibold text-slate-200">${label}</h3>
+                                <span class="text-[10px] px-1.5 py-0.5 text-emerald-400 bg-emerald-500/5 rounded border border-emerald-500/20 font-medium ${active ? '' : 'hidden'}">Active</span>
+                                <span class="text-[10px] px-1.5 py-0.5 text-red-400 bg-red-500/5 rounded border border-red-500/20 font-medium ${active ? 'hidden' : ''}">Inactive</span>
                             </div>
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-1 mt-2 text-xs text-slate-400">
-                                <div>Network: <span class="text-slate-300 font-mono">${{proto.includes('ws') ? 'ws' : 'tcp'}}</span></div>
+                                <div>Network: <span class="text-slate-300 font-mono">${proto.includes('ws') ? 'ws' : 'tcp'}</span></div>
                                 <div>Security: <span class="text-slate-300 font-mono">tls</span></div>
-                                <div>Expiry: <span class="text-slate-300 font-mono">${{l.expires_at ? new Date(l.expires_at).toISOString().slice(0,10) : 'Unlimited'}}</span></div>
+                                <div>Expiry: <span class="text-slate-300 font-mono">${l.expires_at ? new Date(l.expires_at).toISOString().slice(0,10) : 'Unlimited'}</span></div>
                             </div>
                             <div class="mt-2 flex items-center gap-4 text-xs text-slate-400">
-                                <span>Usage: <span class="text-slate-300 font-mono">${{used}} / ${{limit}}</span></span>
-                                <span>IP Limit: <span class="text-slate-300 font-mono">${{l.ip_limit || '∞'}}</span></span>
-                                <span>Speed: <span class="text-slate-300 font-mono">${{speedDisplay}}</span></span>
+                                <span>Usage: <span class="text-slate-300 font-mono">${used} / ${limit}</span></span>
+                                <span>IP Limit: <span class="text-slate-300 font-mono">${l.ip_limit || '∞'}</span></span>
+                                <span>Speed: <span class="text-slate-300 font-mono">${speedDisplay}</span></span>
                             </div>
                             <div class="w-full max-w-xs mt-1.5 h-1.5 bg-slate-800/60 rounded-full overflow-hidden">
-                                <div class="h-full rounded-full" style="width: ${{pct}}%; background: ${{color}};"></div>
+                                <div class="h-full rounded-full" style="width: ${pct}%; background: ${color};"></div>
                             </div>
                         </div>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 lg:justify-end">
                         <div class="relative flex-grow sm:flex-grow-0 min-w-[260px] max-w-xs">
-                            <input type="text" id="uri-${{l.uuid}}" readonly value="${{l.vless_link}}" class="w-full bg-slate-950 border border-slate-800/80 rounded-xl px-3 py-2 pr-10 text-xs font-mono text-slate-400 focus:outline-none select-all truncate">
-                            <button onclick="copyLink('uri-${{l.uuid}}')" class="absolute right-2 top-1.5 p-1 text-slate-500 hover:text-slate-300 transition" title="Copy URI"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                            <input type="text" id="uri-${l.uuid}" readonly value="${l.vless_link}" class="w-full bg-slate-950 border border-slate-800/80 rounded-xl px-3 py-2 pr-10 text-xs font-mono text-slate-400 focus:outline-none select-all truncate">
+                            <button onclick="copyLink('uri-${l.uuid}')" class="absolute right-2 top-1.5 p-1 text-slate-500 hover:text-slate-300 transition" title="Copy URI"><i data-lucide="copy" class="w-4 h-4"></i></button>
                         </div>
-                        <button onclick="openQrModal('${{label}}', '${{l.vless_link}}')" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="QR"><i data-lucide="qr-code" class="w-4 h-4"></i></button>
-                        <button onclick="openEditModal('${{label}}','${{proto}}','${{l.fingerprint||'chrome'}}','${{l.alpn||''}}',${{l.limit_bytes || 0}},${{l.expires_at ? Math.ceil((new Date(l.expires_at) - Date.now()) / (86400000)) : 0}},${{l.ip_limit||0}},${{l.speed_limit_bytes ? (l.speed_limit_bytes * 8 / 1024 / 1024) : 0}},'${{l.speed_limit_unit || 'MBIT'}}','${{l.uuid}}')" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Edit"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                        <button onclick="deleteConfig('${{l.uuid}}')" class="p-2 bg-red-800/20 hover:bg-red-800/40 border border-red-700/30 text-red-300 rounded-xl transition" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        <button onclick="openQrModal('${label}', '${l.vless_link}')" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="QR"><i data-lucide="qr-code" class="w-4 h-4"></i></button>
+                        <button onclick="openEditModal('${label}','${proto}','${l.fingerprint||'chrome'}','${l.alpn||''}',${l.limit_bytes || 0},${l.expires_at ? Math.ceil((new Date(l.expires_at) - Date.now()) / (86400000)) : 0},${l.ip_limit||0},${l.speed_limit_bytes ? (l.speed_limit_bytes * 8 / 1024 / 1024) : 0},'${l.speed_limit_unit || 'MBIT'}','${l.uuid}')" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Edit"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                        <button onclick="deleteConfig('${l.uuid}')" class="p-2 bg-red-800/20 hover:bg-red-800/40 border border-red-700/30 text-red-300 rounded-xl transition" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                     </div>
                 </div>
             </div>`;
-        }}).join('');
+        }).join('');
         lucide.createIcons();
         updateStats();
-    }} catch (e) {{
+    } catch (e) {
         if (e.message.includes('Unauthorized')) location.href = '/login';
-    }}
-}}
+    }
+}
 
-function fmtBytes(b) {{
+function fmtBytes(b) {
     if (b === 0) return '0 B';
     if (b < 1024) return b + ' B';
     if (b < 1024**2) return (b/1024).toFixed(1) + ' KB';
     if (b < 1024**3) return (b/1024**2).toFixed(2) + ' MB';
     return (b/1024**3).toFixed(2) + ' GB';
-}}
+}
 
-async function updateStats() {{
-    try {{
+async function updateStats() {
+    try {
         const res = await fetch('/stats');
         const d = await res.json();
         document.getElementById('uptime-display').textContent = d.uptime || '00:00:00';
@@ -674,10 +674,10 @@ async function updateStats() {{
         document.getElementById('ring-disk-pct').textContent = diskPct.toFixed(1) + '%';
         const diskCircle = document.querySelector('.text-rose-500.circle-chart');
         if (diskCircle) diskCircle.setAttribute('stroke-dasharray', Math.round(diskPct) + ', 100');
-    }} catch(e) {{ console.error(e); }}
-}}
+    } catch(e) { console.error(e); }
+}
 
-async function createConfig() {{
+async function createConfig() {
     const label = document.getElementById('new-label').value.trim() || 'New Config';
     const protocol = document.getElementById('new-protocol').value;
     const fp = document.getElementById('new-fp').value;
@@ -688,7 +688,7 @@ async function createConfig() {{
     const speedVal = parseFloat(document.getElementById('new-speed').value) || 0;
     const speedUnit = document.getElementById('new-speed-unit').value;
 
-    const body = {{
+    const body = {
         label,
         protocol,
         fingerprint: fp,
@@ -699,14 +699,14 @@ async function createConfig() {{
         ip_limit: ipLimit,
         speed_limit_value: speedVal,
         speed_limit_unit: speedUnit
-    }};
+    };
 
-    try {{
-        const res = await fetch('/api/links', {{
+    try {
+        const res = await fetch('/api/links', {
             method: 'POST',
-            headers: {{ 'Content-Type': 'application/json' }},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
-        }});
+        });
         if (!res.ok) throw new Error('Failed');
         toggleModal('inboundModal', false);
         toast('Config created successfully', 'success');
@@ -714,12 +714,12 @@ async function createConfig() {{
         document.getElementById('new-label').value = '';
         document.getElementById('new-alpn').value = '';
         document.getElementById('new-speed').value = '0';
-    }} catch(e) {{
+    } catch(e) {
         toast('Error creating config', 'error');
-    }}
-}}
+    }
+}
 
-async function saveEdit() {{
+async function saveEdit() {
     const uuid = document.getElementById('edit-uuid').value;
     const label = document.getElementById('edit-label').value.trim();
     const protocol = document.getElementById('edit-protocol').value;
@@ -731,7 +731,7 @@ async function saveEdit() {{
     const speedVal = parseFloat(document.getElementById('edit-speed').value) || 0;
     const speedUnit = document.getElementById('edit-speed-unit').value;
 
-    const body = {{
+    const body = {
         label,
         protocol,
         fingerprint: fp,
@@ -742,34 +742,34 @@ async function saveEdit() {{
         ip_limit: ipLimit,
         speed_limit_value: speedVal,
         speed_limit_unit: speedUnit
-    }};
+    };
 
-    try {{
-        const res = await fetch('/api/links/' + uuid, {{
+    try {
+        const res = await fetch('/api/links/' + uuid, {
             method: 'PATCH',
-            headers: {{ 'Content-Type': 'application/json' }},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
-        }});
+        });
         if (!res.ok) throw new Error('Failed');
         toggleModal('editModal', false);
         toast('Config updated', 'success');
         loadConfigs();
-    }} catch(e) {{
+    } catch(e) {
         toast('Error updating config', 'error');
-    }}
-}}
+    }
+}
 
-async function deleteConfig(uuid) {{
+async function deleteConfig(uuid) {
     if (!confirm('Delete this configuration?')) return;
-    try {{
-        const res = await fetch('/api/links/' + uuid, {{ method: 'DELETE' }});
+    try {
+        const res = await fetch('/api/links/' + uuid, { method: 'DELETE' });
         if (!res.ok) throw new Error('Failed');
         toast('Config deleted', 'success');
         loadConfigs();
-    }} catch(e) {{
+    } catch(e) {
         toast('Error deleting', 'error');
-    }}
-}}
+    }
+}
 
 // Initial load
 loadConfigs();
