@@ -480,14 +480,11 @@ async def api_login(request: Request):
     if hash_password(str(body.get("password", ""))) != AUTH["password_hash"]:
         log_activity("auth", f"Failed login from {ip}", "err")
         raise HTTPException(status_code=401, detail="Wrong password")
-    
     token = await create_session()
     log_activity("auth", f"Successful login from {ip}", "ok")
     
-    # Determine if the original request was HTTPS (honor X-Forwarded-Proto)
-    forwarded_proto = request.headers.get("x-forwarded-proto", "").lower()
-    secure = (forwarded_proto == "https") or (request.url.scheme == "https")
-    
+    # همیشه secure=False برای تست (در محیط تولید میتوانید شرط بگذارید)
+    secure = False  # برای تست
     resp = JSONResponse({"ok": True})
     resp.set_cookie(
         SESSION_COOKIE,
@@ -498,8 +495,8 @@ async def api_login(request: Request):
         path="/",
         secure=secure,
     )
-    # Add a small debug log (optional)
-    logger.info(f"Login cookie set: secure={secure}, scheme={request.url.scheme}, forwarded_proto={forwarded_proto}")
+    # لاگ برای دیباگ
+    logger.info(f"Login cookie set: secure={secure}, token={token[:8]}...")
     return resp
 @app.post("/api/logout")
 async def api_logout(request: Request):
@@ -838,7 +835,7 @@ async def login_page(request: Request):
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request):
     token = request.cookies.get(SESSION_COOKIE)
-    logger.info(f"Dashboard cookie: {token}")
+    logger.info(f"Dashboard received cookie: {token}")
     valid = await is_valid_session(token)
     logger.info(f"Dashboard session valid: {valid}")
     if not valid:
