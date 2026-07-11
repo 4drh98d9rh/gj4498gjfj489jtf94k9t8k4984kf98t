@@ -1,5 +1,3 @@
-# vless_relay.py - VLESS WebSocket relay (unchanged logic, updated imports)
-
 import asyncio
 import secrets
 from datetime import datetime
@@ -20,7 +18,7 @@ from app import (
     log_activity,
     now_ir,
 )
-from rate_limiter import throttle
+from speed_limit import throttle
 
 RELAY_BUF = 256 * 1024
 
@@ -76,7 +74,7 @@ async def relay_ws_to_tcp(ws: WebSocket, writer: asyncio.StreamWriter, conn_id: 
             if not data:
                 continue
             if not await check_and_use(uid, len(data)):
-                await ws.close(code=1008, reason="quota/disabled/unknown")
+                await ws.close(code=1008, reason="quota/disabled")
                 break
             await throttle(uid, len(data))
             stats["total_requests"] += 1
@@ -100,7 +98,7 @@ async def relay_tcp_to_ws(ws: WebSocket, reader: asyncio.StreamReader, conn_id: 
             if not data:
                 break
             if not await check_and_use(uid, len(data)):
-                await ws.close(code=1008, reason="quota/disabled/unknown")
+                await ws.close(code=1008, reason="quota/disabled")
                 break
             await throttle(uid, len(data))
             connections[conn_id]["bytes"] += len(data)
@@ -117,14 +115,16 @@ async def websocket_tunnel(ws: WebSocket, uuid: str):
         link = LINKS.get(uuid)
 
     if not is_link_allowed(link):
+        logger.warning(f"WS rejected uuid={uuid[:8]}")
         await ws.close(code=1008, reason="not authorized")
         return
 
     ip = _ws_client_ip(ws)
 
     if not is_ip_allowed(link, uuid, ip):
-        log_activity("connection", f"Connection from {ip} rejected (IP limit)", "warn")
-        await ws.close(code=1008, reason="ip limit reached")
+        logger.warning(f"WS rejected uuid={uuid[:8]} ip={ip} (ip limit)")
+        log_activity("connection", f"Connection from {ip} rejected (ip limit)", "warn")
+        await ws.close(code=1008, reason="ip limit")
         return
 
     conn_id = secrets.token_urlsafe(6)
@@ -135,7 +135,8 @@ async def websocket_tunnel(ws: WebSocket, uuid: str):
         "connected_at": datetime.now().isoformat(),
         "bytes": 0,
     }
-    logger.info(f"WS [{conn_id}] uuid={uuid[:8]}… ip={ip}")
+    logger.info(f"WS [{conn_id}] uuid={uuid[:8]} ip={ip}")
+    log_activity("connection", f"New connection from {ip} (config {link.get('label','?')})", "info")
     writer = None
 
     try:
@@ -154,6 +155,7 @@ async def websocket_tunnel(ws: WebSocket, uuid: str):
 
         stats["total_requests"] += 1
         connections[conn_id]["bytes"] += len(first_chunk)
+        logger.info(f"[{conn_id}] → {address}:{port}")
 
         reader, writer = await asyncio.wait_for(
             asyncio.open_connection(address, port),
@@ -201,3 +203,4 @@ async def websocket_tunnel(ws: WebSocket, uuid: str):
             except Exception:
                 pass
         connections.pop(conn_id, None)
+        logger.info(f"WS closed [{conn_id}]")

@@ -21,7 +21,7 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("MX-UI")
 
-IRAN_TZ = ZoneInfo("Asia/Tehran")   # kept for compatibility
+IRAN_TZ = ZoneInfo("Asia/Tehran")
 
 app = FastAPI(title="MX-UI", docs_url=None, redoc_url=None)
 
@@ -32,7 +32,6 @@ SECRET_FILE = DATA_DIR / "mxui_secret.key"
 SAVE_LOCK = asyncio.Lock()
 
 def _load_or_create_secret() -> str:
-    """Load or create a persistent SECRET_KEY."""
     env_secret = os.environ.get("SECRET_KEY")
     if env_secret:
         return env_secret
@@ -63,6 +62,37 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+async def load_state():
+    global LINKS, AUTH
+    try:
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        if DATA_FILE.exists():
+            async with aiofiles.open(DATA_FILE, "r", encoding="utf-8") as f:
+                raw = await f.read()
+            data = json.loads(raw)
+            LINKS.update(data.get("links", {}))
+            if "password_hash" in data:
+                AUTH["password_hash"] = data["password_hash"]
+            logger.info(f"State loaded: {len(LINKS)} links")
+    except Exception as e:
+        logger.warning(f"Could not load state: {e}")
+
+async def save_state():
+    async with SAVE_LOCK:
+        try:
+            DATA_DIR.mkdir(parents=True, exist_ok=True)
+            data = {
+                "links": dict(LINKS),
+                "password_hash": AUTH["password_hash"],
+                "saved_at": datetime.now().isoformat(),
+            }
+            tmp = DATA_FILE.with_suffix(".tmp")
+            async with aiofiles.open(tmp, "w", encoding="utf-8") as f:
+                await f.write(json.dumps(data, ensure_ascii=False, indent=2))
+            tmp.replace(DATA_FILE)
+        except Exception as e:
+            logger.warning(f"Could not save state: {e}")
+
 # ── In-memory state ───────────────────────────────────────────────────────────
 connections: dict = {}
 stats = {
@@ -77,10 +107,8 @@ hourly_traffic: dict = defaultdict(int)
 http_client: httpx.AsyncClient | None = None
 LINKS: dict = {}
 LINKS_LOCK = asyncio.Lock()
-DEFAULT_PASSWORD = "MUVIXO"
 
-# Protocol definitions (unchanged)
-PROTOCOLS = ("vless-ws", "xhttp-packet-up", "xhttp-stream-up", "xhttp-stream-one")
+PROTOCOLS = ("vless-ws", "xhttp-packet-up", "xhttp-stream-up")
 DEFAULT_PROTOCOL = "vless-ws"
 FINGERPRINTS = ("chrome", "firefox", "safari", "ios", "android", "edge", "360", "qq", "random", "randomized")
 DEFAULT_FINGERPRINT = "chrome"
@@ -88,11 +116,18 @@ DEFAULT_ALPN_BY_PROTOCOL = {
     "vless-ws": "http/1.1",
     "xhttp-packet-up": "h2,http/1.1",
     "xhttp-stream-up": "h2,http/1.1",
-    "xhttp-stream-one": "h2,http/1.1",
 }
 DEFAULT_PORT = 443
 MIN_PORT, MAX_PORT = 1, 65535
 DEFAULT_SPEED_LIMIT = 0
+
+def log_activity(kind: str, message: str, level: str = "info"):
+    activity_logs.append({
+        "kind": kind,
+        "level": level,
+        "message": message,
+        "time": datetime.now().isoformat(),
+    })
 
 # ── Auth ──────────────────────────────────────────────────────────────────────
 SESSION_COOKIE = "mxui_session"
@@ -101,7 +136,7 @@ SESSION_TTL = 60 * 60 * 24 * 365
 def hash_password(pw: str) -> str:
     return hashlib.sha256(f"{pw}{CONFIG['secret']}".encode()).hexdigest()
 
-AUTH = {"password_hash": hash_password(os.environ.get("ADMIN_PASSWORD", DEFAULT_PASSWORD))}
+AUTH = {"password_hash": hash_password(os.environ.get("ADMIN_PASSWORD", "MUVIXO"))}
 SESSIONS: dict = {}
 SESSIONS_LOCK = asyncio.Lock()
 
@@ -134,6 +169,25 @@ async def require_auth(request: Request):
     if not await is_valid_session(token):
         raise HTTPException(status_code=401, detail="unauthorized")
     return token
+
+# ── Startup / Shutdown ────────────────────────────────────────────────────────
+@app.on_event("startup")
+async def startup():
+    global http_client
+    limits = httpx.Limits(max_connections=500, max_keepalive_connections=100)
+    timeout = httpx.Timeout(30.0, connect=10.0)
+    http_client = httpx.AsyncClient(
+        limits=limits, timeout=timeout, follow_redirects=True,
+    )
+    await load_state()
+    log_activity("system", "Server started", "ok")
+    logger.info(f"MX-UI v1.0.0 started on port {CONFIG['port']}")
+
+@app.on_event("shutdown")
+async def shutdown():
+    await save_state()
+    if http_client:
+        await http_client.aclose()
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def get_host(request: Request | None = None) -> str:
@@ -283,64 +337,36 @@ def client_ip(request: Request) -> str:
         return real_ip.strip()
     return request.client.host if request.client else "unknown"
 
-# ── Persistence helpers ──────────────────────────────────────────────────────
-async def load_state():
-    global LINKS, AUTH
-    try:
-        DATA_DIR.mkdir(parents=True, exist_ok=True)
-        if DATA_FILE.exists():
-            async with aiofiles.open(DATA_FILE, "r", encoding="utf-8") as f:
-                raw = await f.read()
-            data = json.loads(raw)
-            LINKS.update(data.get("links", {}))
-            if "password_hash" in data:
-                AUTH["password_hash"] = data["password_hash"]
-            logger.info(f"State loaded: {len(LINKS)} links")
-    except Exception as e:
-        logger.warning(f"Could not load state: {e}")
+# ── Default link ──────────────────────────────────────────────────────────────
+_default_link_created = False
 
-async def save_state():
-    async with SAVE_LOCK:
-        try:
-            DATA_DIR.mkdir(parents=True, exist_ok=True)
-            data = {
-                "links": dict(LINKS),
-                "password_hash": AUTH["password_hash"],
-                "saved_at": datetime.now().isoformat(),
-            }
-            tmp = DATA_FILE.with_suffix(".tmp")
-            async with aiofiles.open(tmp, "w", encoding="utf-8") as f:
-                await f.write(json.dumps(data, ensure_ascii=False, indent=2))
-            tmp.replace(DATA_FILE)
-        except Exception as e:
-            logger.warning(f"Could not save state: {e}")
-
-def log_activity(kind: str, message: str, level: str = "info"):
-    activity_logs.append({
-        "kind": kind,
-        "level": level,
-        "message": message,
-        "time": datetime.now().isoformat(),
-    })
-
-# ── Startup / Shutdown ────────────────────────────────────────────────────────
-@app.on_event("startup")
-async def startup():
-    global http_client
-    limits = httpx.Limits(max_connections=500, max_keepalive_connections=100)
-    timeout = httpx.Timeout(30.0, connect=10.0)
-    http_client = httpx.AsyncClient(
-        limits=limits, timeout=timeout, follow_redirects=True,
-    )
-    await load_state()
-    log_activity("system", "Server started", "ok")
-    logger.info(f"MX-UI v1.0.0 started on port {CONFIG['port']}")
-
-@app.on_event("shutdown")
-async def shutdown():
-    await save_state()
-    if http_client:
-        await http_client.aclose()
+async def ensure_default_link():
+    global _default_link_created
+    if _default_link_created:
+        return
+    async with LINKS_LOCK:
+        if not any(l.get("is_default") for l in LINKS.values()):
+            uid = hashlib.sha256(f"default{CONFIG['secret']}".encode()).hexdigest()
+            uid = f"{uid[:8]}-{uid[8:12]}-{uid[12:16]}-{uid[16:20]}-{uid[20:32]}"
+            if uid not in LINKS:
+                LINKS[uid] = {
+                    "label": "Default Link",
+                    "limit_bytes": 0,
+                    "used_bytes": 0,
+                    "created_at": datetime.now().isoformat(),
+                    "active": True,
+                    "expires_at": None,
+                    "note": "",
+                    "is_default": True,
+                    "protocol": DEFAULT_PROTOCOL,
+                    "fingerprint": DEFAULT_FINGERPRINT,
+                    "alpn": "",
+                    "port": DEFAULT_PORT,
+                    "ip_limit": 0,
+                    "speed_limit_bytes": DEFAULT_SPEED_LIMIT,
+                }
+                asyncio.create_task(save_state())
+        _default_link_created = True
 
 # ── Basic endpoints ───────────────────────────────────────────────────────────
 @app.get("/")
@@ -351,7 +377,7 @@ async def root():
 async def health():
     return {"status": "ok", "connections": len(connections), "uptime": uptime()}
 
-# ── Subscription (single link, base64) ─────────────────────────────────────
+# ── Subscription (single link) ────────────────────────────────────────────────
 @app.get("/sub/{uuid}")
 async def subscription_single(uuid: str, request: Request):
     import base64
@@ -363,7 +389,27 @@ async def subscription_single(uuid: str, request: Request):
     vless = vless_link_for_link(link, uuid, host)
     content = base64.b64encode(vless.encode()).decode()
     return Response(content=content, media_type="text/plain",
-                    headers={"profile-title": quote(link["label"]), "support-url": ""})
+                    headers={"profile-title": quote(link["label"]), "support-url": "https://t.me/Farajian2004f"})
+
+@app.get("/sub/{uuid}/info", response_class=HTMLResponse)
+async def subscription_info(uuid: str, request: Request):
+    from pages import SUB_INFO_HTML
+    async with LINKS_LOCK:
+        link = LINKS.get(uuid)
+    if not link:
+        raise HTTPException(status_code=404, detail="not found")
+    host = get_host(request)
+    return HTMLResponse(content=SUB_INFO_HTML.format(
+        uuid=uuid,
+        label=link.get("label", "Unknown"),
+        used_fmt=fmt_bytes(link.get("used_bytes", 0)),
+        limit_fmt="∞" if link.get("limit_bytes", 0) == 0 else fmt_bytes(link["limit_bytes"]),
+        expires_at=link.get("expires_at", "No expiry"),
+        active=link.get("active", True),
+        vless_link=vless_link_for_link(link, uuid, host),
+        sub_url=f"https://{host}/sub/{uuid}",
+        watermark="Created by Muvixo"
+    ))
 
 @app.get("/sub-all")
 async def subscription_all(request: Request, _=Depends(require_auth)):
@@ -378,27 +424,6 @@ async def subscription_all(request: Request, _=Depends(require_auth)):
     content = base64.b64encode("\n".join(lines).encode()).decode()
     return Response(content=content, media_type="text/plain")
 
-# ── Public config page (per‑link subscription info) ──────────────────────────
-@app.get("/config/{uuid}", response_class=HTMLResponse)
-async def config_page(uuid: str, request: Request):
-    from pages import CONFIG_PAGE_HTML
-    async with LINKS_LOCK:
-        link = LINKS.get(uuid)
-    if not link:
-        return HTMLResponse("<h2>Config not found</h2>", status_code=404)
-    host = get_host(request)
-    vless = vless_link_for_link(link, uuid, host)
-    # Render page with data
-    html = CONFIG_PAGE_HTML.replace("__UUID__", uuid)
-    html = html.replace("__LABEL__", link.get("label", "Unknown"))
-    html = html.replace("__USED__", fmt_bytes(link.get("used_bytes", 0)))
-    html = html.replace("__LIMIT__", fmt_bytes(link.get("limit_bytes", 0)) if link.get("limit_bytes", 0) > 0 else "Unlimited")
-    html = html.replace("__EXPIRY__", link.get("expires_at", "Never") if link.get("expires_at") else "Never")
-    html = html.replace("__VLESS_LINK__", vless)
-    html = html.replace("__SUB_URL__", f"https://{host}/sub/{uuid}")
-    html = html.replace("__ACTIVE__", "Yes" if is_link_allowed(link) else "No")
-    return HTMLResponse(content=html)
-
 # ── Auth endpoints ────────────────────────────────────────────────────────────
 @app.post("/api/login")
 async def api_login(request: Request):
@@ -406,7 +431,7 @@ async def api_login(request: Request):
     ip = client_ip(request)
     if hash_password(str(body.get("password", ""))) != AUTH["password_hash"]:
         log_activity("auth", f"Failed login from {ip}", "err")
-        raise HTTPException(status_code=401, detail="Incorrect password")
+        raise HTTPException(status_code=401, detail="Wrong password")
     token = await create_session()
     log_activity("auth", f"Successful login from {ip}", "ok")
     resp = JSONResponse({"ok": True})
@@ -459,18 +484,15 @@ async def get_stats(_=Depends(require_auth)):
         "expired_links": sum(1 for l in snap.values() if is_link_expired(l)),
     }
 
-# ── Activity Logs ─────────────────────────────────────────────────────────────
 @app.get("/api/activity")
 async def get_activity(_=Depends(require_auth)):
     return {"logs": list(activity_logs)[-150:]}
 
-# ── Live connections ─────────────────────────────────────────────────────────
 @app.get("/api/connections")
 async def get_connections(_=Depends(require_auth)):
+    grouped: dict[str, dict] = {}
     async with LINKS_LOCK:
         snap = dict(LINKS)
-
-    grouped: dict[str, dict] = {}
     for conn_id, c in connections.items():
         ip = c.get("ip", "unknown")
         link = snap.get(c.get("uuid"))
@@ -497,7 +519,6 @@ async def get_connections(_=Depends(require_auth)):
                 g["first_connected_at"] = ca
             if not g["last_connected_at"] or ca > g["last_connected_at"]:
                 g["last_connected_at"] = ca
-
     result = []
     for ip, g in grouped.items():
         result.append({
@@ -512,14 +533,13 @@ async def get_connections(_=Depends(require_auth)):
             "last_connected_at": g["last_connected_at"],
         })
     result.sort(key=lambda x: x.get("last_connected_at") or "", reverse=True)
-
     return {
         "connections": result,
         "count": len(result),
         "raw_count": len(connections),
     }
 
-# ── Link Management ──────────────────────────────────────────────────────────
+# ── Link Management ───────────────────────────────────────────────────────────
 async def make_link(
     label: str = "New Link",
     limit_bytes: int = 0,
@@ -622,6 +642,7 @@ async def create_link(request: Request, _=Depends(require_auth)):
         "expired": False,
         "vless_link": vless_link_for_link(link, uid, host),
         "sub_url": f"https://{host}/sub/{uid}",
+        "info_url": f"https://{host}/sub/{uid}/info",
     }
 
 @app.get("/api/links")
@@ -639,6 +660,7 @@ async def list_links(request: Request, _=Depends(require_auth)):
             "expired": is_link_expired(d),
             "vless_link": vless_link_for_link(d, uid, host),
             "sub_url": f"https://{host}/sub/{uid}",
+            "info_url": f"https://{host}/sub/{uid}/info",
             "connected_ips": len(unique_ips_for_uuid(uid)),
         })
     result.sort(key=lambda x: x["created_at"], reverse=True)
@@ -690,11 +712,10 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
             sv = float(body.get("speed_limit_value") or 0)
             su = body.get("speed_limit_unit") or "MBIT"
             link["speed_limit_bytes"] = 0 if sv <= 0 else parse_speed_to_bytes(sv, su)
-            from rate_limiter import reset_bucket
+            from speed_limit import reset_bucket
             reset_bucket(uid)
         if any(k in body for k in ("label", "note", "limit_value", "expires_days", "fingerprint", "alpn", "port", "ip_limit", "speed_limit_value")):
-            log_activity("link", f"Config «{link['label']}» edited", "info")
-
+            log_activity("link", f"Config «{link['label']}» updated", "info")
     asyncio.create_task(save_state())
     return {"ok": True}
 
@@ -705,16 +726,12 @@ async def delete_link(uid: str, _=Depends(require_auth)):
         raise HTTPException(status_code=404, detail="link not found")
     return {"ok": True, "deleted": uid}
 
-# ══════════════════════════════════════════════════════════════════════════════
-# VLESS Relay
-# ══════════════════════════════════════════════════════════════════════════════
-from vless_relay import websocket_tunnel
+# ── VLESS Relay ──────────────────────────────────────────────────────────────
+from relay_vless import websocket_tunnel
 app.add_api_websocket_route("/ws/{uuid}", websocket_tunnel)
 
-# ══════════════════════════════════════════════════════════════════════════════
-# XHTTP Transport
-# ══════════════════════════════════════════════════════════════════════════════
-from xhttp_transport import router as xhttp_router
+# ── XHTTP ─────────────────────────────────────────────────────────────────────
+from xhttp import router as xhttp_router
 app.include_router(xhttp_router)
 
 # ── HTTP Proxy ────────────────────────────────────────────────────────────────
@@ -752,6 +769,7 @@ async def login_page(request: Request):
 async def dashboard(request: Request):
     if not await is_valid_session(request.cookies.get(SESSION_COOKIE)):
         return RedirectResponse(url="/login")
+    await ensure_default_link()
     return HTMLResponse(content=DASHBOARD_HTML)
 
 if __name__ == "__main__":
