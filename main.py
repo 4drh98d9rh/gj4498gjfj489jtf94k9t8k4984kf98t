@@ -214,7 +214,6 @@ def generate_vless_link(
     protocol: str = DEFAULT_PROTOCOL,
     fingerprint: str | None = None,
     alpn: str | None = None,
-    port: int = DEFAULT_PORT,  # always 443
 ) -> str:
     fp = (fingerprint or DEFAULT_FINGERPRINT).strip() or DEFAULT_FINGERPRINT
     if fp not in FINGERPRINTS:
@@ -436,10 +435,8 @@ async def subscription_user(request: Request, uuid: str = Query(...)):
     quota_str = "∞" if limit == 0 else fmt_bytes(limit)
     remained = "∞" if limit == 0 else fmt_bytes(max(0, limit - used))
     usage_pct = 0 if limit == 0 else min(100, (used / limit) * 100)
-    # For "Downloaded" and "Uploaded" we only track total, so we show total as downloaded, uploaded as 0
     downloaded = fmt_bytes(used)
     uploaded = "0 B"  # could be extended later
-    # QR code link
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={quote(vless)}"
     return HTMLResponse(content=SUB_USER_HTML.format(
         uuid=uuid,
@@ -485,14 +482,24 @@ async def api_login(request: Request):
     token = await create_session()
     log_activity("auth", f"Successful login from {ip}", "ok")
     resp = JSONResponse({"ok": True})
-    resp.set_cookie(SESSION_COOKIE, token, max_age=SESSION_TTL, httponly=True, samesite="lax", path="/")
+    secure = request.url.scheme == "https"
+    resp.set_cookie(
+        SESSION_COOKIE,
+        token,
+        max_age=SESSION_TTL,
+        httponly=True,
+        samesite="lax",
+        path="/",
+        secure=secure,
+    )
     return resp
 
 @app.post("/api/logout")
 async def api_logout(request: Request):
     await destroy_session(request.cookies.get(SESSION_COOKIE))
     resp = JSONResponse({"ok": True})
-    resp.delete_cookie(SESSION_COOKIE, path="/")
+    secure = request.url.scheme == "https"
+    resp.delete_cookie(SESSION_COOKIE, path="/", secure=secure)
     return resp
 
 @app.get("/api/me")
@@ -784,7 +791,7 @@ async def delete_link(uid: str, _=Depends(require_auth)):
     return {"ok": True, "deleted": uid}
 
 # ── VLESS Relay ──────────────────────────────────────────────────────────────
-from relay_vless import websocket_tunnel, check_and_use as relay_check_and_use
+from relay_vless import websocket_tunnel
 app.add_api_websocket_route("/ws/{uuid}", websocket_tunnel)
 
 # ── XHTTP ─────────────────────────────────────────────────────────────────────
