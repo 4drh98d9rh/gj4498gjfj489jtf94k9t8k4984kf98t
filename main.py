@@ -512,6 +512,45 @@ async def api_logout(request: Request):
 async def api_me(request: Request):
     return {"authenticated": await is_valid_session(request.cookies.get(SESSION_COOKIE))}
 
+
+    # ---- Path Management API ----
+    @app.post("/api/update-paths")
+    async def update_paths(request: Request, token=Depends(require_auth)):
+        """به‌روزرسانی مسیرهای برنامه"""
+        body = await request.json()
+        login_path = body.get("login_path", "/login")
+        dashboard_path = body.get("dashboard_path", "/dashboard")
+        sub_path = body.get("sub_path", "/sub")
+        
+        # اعتبارسنجی
+        if not login_path.startswith("/") or not dashboard_path.startswith("/") or not sub_path.startswith("/"):
+            raise HTTPException(status_code=400, detail="Paths must start with '/'")
+        
+        # ذخیره تنظیمات
+        config = {
+            "login_path": login_path,
+            "dashboard_path": dashboard_path,
+            "sub_path": sub_path
+        }
+        save_paths_config(config)
+        
+        # بازنویسی فایل main.py با مسیرهای جدید
+        # این کار نیاز به ریستارت دارد
+        log_activity("system", f"Paths updated: login={login_path}, dashboard={dashboard_path}, sub={sub_path}", "ok")
+        
+        # ایجاد فایل flag برای ریستارت
+        with open("/tmp/restart_required.flag", "w") as f:
+            f.write("restart")
+        
+        return {"ok": True, "message": "Paths updated. Server will restart."}
+    
+    @app.get("/api/current-paths")
+    async def current_paths(request: Request, token=Depends(require_auth)):
+        """دریافت مسیرهای فعلی"""
+        config = load_paths_config()
+        return config
+    
+
 @app.post("/api/change-password")
 async def api_change_password(request: Request, token=Depends(require_auth)):
     body = await request.json()
