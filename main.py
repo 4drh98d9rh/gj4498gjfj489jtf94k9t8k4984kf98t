@@ -131,7 +131,7 @@ DEFAULT_ALPN_BY_PROTOCOL = {
     "xhttp-packet-up": "h2,http/1.1",
     "xhttp-stream-up": "h2,http/1.1",
 }
-DEFAULT_PORT = 443  # fixed, not changeable
+DEFAULT_PORT = 443
 DEFAULT_SPEED_LIMIT = 0
 
 def log_activity(kind: str, message: str, level: str = "info"):
@@ -232,7 +232,7 @@ def generate_vless_link(
     if fp not in FINGERPRINTS:
         fp = DEFAULT_FINGERPRINT
     alpn_val = (alpn or "").strip() or DEFAULT_ALPN_BY_PROTOCOL.get(protocol, "http/1.1")
-    port_val = DEFAULT_PORT  # fixed
+    port_val = DEFAULT_PORT
 
     if protocol == "vless-ws":
         path = f"/ws/{uuid}"
@@ -866,6 +866,18 @@ async def delete_link(uid: str, _=Depends(require_auth)):
         raise HTTPException(status_code=404, detail="link not found")
     return {"ok": True, "deleted": uid}
 
+# ── Reset traffic endpoint ───────────────────────────────────────────────────
+@app.post("/api/links/{uid}/reset-traffic")
+async def reset_link_traffic(uid: str, _=Depends(require_auth)):
+    async with LINKS_LOCK:
+        if uid not in LINKS:
+            raise HTTPException(status_code=404, detail="link not found")
+        LINKS[uid]["used_bytes"] = 0
+        label = LINKS[uid]["label"]
+    asyncio.create_task(save_state())
+    log_activity("link", f"Traffic reset for «{label}»", "info")
+    return {"ok": True, "message": f"Traffic reset for {label}"}
+
 # ── VLESS Relay ──────────────────────────────────────────────────────────────
 from relay_vless import websocket_tunnel
 app.add_api_websocket_route("/ws/{uuid}", websocket_tunnel)
@@ -906,11 +918,9 @@ from pages import LOGIN_HTML, DASHBOARD_HTML
 async def dashboard(request: Request):
     dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
     
-    # If someone visits /dashboard but we're using /dash, redirect
     if request.url.path == "/dashboard" and dashboard_path != "/dashboard":
         return RedirectResponse(url=dashboard_path)
     
-    # If someone visits the current dashboard path
     if request.url.path == dashboard_path:
         token = request.cookies.get(SESSION_COOKIE)
         logger.info(f"Dashboard received cookie: {token}")
@@ -922,11 +932,9 @@ async def dashboard(request: Request):
         await ensure_default_link()
         return HTMLResponse(content=DASHBOARD_HTML)
     
-    # If someone visits some other path that starts with /dash but isn't our path
     if request.url.path.startswith("/dash"):
         return RedirectResponse(url=dashboard_path)
     
-    # Fallback - redirect to dashboard
     return RedirectResponse(url=dashboard_path)
 
 # Login page handler
@@ -941,19 +949,13 @@ async def login_page(request: Request):
         dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
         return RedirectResponse(url=dashboard_path)
     
-    # Check if default password is used
     is_default = AUTH["password_hash"] == hash_password("MUVIXO")
     login_html = LOGIN_HTML
     
-    # If default password is changed, show message
     if not is_default:
         login_html = login_html.replace(
             '<span class="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20 cursor-pointer hover:bg-blue-500/20 transition" onclick="document.getElementById(\'pw\').value=\'MUVIXO\';document.getElementById(\'pw\').focus()">MUVIXO</span>',
             '<span class="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20">Password changed</span>'
-        )
-        login_html = login_html.replace(
-            '<span class="text-xs text-slate-400">Default password</span>',
-            '<span class="text-xs text-slate-400">Default password</span><span class="text-xs text-amber-400 ml-2">(changed)</span>'
         )
     
     return HTMLResponse(content=login_html)
@@ -969,24 +971,14 @@ async def sub_path_handler():
 # ── Catch-all route for any unknown path ─────────────────────────────────────
 @app.get("/{path:path}")
 async def catch_all(request: Request, path: str):
-    """Redirect any unknown path to dashboard"""
-    # Skip API routes
     if path.startswith("api/") or path.startswith("stats") or path.startswith("health"):
         raise HTTPException(status_code=404, detail="Not Found")
-    
-    # Skip static files and common paths
     if path.startswith("favicon") or path.startswith("robots") or path.startswith(".well-known"):
         raise HTTPException(status_code=404, detail="Not Found")
-    
-    # Skip websocket and xhttp paths
     if path.startswith("ws/") or path.startswith("xhttp-siz10/"):
         raise HTTPException(status_code=404, detail="Not Found")
-    
-    # Skip proxy paths
     if path.startswith("proxy/"):
         raise HTTPException(status_code=404, detail="Not Found")
-    
-    # Redirect to dashboard
     dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
     return RedirectResponse(url=dashboard_path)
 
