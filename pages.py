@@ -2061,415 +2061,257 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
     </script>
     <style>
         body {{
-            background-color: #070a13;
+            background-color: #030712;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.03) 0px, transparent 50%);
         }}
-        .glow-effect {{
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.12);
+        .glass-card {{
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }}
-        .status-dot {{
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 6px;
-            flex-shrink: 0;
+        .glass-subcard {{
+            background: rgba(3, 7, 18, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.03);
         }}
-        .status-dot.active {{
-            background-color: #22c55e;
-        }}
-        .status-dot.inactive {{
-            background-color: #ef4444;
-        }}
-        .copy-btn {{
-            transition: all 0.2s ease;
-            min-height: 36px;
-            min-width: 36px;
-        }}
-        .copy-btn:active {{
-            transform: scale(0.95);
+        .glow-cyan {{
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.15);
         }}
         .progress-bar-fill {{
-            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }}
-        .qr-container {{
-            transition: all 0.3s ease;
-        }}
-        .qr-container:active {{
-            transform: scale(0.98);
-        }}
-        .detail-row {{
-            transition: background-color 0.15s ease;
-        }}
-        .detail-row:hover {{
-            background-color: rgba(30, 41, 59, 0.3);
-        }}
-        @media (max-width: 640px) {{
-            .mobile-stack {{
-                flex-direction: column;
-                align-items: stretch;
-            }}
-            .mobile-text-center {{
-                text-align: center;
-            }}
-            .mobile-padding {{
-                padding-left: 0.75rem;
-                padding-right: 0.75rem;
-            }}
-            .mobile-gap {{
-                gap: 0.5rem;
-            }}
-            .qr-image {{
-                width: 160px;
-                height: 160px;
-            }}
-        }}
-        @media (max-width: 480px) {{
-            .xs-text-xs {{
-                font-size: 0.65rem;
-            }}
-            .xs-padding {{
-                padding: 0.5rem;
-            }}
-            .qr-image {{
-                width: 140px;
-                height: 140px;
-            }}
-            .detail-label {{
-                font-size: 0.6rem;
-            }}
-            .detail-value {{
-                font-size: 0.65rem;
-            }}
-        }}
-        .input-focus-ring:focus {{
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, #06b6d4 0%, #3b82f6 100%);
         }}
         .toast {{
             position: fixed;
-            bottom: 20px;
+            bottom: 24px;
             left: 50%;
             transform: translateX(-50%) translateY(20px);
-            background: #0f172a;
-            border: 1px solid #1e293b;
+            background: rgba(17, 24, 39, 0.9);
+            border: 1px solid rgba(6, 182, 212, 0.3);
             color: #e2e8f0;
-            padding: 8px 18px;
+            padding: 10px 20px;
             border-radius: 12px;
             font-size: 13px;
-            font-family: Inter, sans-serif;
+            backdrop-filter: blur(8px);
             opacity: 0;
-            transition: opacity 0.25s, transform 0.25s;
+            transition: opacity 0.3s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 9999;
-            pointer-events: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            max-width: 90vw;
-            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         }}
         .toast.show {{
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }}
-        .toast.success {{
-            border-color: #22c55e;
-            color: #86efac;
+        .status-dot {{
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
         }}
-        .toast.error {{
-            border-color: #ef4444;
-            color: #fca5a5;
+        .status-dot.active {{
+            background-color: #06b6d4;
+            box-shadow: 0 0 10px #06b6d4;
         }}
-        .status-badge {{
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.025em;
+        .status-dot.inactive {{
+            background-color: #ef4444;
+            box-shadow: 0 0 10px #ef4444;
         }}
-        .status-badge.active {{
-            background-color: rgba(34, 197, 94, 0.1);
-            color: #4ade80;
-            border: 1px solid rgba(34, 197, 94, 0.2);
-        }}
-        .status-badge.inactive {{
-            background-color: rgba(239, 68, 68, 0.1);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.2);
+        @media (max-width: 640px) {{
+            .mobile-column {{
+                flex-direction: column;
+                align-items: stretch;
+            }}
         }}
     </style>
 </head>
-<body class="font-sans text-slate-200 min-h-screen flex flex-col justify-between relative antialiased tracking-tight">
+<body class="font-sans text-slate-300 min-h-screen flex flex-col justify-between antialiased tracking-tight">
     
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
     
-    <div class="max-w-2xl w-full mx-auto px-3 sm:px-4 py-6 sm:py-10 flex-grow mobile-padding">
-        <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5 sm:p-8 backdrop-blur-xl glow-effect transition-all duration-300 hover:border-slate-700/80">
+    <div class="max-w-xl w-full mx-auto px-4 py-8 sm:py-14 flex-grow flex flex-col justify-center">
+        <div class="glass-card rounded-2xl p-6 sm:p-8 glow-cyan transition-all duration-300">
             
-            <!-- Header -->
-            <div class="flex items-center gap-3 mb-6">
-                <div class="bg-blue-600 p-2 rounded-xl text-white glow-effect flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                        <polyline points="9 12 11 14 15 10"/>
-                    </svg>
+            <!-- Top Header & Brand -->
+            <div class="flex items-center justify-between mb-8 border-b border-slate-800/80 pb-5">
+                <div class="flex items-center gap-3">
+                    <div class="h-9 w-9 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-sm font-bold tracking-wider text-slate-200 font-mono">MX-UI // CORE</h1>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-medium">Node Security Dashboard</p>
+                    </div>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <span class="font-bold text-base sm:text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent block truncate">MX-UI PANEL</span>
-                    <span class="text-[10px] sm:text-xs text-slate-500 font-medium block truncate">v1.0.0</span>
-                </div>
-            </div>
-
-            <!-- Title Section -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 sm:mb-6">
-                <div class="min-w-0">
-                    <h2 class="text-xl sm:text-2xl font-bold text-slate-100 truncate">Subscription Info</h2>
-                    <p class="text-xs sm:text-sm text-slate-400 truncate">Details for your configuration</p>
-                </div>
-                <span id="status-badge" class="status-badge active shrink-0 self-start sm:self-center">
+                
+                <span id="status-badge" class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-slate-950 border border-slate-800 text-[10px] font-mono tracking-wider uppercase">
                     <span class="status-dot active"></span>
-                    Loading...
+                    <span class="text-slate-400">Loading</span>
                 </span>
             </div>
 
-            <!-- QR Code -->
-            <div class="mb-5 sm:mb-6 flex justify-center">
-                <div class="bg-white p-2 sm:p-3 rounded-xl shadow-lg border-2 border-slate-700/50 qr-container">
-                    <img src="{qr_url}" alt="QR Code" class="qr-image w-36 h-36 sm:w-48 sm:h-48 object-contain">
+            <!-- Profile Title Summary -->
+            <div class="mb-6 flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-semibold text-slate-100">{label}</h2>
+                    <p class="text-xs text-slate-500 font-mono mt-0.5 max-w-[240px] sm:max-w-xs truncate">{uuid}</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-[10px] font-mono uppercase tracking-wider text-slate-500 block">Current Status</span>
+                    <span class="text-sm font-medium text-cyan-400 font-mono block mt-0.5">{status}</span>
                 </div>
             </div>
 
-            <!-- Details Grid -->
-            <div class="space-y-1.5 sm:space-y-2 mb-5 sm:mb-6">
-                <!-- Label -->
-                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Label</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-200 font-semibold truncate">{label}</span>
-                </div>
-                
-                <!-- Subscription ID -->
-                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Subscription ID</span>
-                    <span class="detail-value text-[10px] sm:text-xs font-mono text-slate-200 truncate">{uuid}</span>
-                </div>
-                
-                <!-- Status -->
-                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Status</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono font-semibold">{status}</span>
-                </div>
-                
-                <!-- Downloaded -->
-                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Downloaded</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-blue-300 font-semibold">{downloaded}</span>
-                </div>
-                
-                <!-- Uploaded -->
-                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Uploaded</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-purple-300 font-semibold">{uploaded}</span>
-                </div>
-                
-                <!-- Usage -->
-                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Usage</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-amber-300 font-semibold">{usage} / {total_quota}</span>
-                </div>
-                
-                <!-- Total Quota -->
-                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Total Quota</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-200 font-semibold">{total_quota}</span>
-                </div>
-                
-                <!-- Remained -->
-                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Remained</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-emerald-300 font-semibold">{remained}</span>
-                </div>
-                
-                <!-- Last Online -->
-                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Last Online</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-300">{last_online}</span>
-                </div>
-                
-                <!-- Expiry -->
-                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Expiry</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-rose-300 font-semibold">{expiry}</span>
-                </div>
-                
-                <!-- IPs Connected -->
-                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">IP(s) Connected</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-cyan-300">{ips}</span>
+            <!-- Enhanced QR Visualization -->
+            <div class="mb-8 flex justify-center">
+                <div class="relative group p-3 bg-white rounded-xl shadow-2xl transition-transform duration-300 hover:scale-[1.01]">
+                    <img src="{qr_url}" alt="Configuration QR" class="w-40 h-40 sm:w-44 sm:h-44 object-contain mix-blend-multiply opacity-95">
+                    <div class="absolute inset-0 border border-slate-950/5 rounded-xl pointer-events-none"></div>
                 </div>
             </div>
 
-            <!-- Progress Bar Section -->
-            <div class="mt-5 sm:mt-6 p-4 sm:p-5 bg-slate-950/60 border border-slate-800/60 rounded-xl">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 mb-2">
-                    <span class="text-xs sm:text-sm text-slate-300 font-medium truncate">{label}</span>
-                    <span class="text-[10px] sm:text-xs text-slate-400 font-mono">{used_fmt} / {limit_fmt}</span>
+            <!-- Live Usage Metrics Framework -->
+            <div class="mb-6 p-4 bg-slate-950/80 border border-slate-800/80 rounded-xl">
+                <div class="flex justify-between items-end mb-2">
+                    <div>
+                        <span class="text-[10px] font-mono uppercase tracking-widest text-slate-500 block">Bandwidth Allocation</span>
+                        <span class="text-xs font-semibold text-slate-300 mt-0.5 block">{usage} used</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-mono font-medium text-slate-400">{total_quota} Limit</span>
+                    </div>
                 </div>
-                <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full progress-bar-fill" style="width: {usage_pct}%;"></div>
+                
+                <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden p-[1px] border border-slate-800/50">
+                    <div class="h-full rounded-full progress-bar-fill" style="width: {usage_pct}%;"></div>
                 </div>
-                <div class="flex flex-col xs:flex-row xs:justify-between gap-0.5 xs:gap-0 mt-1.5">
-                    <span class="text-[10px] sm:text-xs text-slate-500">{usage_pct}% used</span>
-                    <span class="text-[10px] sm:text-xs text-slate-500">{remained} remaining</span>
+                
+                <div class="flex justify-between items-center mt-2 font-mono text-[10px] text-slate-500">
+                    <span>{usage_pct}% Consumed</span>
+                    <span class="text-emerald-400/90">{remained} Remained</span>
                 </div>
             </div>
 
-            <!-- VLESS Link -->
-            <div class="mt-5 sm:mt-6 p-3 sm:p-4 bg-slate-950/60 border border-slate-800/60 rounded-xl">
-                <p class="text-[10px] sm:text-xs text-slate-400 mb-2 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            <!-- Core Metrics Data Grid Split -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                <!-- Segment Left: Traffic Metrics -->
+                <div class="glass-subcard rounded-xl p-3.5 space-y-2.5">
+                    <div class="flex justify-between items-center text-xs border-b border-slate-900 pb-2">
+                        <span class="text-slate-500 font-medium">Downlink Traffic</span>
+                        <span class="font-mono font-medium text-blue-400">{downloaded}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs border-b border-slate-900 pb-2">
+                        <span class="text-slate-500 font-medium">Uplink Traffic</span>
+                        <span class="font-mono font-medium text-purple-400">{uploaded}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 font-medium">Active IP Access</span>
+                        <span class="font-mono font-medium text-cyan-400">{ips} Devices</span>
+                    </div>
+                </div>
+
+                <!-- Segment Right: Dynamic Expirations -->
+                <div class="glass-subcard rounded-xl p-3.5 space-y-2.5">
+                    <div class="flex justify-between items-center text-xs border-b border-slate-900 pb-2">
+                        <span class="text-slate-500 font-medium">Expiration Boundary</span>
+                        <span class="font-mono font-medium text-rose-400">{expiry}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs border-b border-slate-900 pb-2">
+                        <span class="text-slate-500 font-medium">Network Limit</span>
+                        <span class="font-mono font-medium text-slate-300">{limit_fmt}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 font-medium">Last Node Echo</span>
+                        <span class="font-mono font-medium text-slate-400 truncate max-w-[90px]">{last_online}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Refactored Clean Proxy Copy Strip -->
+            <div class="glass-subcard rounded-xl p-3 border border-slate-800/60 flex items-center justify-between gap-3 group hover:border-slate-700/60 transition-colors cursor-pointer" onclick="copyToClipboard('{vless_link}')">
+                <div class="min-w-0 flex-1 pl-1">
+                    <span class="text-[9px] font-mono uppercase tracking-widest text-slate-500 block mb-0.5">VLESS Node Configuration String</span>
+                    <div class="text-[11px] font-mono text-slate-400 truncate pr-2 select-all">{vless_link}</div>
+                </div>
+                <button class="h-9 w-9 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                     </svg>
-                    <span class="truncate">VLESS Link (copy to client):</span>
-                </p>
-                <div class="flex items-center gap-2 mobile-stack">
-                    <input type="text" readonly value="{vless_link}" id="vless-link-input" class="flex-1 min-w-0 bg-slate-950 border border-slate-800/80 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 text-[8px] sm:text-[10px] font-mono text-slate-400 focus:outline-none select-all truncate input-focus-ring">
-                    <button onclick="copyToClipboard('{vless_link}')" class="copy-btn px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition shadow-lg shadow-blue-600/20 flex items-center justify-center gap-1.5 shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                        </svg>
-                        <span class="hidden xs:inline text-[10px] sm:text-xs">Copy</span>
-                    </button>
-                </div>
+                </button>
             </div>
 
-            <!-- Footer -->
-            <div class="mt-6 sm:mt-8 text-center text-[10px] sm:text-xs text-slate-500 border-t border-slate-800/60 pt-4">
+            <!-- Clean Embedded Footnote Watermark -->
+            <div class="mt-8 text-center text-[10px] font-mono text-slate-600 tracking-wider">
                 {watermark}
             </div>
         </div>
     </div>
 
     <script>
-        // Toast notification system
-        function showToast(message, type) {{
+        // Precision Toast Pipeline
+        function showToast(message, isSuccess = true) {{
             const toast = document.getElementById('toast');
             toast.textContent = message;
-            toast.className = 'toast show' + (type ? ' ' + type : '');
+            toast.style.borderColor = isSuccess ? 'rgba(6, 182, 212, 0.4)' : 'rgba(239, 68, 68, 0.4)';
+            toast.className = 'toast show';
             clearTimeout(toast._timeout);
             toast._timeout = setTimeout(() => {{
                 toast.classList.remove('show');
-            }}, 3000);
+            }}, 2500);
         }}
 
-        // Copy to clipboard with fallback
+        // Dynamic System Clipboard API Hook with Textarea Redundancy
         function copyToClipboard(text) {{
             if (navigator.clipboard && navigator.clipboard.writeText) {{
                 navigator.clipboard.writeText(text).then(() => {{
-                    showToast('Copied to clipboard!', 'success');
+                    showToast('Configuration securely copied');
                 }}).catch(() => {{
-                    fallbackCopy(text);
+                    fallbackClipboardCopy(text);
                 }});
             }} else {{
-                fallbackCopy(text);
+                fallbackClipboardCopy(text);
             }}
         }}
 
-        function fallbackCopy(text) {{
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed';
-            textarea.style.opacity = '0';
-            textarea.style.left = '-9999px';
-            textarea.style.top = '-9999px';
-            document.body.appendChild(textarea);
-            textarea.select();
+        function fallbackClipboardCopy(text) {{
+            const area = document.createElement('textarea');
+            area.value = text;
+            area.style.position = 'fixed';
+            area.style.opacity = '0';
+            document.body.appendChild(area);
+            area.select();
             try {{
                 document.execCommand('copy');
-                showToast('Copied to clipboard!', 'success');
-            }} catch (e) {{
-                showToast('Failed to copy', 'error');
+                showToast('Configuration securely copied');
+            }} catch (err) {{
+                showToast('Copy execution failed', false);
             }}
-            document.body.removeChild(textarea);
+            document.body.removeChild(area);
         }}
 
-        // Auto-select input on click
+        // Lifecycle Events Execution
         document.addEventListener('DOMContentLoaded', function() {{
-            const input = document.getElementById('vless-link-input');
-            if (input) {{
-                input.addEventListener('click', function() {{
-                    this.select();
-                }});
-                input.addEventListener('focus', function() {{
-                    this.select();
-                }});
-            }}
-
-            // Update status badge based on status text
-            const statusBadge = document.getElementById('status-badge');
-            const statusValue = document.querySelector('.detail-row:nth-child(3) .detail-value');
-            if (statusValue) {{
-                const isActive = statusValue.textContent.trim().toLowerCase().includes('active');
-                const dot = statusBadge.querySelector('.status-dot');
-                if (isActive) {{
-                    statusBadge.className = 'status-badge active';
+            const badge = document.getElementById('status-badge');
+            const targetText = '{status}'.trim().toLowerCase();
+            
+            if (badge) {{
+                const isLive = targetText.includes('active') || targetText.includes('true') || targetText.includes('online');
+                const dot = badge.querySelector('.status-dot');
+                if (isLive) {{
+                    badge.className = 'inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-cyan-950/30 border border-cyan-800/30 text-[10px] font-mono tracking-wider uppercase';
                     dot.className = 'status-dot active';
-                    statusBadge.innerHTML = '<span class="status-dot active"></span> Active';
+                    badge.innerHTML = '<span class="status-dot active"></span> <span class="text-cyan-400">Active</span>';
                 }} else {{
-                    statusBadge.className = 'status-badge inactive';
+                    badge.className = 'inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-rose-950/30 border border-rose-800/30 text-[10px] font-mono tracking-wider uppercase';
                     dot.className = 'status-dot inactive';
-                    statusBadge.innerHTML = '<span class="status-dot inactive"></span> Inactive';
+                    badge.innerHTML = '<span class="status-dot inactive"></span> <span class="text-rose-400">Suspended</span>';
                 }}
             }}
         }});
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {{
-            if ((e.ctrlKey || e.metaKey) && e.key === 'c') {{
-                const input = document.getElementById('vless-link-input');
-                if (document.activeElement === input) {{
-                    copyToClipboard(input.value);
-                }}
-            }}
-        }});
-
-        // Handle page visibility change to refresh QR if needed
-        document.addEventListener('visibilitychange', function() {{
-            if (!document.hidden) {{
-                const qrImg = document.querySelector('.qr-image');
-                if (qrImg && qrImg.src && qrImg.src.includes('qrserver')) {{
-                    const url = new URL(qrImg.src);
-                    url.searchParams.set('t', Date.now());
-                    qrImg.src = url.toString();
-                }}
-            }}
-        }});
-
-        // Touch feedback for copy button
-        document.querySelector('.copy-btn')?.addEventListener('touchstart', function() {{
-            this.style.transform = 'scale(0.95)';
-        }}, {{ passive: true }});
-        
-        document.querySelector('.copy-btn')?.addEventListener('touchend', function() {{
-            this.style.transform = 'scale(1)';
-        }}, {{ passive: true }});
-
-        // Handle responsive QR code loading
-        function handleQrLoading() {{
-            const qrImg = document.querySelector('.qr-image');
-            if (qrImg) {{
-                qrImg.addEventListener('error', function() {{
-                    const currentSrc = this.src;
-                    if (currentSrc.includes('api.qrserver.com')) {{
-                        const dataParam = new URL(currentSrc).searchParams.get('data');
-                        if (dataParam) {{
-                            this.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + dataParam + '&t=' + Date.now();
-                        }}
-                    }}
-                }});
-            }}
-        }}
-        document.addEventListener('DOMContentLoaded', handleQrLoading);
     </script>
 </body>
 </html>"""
