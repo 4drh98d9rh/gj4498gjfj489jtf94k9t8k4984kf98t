@@ -30,7 +30,35 @@ logger = logging.getLogger("MX-UI")
 IRAN_TZ = ZoneInfo("Asia/Tehran")
 
 app = FastAPI(title="MX-UI", docs_url=None, redoc_url=None)
+# اضافه کردن بعد از imports
+import random
 
+# Emoji lists for random selection
+COUNTRY_EMOJIS = [
+    "🇺🇸", "🇬🇧", "🇩🇪", "🇫🇷", "🇮🇹", "🇪🇸", "🇵🇹", "🇳🇱", "🇧🇪", "🇨🇭",
+    "🇦🇹", "🇸🇪", "🇳🇴", "🇩🇰", "🇫🇮", "🇮🇪", "🇬🇷", "🇹🇷", "🇷🇺", "🇺🇦",
+    "🇵🇱", "🇨🇿", "🇭🇺", "🇷🇴", "🇧🇬", "🇭🇷", "🇷🇸", "🇸🇰", "🇸🇮", "🇱🇹",
+    "🇱🇻", "🇪🇪", "🇨🇦", "🇲🇽", "🇧🇷", "🇦🇷", "🇨🇱", "🇨🇴", "🇵🇪", "🇻🇪",
+    "🇯🇵", "🇰🇷", "🇨🇳", "🇹🇼", "🇭🇰", "🇸🇬", "🇲🇾", "🇮🇩", "🇵🇭", "🇻🇳",
+    "🇹🇭", "🇮🇳", "🇵🇰", "🇧🇩", "🇦🇪", "🇸🇦", "🇮🇱", "🇪🇬", "🇿🇦", "🇳🇬",
+    "🇦🇺", "🇳🇿", "🇵🇬", "🇫🇯", "🇼🇸", "🇹🇴", "🇸🇧", "🇻🇺", "🇳🇨", "🇵🇫"
+]
+
+SPEED_EMOJIS = ["⚡", "🔥", "💨", "🚀", "⭐", "💎", "🌟", "✨", "🎯", "🏆"]
+STATUS_EMOJIS = ["✅", "🔰", "🛡️", "🔒", "🔐", "🛡️", "⚔️", "🎖️", "🏅", "📡"]
+FLOWER_EMOJIS = ["🌸", "🌺", "🌻", "🌹", "🌷", "🌿", "🍀", "🌴", "🌳", "🎋"]
+TECH_EMOJIS = ["💻", "🖥️", "📱", "📡", "🛰️", "🎮", "🕹️", "⌨️", "🖱️", "📀"]
+GAME_EMOJIS = ["🎮", "🕹️", "🎯", "🎲", "♟️", "🎪", "🎭", "🎨", "🎵", "🎶"]
+
+ALL_EMOJIS = COUNTRY_EMOJIS + SPEED_EMOJIS + STATUS_EMOJIS + FLOWER_EMOJIS + TECH_EMOJIS + GAME_EMOJIS
+
+def get_random_emoji() -> str:
+    """Get a random emoji from the list"""
+    return random.choice(ALL_EMOJIS)
+
+def get_random_country_emoji() -> str:
+    """Get a random country flag emoji"""
+    return random.choice(COUNTRY_EMOJIS)
 # ── Persistence ───────────────────────────────────────────────────────────────
 DATA_DIR = Path(os.environ.get("DATA_DIR", "/data"))
 DATA_FILE = DATA_DIR / "mxui_state.json"
@@ -930,8 +958,6 @@ async def get_connections(_=Depends(require_auth)):
         "count": len(result),
         "raw_count": len(connections),
     }
-
-# ── Link Management ───────────────────────────────────────────────────────────
 async def make_link(
     label: str = "New Link",
     limit_bytes: int = 0,
@@ -949,9 +975,18 @@ async def make_link(
     if fingerprint not in FINGERPRINTS:
         fingerprint = DEFAULT_FINGERPRINT
     uid = generate_uuid()
+    
+    # Generate random emoji for label
+    random_emoji = get_random_emoji()
+    country_emoji = get_random_country_emoji()
+    
+    # Format label with emoji
+    label_text = (label or "New Link").strip()[:60] or "New Link"
+    formatted_label = f"{country_emoji} {random_emoji} {label_text}"
+    
     async with LINKS_LOCK:
         LINKS[uid] = {
-            "label": (label or "New Link").strip()[:60] or "New Link",
+            "label": formatted_label,
             "limit_bytes": max(0, limit_bytes),
             "used_bytes": 0,
             "created_at": datetime.now().isoformat(),
@@ -969,7 +1004,35 @@ async def make_link(
     asyncio.create_task(save_state())
     log_activity("link", f"Config «{LINKS[uid]['label']}» created", "ok")
     return uid, LINKS[uid]
+def get_emoji_by_limit(limit_bytes: int) -> str:
+    """Get emoji based on traffic limit"""
+    if limit_bytes == 0:
+        return "♾️"
+    elif limit_bytes < 1024 ** 3:  # < 1GB
+        return "📦"
+    elif limit_bytes < 10 * 1024 ** 3:  # < 10GB
+        return "📦"
+    elif limit_bytes < 100 * 1024 ** 3:  # < 100GB
+        return "🚀"
+    else:
+        return "🌌"
 
+def format_label_with_emoji(label: str, limit_bytes: int, speed_bytes: int) -> str:
+    """Format label with appropriate emojis based on limits"""
+    limit_emoji = get_emoji_by_limit(limit_bytes)
+    speed_emoji = "⚡" if speed_bytes > 0 else "🐢"
+    random_emoji = get_random_emoji()
+    country_emoji = get_random_country_emoji()
+    
+    # Format limit as GB or MB
+    if limit_bytes >= 1024 ** 3:
+        limit_str = f"{limit_bytes / 1024 ** 3:.1f}GB"
+    elif limit_bytes >= 1024 ** 2:
+        limit_str = f"{limit_bytes / 1024 ** 2:.0f}MB"
+    else:
+        limit_str = f"{limit_bytes / 1024:.0f}KB" if limit_bytes > 0 else "∞"
+    
+    return f"{country_emoji} {random_emoji} {label} {limit_emoji} {limit_str}"
 async def remove_link(uid: str) -> str | None:
     async with LINKS_LOCK:
         if uid not in LINKS:
@@ -989,7 +1052,6 @@ async def set_link_active(uid: str, active: bool) -> dict | None:
     log_activity("link", f"Config «{label}» {'activated' if active else 'deactivated'}", "ok" if active else "warn")
     asyncio.create_task(save_state())
     return LINKS[uid]
-
 @app.post("/api/links")
 async def create_link(request: Request, _=Depends(require_auth)):
     body = await request.json()
@@ -1007,8 +1069,29 @@ async def create_link(request: Request, _=Depends(require_auth)):
     su = body.get("speed_limit_unit") or "MBIT"
     speed_limit_bytes = 0 if sv <= 0 else parse_speed_to_bytes(sv, su)
 
+    # Get base label
+    base_label = body.get("label") or "New Config"
+    
+    # Generate label with emojis
+    if limit_bytes > 0:
+        if limit_bytes >= 1024 ** 3:
+            limit_str = f"{limit_bytes / 1024 ** 3:.1f}GB"
+        elif limit_bytes >= 1024 ** 2:
+            limit_str = f"{limit_bytes / 1024 ** 2:.0f}MB"
+        else:
+            limit_str = f"{limit_bytes / 1024:.0f}KB"
+    else:
+        limit_str = "∞"
+    
+    country_emoji = get_random_country_emoji()
+    random_emoji = get_random_emoji()
+    limit_emoji = get_emoji_by_limit(limit_bytes)
+    speed_emoji = "⚡" if speed_limit_bytes > 0 else "🐢"
+    
+    formatted_label = f"{country_emoji} {random_emoji} {base_label} {limit_emoji} {limit_str} {speed_emoji}"
+
     uid, link = await make_link(
-        label=body.get("label") or "New Link",
+        label=formatted_label,
         limit_bytes=limit_bytes,
         expires_at=expires_at,
         note=body.get("note") or "",
@@ -1028,6 +1111,26 @@ async def create_link(request: Request, _=Depends(require_auth)):
         "sub_url": f"https://{host}/sub/{uid}",
         "info_url": f"https://{host}/sub/{uid}/info",
     }
+def generate_emoji_label(base_label: str, limit_bytes: int, speed_limit_bytes: int) -> str:
+    """Generate a formatted label with emojis"""
+    # Get limit string
+    if limit_bytes > 0:
+        if limit_bytes >= 1024 ** 3:
+            limit_str = f"{limit_bytes / 1024 ** 3:.1f}GB"
+        elif limit_bytes >= 1024 ** 2:
+            limit_str = f"{limit_bytes / 1024 ** 2:.0f}MB"
+        else:
+            limit_str = f"{limit_bytes / 1024:.0f}KB"
+    else:
+        limit_str = "∞"
+    
+    # Get emojis
+    country_emoji = get_random_country_emoji()
+    random_emoji = get_random_emoji()
+    limit_emoji = get_emoji_by_limit(limit_bytes)
+    speed_emoji = "⚡" if speed_limit_bytes > 0 else "🐢"
+    
+    return f"{country_emoji} {random_emoji} {base_label} {limit_emoji} {limit_str} {speed_emoji}"
 @app.get("/api/links")
 async def list_links(request: Request, _=Depends(require_auth)):
     host = get_host(request)
@@ -1061,7 +1164,6 @@ async def list_links(request: Request, _=Depends(require_auth)):
         })
     result.sort(key=lambda x: x["created_at"], reverse=True)
     return {"links": result}
-
 @app.patch("/api/links/{uid}")
 async def update_link(uid: str, request: Request, _=Depends(require_auth)):
     body = await request.json()
@@ -1082,14 +1184,36 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
             log_activity("link", f"Config «{label}» {'activated' if link['active'] else 'deactivated'}", "ok" if link["active"] else "warn")
         
         if "label" in body:
-            link["label"] = str(body["label"])[:60]
+            # Preserve emoji pattern when updating label
+            new_label = str(body["label"])[:60]
+            # Check if the label already has emojis
+            import re
+            emoji_pattern = re.compile(r'[🇦-🇿🌍-🌏🎌🏁🚩🇺🇸🇬🇧🇩🇪🇫🇷🇮🇹🇪🇸🇵🇹🇳🇱🇧🇪🇨🇭🇦🇹🇸🇪🇳🇴🇩🇰🇫🇮🇮🇪🇬🇷🇹🇷🇷🇺🇺🇦🇵🇱🇨🇿🇭🇺🇷🇴🇧🇬🇭🇷🇷🇸🇸🇰🇸🇮🇱🇹🇱🇻🇪🇪🇨🇦🇲🇽🇧🇷🇦🇷🇨🇱🇨🇴🇵🇪🇻🇪🇯🇵🇰🇷🇨🇳🇹🇼🇭🇰🇸🇬🇲🇾🇮🇩🇵🇭🇻🇳🇹🇭🇮🇳🇵🇰🇧🇩🇦🇪🇸🇦🇮🇱🇪🇬🇿🇦🇳🇬🇦🇺🇳🇿]')
+            
+            # If the label has emojis, keep them and just update the text part
+            if emoji_pattern.search(new_label):
+                # Extract the text part (after the emojis)
+                parts = new_label.split(' ', 2)
+                if len(parts) >= 3:
+                    # Keep first two parts (emojis) and update the rest
+                    text_part = ' '.join(parts[2:]) if len(parts) > 2 else ''
+                    # Rebuild with current limit info
+                    current_limit = link.get("limit_bytes", 0)
+                    current_speed = link.get("speed_limit_bytes", 0)
+                    link["label"] = generate_emoji_label(text_part, current_limit, current_speed)
+                else:
+                    link["label"] = new_label
+            else:
+                # No emojis, generate new emoji label
+                current_limit = link.get("limit_bytes", 0)
+                current_speed = link.get("speed_limit_bytes", 0)
+                link["label"] = generate_emoji_label(new_label, current_limit, current_speed)
         
         if "note" in body:
             link["note"] = str(body["note"])[:200]
         
         if "reset_usage" in body and body["reset_usage"]:
             link["used_bytes"] = 0
-            # Reactivate if it was deactivated due to quota
             if not link.get("active", True):
                 link["active"] = True
             log_activity("link", f"Usage reset for «{label}»", "info")
@@ -1098,6 +1222,16 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
             lv = float(body.get("limit_value") or 0)
             lu = body.get("limit_unit") or "GB"
             link["limit_bytes"] = 0 if lv <= 0 else parse_size_to_bytes(lv, lu)
+            # Update label with new limit info
+            current_label = link.get("label", "")
+            # Extract text part without emojis
+            import re
+            emoji_pattern = re.compile(r'[🇦-🇿🌍-🌏🎌🏁🚩🇺🇸🇬🇧🇩🇪🇫🇷🇮🇹🇪🇸🇵🇹🇳🇱🇧🇪🇨🇭🇦🇹🇸🇪🇳🇴🇩🇰🇫🇮🇮🇪🇬🇷🇹🇷🇷🇺🇺🇦🇵🇱🇨🇿🇭🇺🇷🇴🇧🇬🇭🇷🇷🇸🇸🇰🇸🇮🇱🇹🇱🇻🇪🇪🇨🇦🇲🇽🇧🇷🇦🇷🇨🇱🇨🇴🇵🇪🇻🇪🇯🇵🇰🇷🇨🇳🇹🇼🇭🇰🇸🇬🇲🇾🇮🇩🇵🇭🇻🇳🇹🇭🇮🇳🇵🇰🇧🇩🇦🇪🇸🇦🇮🇱🇪🇬🇿🇦🇳🇬🇦🇺🇳🇿⚡🔥💨🚀⭐💎🌟✨🎯🏆✅🔰🛡️🔒🔐⚔️🎖️🏅📡🌸🌺🌻🌹🌷🌿🍀🌴🌳🎋💻🖥️📱📡🛰️🎮🕹️⌨️🖱️📀]')
+            text_part = emoji_pattern.sub('', current_label).strip()
+            if not text_part:
+                text_part = link.get("label", "Config")
+            current_speed = link.get("speed_limit_bytes", 0)
+            link["label"] = generate_emoji_label(text_part, link["limit_bytes"], current_speed)
         
         if "expires_days" in body:
             ed = int(body["expires_days"] or 0)
@@ -1121,6 +1255,15 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
             sv = float(body.get("speed_limit_value") or 0)
             su = body.get("speed_limit_unit") or "MBIT"
             link["speed_limit_bytes"] = 0 if sv <= 0 else parse_speed_to_bytes(sv, su)
+            # Update label with new speed info
+            current_label = link.get("label", "")
+            import re
+            emoji_pattern = re.compile(r'[🇦-🇿🌍-🌏🎌🏁🚩🇺🇸🇬🇧🇩🇪🇫🇷🇮🇹🇪🇸🇵🇹🇳🇱🇧🇪🇨🇭🇦🇹🇸🇪🇳🇴🇩🇰🇫🇮🇮🇪🇬🇷🇹🇷🇷🇺🇺🇦🇵🇱🇨🇿🇭🇺🇷🇴🇧🇬🇭🇷🇷🇸🇸🇰🇸🇮🇱🇹🇱🇻🇪🇪🇨🇦🇲🇽🇧🇷🇦🇷🇨🇱🇨🇴🇵🇪🇻🇪🇯🇵🇰🇷🇨🇳🇹🇼🇭🇰🇸🇬🇲🇾🇮🇩🇵🇭🇻🇳🇹🇭🇮🇳🇵🇰🇧🇩🇦🇪🇸🇦🇮🇱🇪🇬🇿🇦🇳🇬🇦🇺🇳🇿⚡🔥💨🚀⭐💎🌟✨🎯🏆✅🔰🛡️🔒🔐⚔️🎖️🏅📡🌸🌺🌻🌹🌷🌿🍀🌴🌳🎋💻🖥️📱📡🛰️🎮🕹️⌨️🖱️📀]')
+            text_part = emoji_pattern.sub('', current_label).strip()
+            if not text_part:
+                text_part = link.get("label", "Config")
+            current_limit = link.get("limit_bytes", 0)
+            link["label"] = generate_emoji_label(text_part, current_limit, link["speed_limit_bytes"])
             from speed_limit import reset_bucket
             reset_bucket(uid)
         
