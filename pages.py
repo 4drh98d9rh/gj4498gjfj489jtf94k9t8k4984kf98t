@@ -529,17 +529,16 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     </div>
 </div>
 <!-- ===== MODAL: QR with 4 items ===== -->
-<!-- ===== MODAL: QR with 4 items ===== -->
-<div id="qrModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow p-6 space-y-3">
+<div id="qrModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75" style="display: none;">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow p-6 space-y-3 relative">
         <div class="flex items-center justify-between border-b border-slate-800 pb-2">
             <div>
-    <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
-        <i data-lucide="qrcode" class="w-5 h-5 text-blue-400"></i>
-        QR Codes
-    </h3>
-    <p class="text-xs text-slate-400 font-mono pl-7" id="qrTargetLabel">Default Link</p>
-</div>
+                <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                    <i data-lucide="qrcode" class="w-5 h-5 text-blue-400"></i>
+                    QR Codes
+                </h3>
+                <p class="text-xs text-slate-400 font-mono pl-7" id="qrTargetLabel">Default Link</p>
+            </div>
             <button onclick="toggleModal('qrModal', false)" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition">
                 <i data-lucide="x" class="w-4 h-4"></i>
             </button>
