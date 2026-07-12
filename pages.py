@@ -8,127 +8,219 @@ LOGO_B64 = "iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAABOq0lEQVR42q2dd7wldXn/
 LOGIN_HTML = r"""<!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login · MX-UI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-    theme: {
-        extend: {
-            fontFamily: {
-                sans: ['Inter', 'sans-serif'],
-                mono: ['JetBrains Mono', 'monospace'],
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login · MX-UI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
             }
         }
-    }
-}
-</script>
-<style>
-body { background-color: #070a13; }
-.glow-effect { box-shadow: 0 0 25px rgba(59, 130, 246, 0.12); }
-</style>
+    </script>
+    <style>
+        body {
+            background-color: #070a13;
+        }
+        .glow-effect {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.12);
+        }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .pulse-slow {
+            animation: pulse-slow 2s ease-in-out infinite;
+        }
+        .input-focus-ring:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        @media (max-width: 640px) {
+            .mobile-padding {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+    </style>
 </head>
-<body class="font-sans text-slate-200 min-h-screen flex items-center justify-center bg-[#070a13] relative antialiased tracking-tight p-4">
-<div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(59,130,246,0.08),transparent_70%)] pointer-events-none"></div>
-<div class="w-full max-w-md relative z-10">
-    <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-8 backdrop-blur-xl glow-effect">
-        <div class="flex items-center gap-3 mb-6">
-            <div class="bg-blue-600 p-2 rounded-xl text-white glow-effect">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+<body class="font-sans text-slate-200 min-h-screen flex items-center justify-center bg-[#070a13] relative antialiased tracking-tight p-4 mobile-padding">
+    
+    <!-- Background Effects -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(59,130,246,0.08),transparent_70%)] pointer-events-none"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_100%,rgba(99,102,241,0.05),transparent_70%)] pointer-events-none"></div>
+    
+    <!-- Grid Pattern Overlay -->
+    <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(circle at 1px 1px, #3b82f6 1px, transparent 0); background-size: 24px 24px;"></div>
+    
+    <div class="w-full max-w-md relative z-10">
+        <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-6 sm:p-8 backdrop-blur-xl glow-effect transition-all duration-300 hover:border-slate-700/80">
+            
+            <!-- Logo & Brand -->
+            <div class="flex items-center gap-3 mb-6">
+                <div class="bg-blue-600 p-2 rounded-xl text-white glow-effect flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <polyline points="9 12 11 14 15 10"/>
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent block truncate">MX-UI PANEL</span>
+                    <span class="text-xs text-slate-500 font-medium">v1.0.0</span>
+                </div>
             </div>
-            <div>
-                <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">MX-UI PANEL</span>
-                <span class="text-xs block text-slate-500 font-medium">v1.0.0</span>
+            
+            <!-- Title -->
+            <h1 class="text-xl font-bold text-slate-100 mb-1">Sign In</h1>
+            <p class="text-sm text-slate-400 mb-6">Enter your password to access the dashboard</p>
+            
+            <!-- Default Password Display -->
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-xl p-3 mb-5">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <span class="text-xs text-slate-400">Default password</span>
+                    <span id="default-password-display" class="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20 cursor-pointer hover:bg-blue-500/20 transition text-center sm:text-left" onclick="document.getElementById('pw').value='MUVIXO';document.getElementById('pw').focus();">
+                        MUVIXO
+                    </span>
+                </div>
+                <div id="password-status-message" class="hidden mt-2 text-xs text-amber-400 border-t border-amber-500/20 pt-2">
+                    <span class="font-medium">⚠️ Password changed</span>
+                    <span class="text-slate-400 ml-2">(your custom password)</span>
+                </div>
             </div>
-        </div>
-        <h1 class="text-xl font-bold text-slate-100 mb-1">Sign In</h1>
-        <p class="text-sm text-slate-400 mb-6">Enter your password to access the dashboard</p>
-        
-        <!-- Default Password Display -->
-        <div class="bg-slate-800/40 border border-slate-700/50 rounded-xl p-3 mb-5">
-            <div class="flex items-center justify-between">
-                <span class="text-xs text-slate-400">Default password</span>
-                <span id="default-password-display" class="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20 cursor-pointer hover:bg-blue-500/20 transition" onclick="document.getElementById('pw').value='MUVIXO';document.getElementById('pw').focus()">MUVIXO</span>
+            
+            <!-- Login Form -->
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password</label>
+                    <input type="password" id="pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="Enter your password" autofocus required>
+                </div>
+                <button type="submit" id="loginButton" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm px-4 py-2.5 rounded-xl transition duration-200 shadow-lg shadow-blue-600/10 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                        <polyline points="10 17 15 12 10 7"/>
+                        <line x1="15" y1="12" x2="3" y2="12"/>
+                    </svg>
+                    Sign In
+                </button>
+                <div id="errorMsg" class="mt-3 text-sm text-red-400 hidden"></div>
+            </form>
+            
+            <!-- Footer -->
+            <div class="mt-6 pt-4 border-t border-slate-800/60 text-center text-xs text-slate-500">
+                Created by Muvixo
             </div>
-            <div id="password-status-message" class="hidden mt-2 text-xs text-amber-400 border-t border-amber-500/20 pt-2">
-                <span class="font-medium">⚠️ Password changed</span>
-                <span class="text-slate-400 ml-2">(your custom password)</span>
-            </div>
-        </div>
-        
-        <form id="loginForm">
-            <div class="mb-4">
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password</label>
-                <input type="password" id="pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition" placeholder="Enter your password" autofocus required>
-            </div>
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm px-4 py-2.5 rounded-xl transition duration-200 shadow-lg shadow-blue-600/10 flex items-center justify-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                Sign In
-            </button>
-            <div id="errorMsg" class="mt-3 text-sm text-red-400 hidden"></div>
-        </form>
-        <div class="mt-6 pt-4 border-t border-slate-800/60 text-center text-xs text-slate-500">
-            Created by Muvixo
         </div>
     </div>
-</div>
 
-<script>
-// Check if default password is still used
-async function checkDefaultPassword() {
-    try {
-        const res = await fetch('/api/is-default-password');
-        const data = await res.json();
-        if (!data.is_default) {
-            const display = document.getElementById('default-password-display');
-            display.textContent = 'Password changed';
-            display.className = 'text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20';
-            display.onclick = null;
+    <script>
+        // Check if default password is still used
+        async function checkDefaultPassword() {
+            try {
+                const res = await fetch('/api/is-default-password');
+                const data = await res.json();
+                if (!data.is_default) {
+                    const display = document.getElementById('default-password-display');
+                    display.textContent = 'Password changed';
+                    display.className = 'text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20 text-center sm:text-left';
+                    display.onclick = null;
+                    
+                    // Show status message
+                    const statusMsg = document.getElementById('password-status-message');
+                    statusMsg.classList.remove('hidden');
+                }
+            } catch(e) {
+                console.error('Error checking password status:', e);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            checkDefaultPassword();
             
-            // Show status message
-            const statusMsg = document.getElementById('password-status-message');
-            statusMsg.classList.remove('hidden');
-        }
-    } catch(e) {
-        console.error('Error checking password status:', e);
-    }
-}
-checkDefaultPassword();
-
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    const err = document.getElementById('errorMsg');
-    err.classList.add('hidden');
-    btn.disabled = true;
-    btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Signing in...';
-    try {
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password: document.getElementById('pw').value })
+            // Auto-focus the password field
+            const pwInput = document.getElementById('pw');
+            if (pwInput) {
+                setTimeout(() => pwInput.focus(), 100);
+            }
         });
-        if (!res.ok) {
-            const data = await res.json().catch(() => ({}));
-            throw new Error(data.detail || 'Invalid password');
-        }
-        // Redirect to dashboard
-        location.href = '/dashboard';
-    } catch (e) {
-        err.textContent = e.message;
-        err.classList.remove('hidden');
-        btn.disabled = false;
-        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Sign In';
-    }
-});
 
-// Also check when page loads from cache
-document.addEventListener('DOMContentLoaded', function() {
-    checkDefaultPassword();
-});
-</script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('loginButton');
+            const err = document.getElementById('errorMsg');
+            err.classList.add('hidden');
+            btn.disabled = true;
+            
+            // Store original button content
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Signing in...';
+            
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: document.getElementById('pw').value })
+                });
+                
+                if (!res.ok) {
+                    let errorMsg = 'Invalid password';
+                    try {
+                        const data = await res.json();
+                        if (data && data.detail) {
+                            errorMsg = data.detail;
+                        }
+                    } catch (parseError) {
+                        // If response is not JSON, use status text
+                        if (res.statusText) {
+                            errorMsg = res.statusText;
+                        }
+                    }
+                    throw new Error(errorMsg);
+                }
+                
+                // Redirect to dashboard on success
+                location.href = '/dashboard';
+                
+            } catch (e) {
+                err.textContent = e.message || 'Invalid password';
+                err.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+                
+                // Shake the password input on error
+                const pwInput = document.getElementById('pw');
+                pwInput.classList.add('border-red-500');
+                setTimeout(() => {
+                    pwInput.classList.remove('border-red-500');
+                }, 1000);
+                
+                // Clear password field
+                pwInput.value = '';
+                pwInput.focus();
+            }
+        });
+
+        // Add keyboard shortcut (Enter key on password field triggers submit)
+        document.getElementById('pw').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+        
+        // Also check when page loads from cache
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                checkDefaultPassword();
+            }
+        });
+    </script>
 </body>
 </html>"""
 # ---------- DASHBOARD_HTML (escaped braces) ----------
@@ -136,7 +228,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>MX-UI v1.0.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -188,6 +280,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             z-index: 9999;
             pointer-events: none;
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            max-width: 90vw;
+            text-align: center;
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .toast.success { border-color: #22c55e; color: #86efac; }
@@ -207,133 +301,192 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         .qr-code-container:hover {
             transform: scale(1.02);
         }
+        .config-row {
+            transition: background-color 0.15s ease;
+        }
+        .config-row:hover {
+            background-color: rgba(30, 41, 59, 0.3);
+        }
+        @media (max-width: 640px) {
+            .mobile-stack {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .mobile-full-width {
+                width: 100%;
+            }
+            .mobile-text-center {
+                text-align: center;
+            }
+            .mobile-padding {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+            .ring-container {
+                flex-direction: row;
+                justify-content: space-around;
+            }
+        }
+        @media (max-width: 480px) {
+            .xs-text-sm {
+                font-size: 0.75rem;
+            }
+            .xs-padding {
+                padding: 0.5rem;
+            }
+        }
+        .scrollable-modal-content {
+            max-height: 65vh;
+            overflow-y: auto;
+        }
+        .scrollable-modal-content::-webkit-scrollbar {
+            width: 4px;
+        }
+        .scrollable-modal-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .scrollable-modal-content::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 2px;
+        }
+        .input-focus-ring:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .input-focus-ring-amber:focus {
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+        }
+        .input-focus-ring-purple:focus {
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+        }
     </style>
 </head>
-<body class="font-sans text-slate-200 min-h-screen flex flex-col justify-between relative antialiased tracking-tight">
+<body class="font-sans text-slate-200 min-h-screen flex flex-col relative antialiased tracking-tight">
 
 <div class="toast" id="toast"></div>
 
 <!-- Top Navigation -->
 <header class="border-b border-slate-800/80 bg-slate-900/40 backdrop-blur-md sticky top-0 z-40">
-    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-            <div class="bg-blue-600 p-2 rounded-xl text-white glow-effect">
-                <i data-lucide="shield-check" class="w-5 h-5"></i>
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-2 mobile-padding">
+        <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
+            <div class="bg-blue-600 p-1.5 sm:p-2 rounded-xl text-white glow-effect flex-shrink-0">
+                <i data-lucide="shield-check" class="w-4 h-4 sm:w-5 sm:h-5"></i>
             </div>
-            <div>
-                <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent font-sans">MX-UI PANEL</span>
-                <span class="text-xs block text-slate-500 font-medium tracking-normal">v1.0.0 • Core Matrix</span>
+            <div class="min-w-0">
+                <span class="font-bold text-sm sm:text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent font-sans truncate block">MX-UI PANEL</span>
+                <span class="text-[10px] sm:text-xs text-slate-500 font-medium tracking-normal block truncate">v1.0.0 • Core Matrix</span>
             </div>
         </div>
-        <div class="flex items-center space-x-4">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <div class="flex items-center space-x-1 sm:space-x-3 flex-shrink-0">
+            <span class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">
                 <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                Node Gateway Online
+                Node Online
             </span>
-            <button onclick="toggleModal('settingsModal', true)" class="text-slate-400 hover:text-slate-200 text-sm font-medium flex items-center gap-1.5">
-                <i data-lucide="settings" class="w-4 h-4"></i> Settings
+            <button onclick="toggleModal('settingsModal', true)" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0">
+                <i data-lucide="settings" class="w-4 h-4"></i>
+                <span class="hidden xs:inline">Settings</span>
             </button>
-            <button onclick="logout()" class="text-slate-400 hover:text-slate-200 text-sm font-medium flex items-center gap-1.5">
-                <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+            <button onclick="logout()" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
+                <span class="hidden xs:inline">Logout</span>
             </button>
         </div>
     </div>
 </header>
 
 <!-- Main -->
-<main class="max-w-6xl w-full mx-auto px-4 py-8 flex-grow">
+<main class="max-w-6xl w-full mx-auto px-4 py-6 sm:py-8 flex-grow mobile-padding">
     
     <!-- Stats Summary -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-4 text-center">
-            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Sent/Received</p>
-            <p class="text-lg font-bold text-blue-400 font-mono" id="total-traffic">0 MB</p>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
+            <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Traffic</p>
+            <p class="text-sm sm:text-lg font-bold text-blue-400 font-mono truncate" id="total-traffic">0 MB</p>
         </div>
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-4 text-center">
-            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Usage</p>
-            <p class="text-lg font-bold text-amber-400 font-mono" id="total-usage">0 GB</p>
+        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
+            <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Usage</p>
+            <p class="text-sm sm:text-lg font-bold text-amber-400 font-mono truncate" id="total-usage">0 GB</p>
         </div>
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-4 text-center">
-            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Inbounds</p>
-            <p class="text-lg font-bold text-emerald-400 font-mono" id="total-inbounds">0</p>
+        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
+            <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Inbounds</p>
+            <p class="text-sm sm:text-lg font-bold text-emerald-400 font-mono truncate" id="total-inbounds">0</p>
         </div>
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-4 text-center">
-            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Active Connections</p>
-            <p class="text-lg font-bold text-purple-400 font-mono" id="active-connections">0</p>
+        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
+            <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Connections</p>
+            <p class="text-sm sm:text-lg font-bold text-purple-400 font-mono truncate" id="active-connections">0</p>
         </div>
     </div>
 
     <!-- Hardware Diagnostic Rings -->
-    <h2 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 px-1">System Diagnostics</h2>
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <h2 class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 px-1">System Diagnostics</h2>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
         <!-- CPU -->
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="relative w-16 h-16 shrink-0">
+        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
+            <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
                 <svg class="w-full h-full" viewBox="0 0 36 36">
                     <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     <path class="text-blue-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                 </svg>
-                <div class="absolute inset-0 flex items-center justify-center text-[10px] font-mono font-bold text-blue-400" id="ring-cpu-pct">0%</div>
+                <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-blue-400" id="ring-cpu-pct">0%</div>
             </div>
-            <div class="text-center sm:text-right">
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">CPU</p>
-                <p class="text-lg font-bold mt-0.5 text-slate-100 font-mono" id="ring-cpu-val">0 Cores</p>
+            <div class="text-right flex-1 min-w-0">
+                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">CPU</p>
+                <p class="text-xs sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-cpu-val">0 Cores</p>
             </div>
         </div>
         <!-- RAM -->
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="relative w-16 h-16 shrink-0">
+        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
+            <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
                 <svg class="w-full h-full" viewBox="0 0 36 36">
                     <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     <path class="text-indigo-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                 </svg>
-                <div class="absolute inset-0 flex items-center justify-center text-[10px] font-mono font-bold text-indigo-400" id="ring-ram-pct">0%</div>
+                <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-indigo-400" id="ring-ram-pct">0%</div>
             </div>
-            <div class="text-center sm:text-right">
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">RAM</p>
-                <p class="text-lg font-bold mt-0.5 text-slate-100 font-mono" id="ring-ram-val">0 GB / 0 GB</p>
+            <div class="text-right flex-1 min-w-0">
+                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">RAM</p>
+                <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-ram-val">0 GB</p>
             </div>
         </div>
         <!-- Swap -->
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="relative w-16 h-16 shrink-0">
+        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
+            <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
                 <svg class="w-full h-full" viewBox="0 0 36 36">
                     <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     <path class="text-amber-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                 </svg>
-                <div class="absolute inset-0 flex items-center justify-center text-[10px] font-mono font-bold text-amber-400" id="ring-swap-pct">0%</div>
+                <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-amber-400" id="ring-swap-pct">0%</div>
             </div>
-            <div class="text-center sm:text-right">
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Swap</p>
-                <p class="text-lg font-bold mt-0.5 text-slate-100 font-mono" id="ring-swap-val">0 GB / 0 GB</p>
+            <div class="text-right flex-1 min-w-0">
+                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Swap</p>
+                <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-swap-val">0 GB</p>
             </div>
         </div>
         <!-- Storage -->
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="relative w-16 h-16 shrink-0">
+        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
+            <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
                 <svg class="w-full h-full" viewBox="0 0 36 36">
                     <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     <path class="text-rose-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                 </svg>
-                <div class="absolute inset-0 flex items-center justify-center text-[10px] font-mono font-bold text-rose-400" id="ring-disk-pct">0%</div>
+                <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-rose-400" id="ring-disk-pct">0%</div>
             </div>
-            <div class="text-center sm:text-right">
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Storage</p>
-                <p class="text-lg font-bold mt-0.5 text-slate-100 font-mono" id="ring-disk-val">0 GB / 0 GB</p>
+            <div class="text-right flex-1 min-w-0">
+                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Storage</p>
+                <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-disk-val">0 GB</p>
             </div>
         </div>
     </div>
 
     <!-- Configurations Container -->
     <div class="bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden glow-effect">
-        <div class="p-6 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-900/40">
-            <div>
-                <h2 class="text-xl font-bold text-slate-100">V2Ray Inbound Proxies</h2>
-                <p class="text-sm text-slate-400 mt-0.5">Manage virtual server bridges, generate QR structures, or modify framework credentials.</p>
+        <div class="p-4 sm:p-6 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-900/40">
+            <div class="min-w-0">
+                <h2 class="text-lg sm:text-xl font-bold text-slate-100 truncate">V2Ray Inbound Proxies</h2>
+                <p class="text-xs sm:text-sm text-slate-400 mt-0.5 truncate">Manage virtual server bridges, generate QR structures, or modify framework credentials.</p>
             </div>
-            <button onclick="toggleModal('inboundModal', true)" class="flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm px-4 py-2.5 rounded-xl transition duration-200 shadow-lg shadow-blue-600/10 shrink-0">
-                <i data-lucide="plus" class="w-4 h-4"></i>
-                <span>Add New Config</span>
+            <button onclick="toggleModal('inboundModal', true)" class="flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition duration-200 shadow-lg shadow-blue-600/10 shrink-0">
+                <i data-lucide="plus" class="w-3 h-3 sm:w-4 sm:h-4"></i>
+                <span>Add Config</span>
             </button>
         </div>
 
@@ -345,53 +498,53 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 </main>
 
 <!-- Footer -->
-<footer class="border-t border-slate-800/60 bg-slate-950 py-4 text-xs text-slate-500">
-    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div class="flex items-center space-x-3">
+<footer class="border-t border-slate-800/60 bg-slate-950 py-3 sm:py-4 text-[10px] sm:text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 mobile-padding">
+        <div class="flex items-center space-x-2 sm:space-x-3 flex-wrap justify-center sm:justify-start">
             <p>MX-UI v1.0.0</p>
-            <span class="text-[9px] font-mono font-bold tracking-widest text-slate-400 border border-slate-800 px-1.5 py-0.5 rounded bg-slate-900/60 select-none">
+            <span class="text-[8px] sm:text-[9px] font-mono font-bold tracking-widest text-slate-400 border border-slate-800 px-1.5 py-0.5 rounded bg-slate-900/60 select-none">
                 Created by Muvixo
             </span>
         </div>
-        <div class="flex items-center space-x-4">
-            <span>Core Clock: <strong class="text-slate-400 font-mono text-[11px]" id="uptime-display">00:00:00</strong></span>
-            <span>API Linkage: <strong class="text-emerald-400">Connected</strong></span>
+        <div class="flex items-center space-x-3 sm:space-x-4 flex-wrap justify-center">
+            <span>Core: <strong class="text-slate-400 font-mono text-[10px] sm:text-[11px]" id="uptime-display">00:00:00</strong></span>
+            <span>API: <strong class="text-emerald-400">Connected</strong></span>
         </div>
     </div>
 </footer>
 
 <!-- ===== MODAL: CREATE CONFIG ===== -->
-<div id="inboundModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow">
-        <div class="p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40">
-            <div class="flex items-center space-x-3">
-                <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20"><i data-lucide="plus-circle" class="w-5 h-5"></i></div>
-                <div>
-                    <h3 class="text-lg font-bold text-slate-100">Add New Config</h3>
-                    <p class="text-xs text-slate-400">Deploy a new VLESS or XHTTP configuration.</p>
+<div id="inboundModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col">
+        <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
+            <div class="flex items-center space-x-3 min-w-0">
+                <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20 shrink-0"><i data-lucide="plus-circle" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
+                <div class="min-w-0">
+                    <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">Add New Config</h3>
+                    <p class="text-[10px] sm:text-xs text-slate-400 truncate">Deploy a new VLESS or XHTTP configuration.</p>
                 </div>
             </div>
-            <button onclick="toggleModal('inboundModal', false)" class="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <button onclick="toggleModal('inboundModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition shrink-0"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
         </div>
-        <div class="p-6 max-h-[65vh] overflow-y-auto space-y-5">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Remark / Label</label>
-                    <input type="text" id="new-label" placeholder="e.g., US-Reality-HighSpeed" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Remark / Label</label>
+                    <input type="text" id="new-label" placeholder="e.g., US-Reality" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Protocol</label>
-                    <select id="new-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition font-mono text-xs">
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Protocol</label>
+                    <select id="new-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition font-mono text-xs">
                         <option value="vless-ws">VLESS + WS</option>
                         <option value="xhttp-packet-up">XHTTP (packet-up)</option>
                         <option value="xhttp-stream-up">XHTTP (stream-up)</option>
                     </select>
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Fingerprint (uTLS)</label>
-                    <select id="new-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition font-mono text-xs">
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Fingerprint (uTLS)</label>
+                    <select id="new-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition font-mono text-xs">
                         <option value="chrome">chrome</option>
                         <option value="firefox">firefox</option>
                         <option value="safari">safari</option>
@@ -405,30 +558,30 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">ALPN (optional)</label>
-                    <input type="text" id="new-alpn" placeholder="e.g., h2,http/1.1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">ALPN (optional)</label>
+                    <input type="text" id="new-alpn" placeholder="e.g., h2,http/1.1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Traffic Limit (MB)</label>
-                    <input type="number" id="new-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Traffic Limit (MB)</label>
+                    <input type="number" id="new-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Expiry (days, 0 = unlimited)</label>
-                    <input type="number" id="new-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Expiry (days, 0 = unlimited)</label>
+                    <input type="number" id="new-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">IP Limit (0 = unlimited)</label>
-                    <input type="number" id="new-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition">
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">IP Limit (0 = unlimited)</label>
+                    <input type="number" id="new-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Speed Limit (0 = unlimited)</label>
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Speed Limit (0 = unlimited)</label>
                     <div class="flex gap-2">
-                        <input type="number" id="new-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition">
-                        <select id="new-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition font-mono">
+                        <input type="number" id="new-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+                        <select id="new-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition font-mono">
                             <option value="MBIT">Mbps</option>
                             <option value="KB">KB/s</option>
                             <option value="MB">MB/s</option>
@@ -437,46 +590,46 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 </div>
             </div>
         </div>
-        <div class="p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end space-x-3">
-            <button onclick="toggleModal('inboundModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-xl transition">Cancel</button>
-            <button onclick="createConfig()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition shadow-lg shadow-blue-600/10">Deploy Config</button>
+        <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex flex-col sm:flex-row items-center justify-end space-y-2 sm:space-y-0 sm:space-x-3 shrink-0">
+            <button onclick="toggleModal('inboundModal', false)" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition">Cancel</button>
+            <button onclick="createConfig()" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-blue-600/10">Deploy Config</button>
         </div>
     </div>
 </div>
 
 <!-- ===== MODAL: EDIT ===== -->
-<div id="editModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow">
-        <div class="p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40">
-            <div class="flex items-center space-x-3">
-                <div class="p-2 bg-amber-500/10 rounded-lg text-amber-400 border border-amber-500/20"><i data-lucide="edit" class="w-5 h-5"></i></div>
-                <div>
-                    <h3 class="text-lg font-bold text-slate-100">Modify Configuration: <span id="editNodeTitle" class="text-blue-400">Node</span></h3>
-                    <p class="text-xs text-slate-400">Altering production values resets live connection pipelines directly.</p>
+<div id="editModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col">
+        <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
+            <div class="flex items-center space-x-3 min-w-0">
+                <div class="p-2 bg-amber-500/10 rounded-lg text-amber-400 border border-amber-500/20 shrink-0"><i data-lucide="edit" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
+                <div class="min-w-0">
+                    <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">Modify Config: <span id="editNodeTitle" class="text-amber-400">Node</span></h3>
+                    <p class="text-[10px] sm:text-xs text-slate-400 truncate">Altering production values resets live connection pipelines.</p>
                 </div>
             </div>
-            <button onclick="toggleModal('editModal', false)" class="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <button onclick="toggleModal('editModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition shrink-0"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
         </div>
-        <div class="p-6 space-y-5">
+        <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-5">
             <input type="hidden" id="edit-uuid">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Remark Label</label>
-                    <input type="text" id="edit-label" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono">
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Remark Label</label>
+                    <input type="text" id="edit-label" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono input-focus-ring-amber">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Protocol</label>
-                    <select id="edit-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono text-xs">
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Protocol</label>
+                    <select id="edit-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono text-xs">
                         <option value="vless-ws">VLESS + WS</option>
                         <option value="xhttp-packet-up">XHTTP (packet-up)</option>
                         <option value="xhttp-stream-up">XHTTP (stream-up)</option>
                     </select>
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Fingerprint</label>
-                    <select id="edit-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono text-xs">
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Fingerprint</label>
+                    <select id="edit-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono text-xs">
                         <option value="chrome">chrome</option>
                         <option value="firefox">firefox</option>
                         <option value="safari">safari</option>
@@ -490,30 +643,30 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">ALPN (optional)</label>
-                    <input type="text" id="edit-alpn" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition">
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">ALPN (optional)</label>
+                    <input type="text" id="edit-alpn" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Traffic Limit (MB)</label>
-                    <input type="number" id="edit-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition">
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Traffic Limit (MB)</label>
+                    <input type="number" id="edit-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Expiry (days from now)</label>
-                    <input type="number" id="edit-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition">
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Expiry (days from now)</label>
+                    <input type="number" id="edit-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">IP Limit</label>
-                    <input type="number" id="edit-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition">
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">IP Limit</label>
+                    <input type="number" id="edit-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Speed Limit</label>
+                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Speed Limit</label>
                     <div class="flex gap-2">
-                        <input type="number" id="edit-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition">
-                        <select id="edit-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono">
+                        <input type="number" id="edit-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
+                        <select id="edit-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono">
                             <option value="MBIT">Mbps</option>
                             <option value="KB">KB/s</option>
                             <option value="MB">MB/s</option>
@@ -522,40 +675,40 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 </div>
             </div>
         </div>
-        <div class="p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end space-x-3">
-            <button onclick="toggleModal('editModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-xl transition">Discard</button>
-            <button onclick="saveEdit()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium rounded-xl transition shadow-lg shadow-amber-600/10">Commit Changes</button>
+        <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex flex-col sm:flex-row items-center justify-end space-y-2 sm:space-y-0 sm:space-x-3 shrink-0">
+            <button onclick="toggleModal('editModal', false)" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition">Discard</button>
+            <button onclick="saveEdit()" class="w-full sm:w-auto px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-amber-600/10">Commit Changes</button>
         </div>
     </div>
 </div>
-<div id="qrModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow p-6 space-y-3">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-            <div>
-                <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
-                    <i data-lucide="qrcode" class="w-5 h-5 text-blue-400"></i>
+
+<!-- ===== MODAL: QR ===== -->
+<div id="qrModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 space-y-3 max-h-[95vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2 flex-wrap gap-2">
+            <div class="min-w-0">
+                <h3 class="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2">
+                    <i data-lucide="qrcode" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-400"></i>
                     QR Codes
                 </h3>
-                <p class="text-xs text-slate-400 font-mono pl-7" id="qrTargetLabel">Default Link</p>
+                <p class="text-[10px] sm:text-xs text-slate-400 font-mono truncate" id="qrTargetLabel">Default Link</p>
             </div>
-            <button onclick="toggleModal('qrModal', false)" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition">
-                <i data-lucide="x" class="w-4 h-4"></i>
-            </button>
+            <button onclick="toggleModal('qrModal', false)" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition shrink-0"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
 
         <!-- Two columns: Config QR and Sub QR -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <!-- Config QR -->
-            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-4 text-center qr-code-container">
-                <p class="text-xs text-slate-400 mb-3 font-medium flex items-center justify-center gap-1">
+            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3 sm:p-4 text-center qr-code-container">
+                <p class="text-[10px] sm:text-xs text-slate-400 mb-2 sm:mb-3 font-medium flex items-center justify-center gap-1">
                     <i data-lucide="link" class="w-3 h-3"></i>
                     Config Link QR
                 </p>
-                <div class="mx-auto w-40 h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50">
+                <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50">
                     <img id="qrImage" src="" alt="Config QR Code" class="w-full h-full object-contain">
                 </div>
-                <div class="mt-3">
-                    <button onclick="copyText(document.getElementById('qrTextPayload').textContent)" class="text-xs text-blue-400 hover:text-blue-300 transition flex items-center justify-center gap-1">
+                <div class="mt-2 sm:mt-3">
+                    <button onclick="copyText(document.getElementById('qrTextPayload').textContent)" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition flex items-center justify-center gap-1">
                         <i data-lucide="copy" class="w-3 h-3"></i>
                         Copy Config Link
                     </button>
@@ -563,16 +716,16 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             </div>
 
             <!-- Subscription QR -->
-            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-4 text-center qr-code-container">
-                <p class="text-xs text-slate-400 mb-3 font-medium flex items-center justify-center gap-1">
+            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3 sm:p-4 text-center qr-code-container">
+                <p class="text-[10px] sm:text-xs text-slate-400 mb-2 sm:mb-3 font-medium flex items-center justify-center gap-1">
                     <i data-lucide="folder-tree" class="w-3 h-3"></i>
                     Subscription Link QR
                 </p>
-                <div class="mx-auto w-40 h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50">
+                <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50">
                     <img id="qrSubImage" src="" alt="Subscription QR Code" class="w-full h-full object-contain">
                 </div>
-                <div class="mt-3">
-                    <button onclick="copyText(document.getElementById('qrSubPayload').textContent)" class="text-xs text-blue-400 hover:text-blue-300 transition flex items-center justify-center gap-1">
+                <div class="mt-2 sm:mt-3">
+                    <button onclick="copyText(document.getElementById('qrSubPayload').textContent)" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition flex items-center justify-center gap-1">
                         <i data-lucide="copy" class="w-3 h-3"></i>
                         Copy Sub Link
                     </button>
@@ -581,81 +734,82 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         </div>
 
         <!-- Links display -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3">
-                <span class="text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1 flex items-center gap-1">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-2 sm:p-3">
+                <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-0.5 sm:mb-1 flex items-center gap-1">
                     <i data-lucide="link" class="w-3 h-3"></i>
                     Config Link
                 </span>
-                <p id="qrTextPayload" class="text-[10px] font-mono text-slate-400 break-all select-all truncate"></p>
+                <p id="qrTextPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate"></p>
             </div>
-            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3">
-                <span class="text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1 flex items-center gap-1">
+            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-2 sm:p-3">
+                <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-0.5 sm:mb-1 flex items-center gap-1">
                     <i data-lucide="folder-tree" class="w-3 h-3"></i>
                     Subscription Link
                 </span>
-                <p id="qrSubPayload" class="text-[10px] font-mono text-slate-400 break-all select-all truncate"></p>
+                <p id="qrSubPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate"></p>
             </div>
         </div>
 
-        <button onclick="toggleModal('qrModal', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition">
+        <button onclick="toggleModal('qrModal', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition">
             Close
         </button>
     </div>
 </div>
-<!-- ===== MODAL: CONFIRM (custom, no browser confirm()) ===== -->
-<div id="confirmModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden modal-glow p-6 text-center space-y-4">
-        <div class="mx-auto w-12 h-12 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
-            <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+
+<!-- ===== MODAL: CONFIRM ===== -->
+<div id="confirmModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 text-center space-y-3 sm:space-y-4">
+        <div class="mx-auto w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
+            <i data-lucide="alert-triangle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
         </div>
         <div class="space-y-1">
-            <h3 class="text-base font-bold text-slate-100">Confirm Action</h3>
-            <p id="confirmMessage" class="text-xs text-slate-400 leading-relaxed px-2">Are you sure?</p>
+            <h3 class="text-sm sm:text-base font-bold text-slate-100">Confirm Action</h3>
+            <p id="confirmMessage" class="text-[11px] sm:text-xs text-slate-400 leading-relaxed px-2">Are you sure?</p>
         </div>
         <div class="flex gap-3">
-            <button onclick="_confirmNo()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition">Cancel</button>
-            <button onclick="_confirmYes()" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-xl transition">Delete</button>
+            <button onclick="_confirmNo()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition">Cancel</button>
+            <button onclick="_confirmYes()" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-[10px] sm:text-xs font-semibold rounded-xl transition">Delete</button>
         </div>
     </div>
 </div>
 
-<!-- ===== MODAL: SETTINGS (Full Settings) ===== -->
-<div id="settingsModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[90vh] flex flex-col">
-        <div class="p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
-            <div class="flex items-center space-x-3">
-                <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20"><i data-lucide="settings" class="w-5 h-5"></i></div>
-                <div>
-                    <h3 class="text-lg font-bold text-slate-100">Settings</h3>
-                    <p class="text-xs text-slate-400">Manage dashboard paths and security</p>
+<!-- ===== MODAL: SETTINGS ===== -->
+<div id="settingsModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col">
+        <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
+            <div class="flex items-center space-x-3 min-w-0">
+                <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20 shrink-0"><i data-lucide="settings" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
+                <div class="min-w-0">
+                    <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">Settings</h3>
+                    <p class="text-[10px] sm:text-xs text-slate-400 truncate">Manage dashboard paths and security</p>
                 </div>
             </div>
-            <button onclick="toggleModal('settingsModal', false)" class="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <button onclick="toggleModal('settingsModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition shrink-0"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
         </div>
         
-        <div class="p-6 overflow-y-auto flex-1 space-y-6">
+        <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-6">
             <!-- Change Password Section -->
             <div>
-                <h4 class="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">
-                    <i data-lucide="key" class="w-4 h-4 text-blue-400"></i>
+                <h4 class="text-xs sm:text-sm font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2">
+                    <i data-lucide="key" class="w-3 h-3 sm:w-4 sm:h-4 text-blue-400"></i>
                     Change Password
                 </h4>
-                <div class="space-y-4">
+                <div class="space-y-3 sm:space-y-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Current Password</label>
-                        <input type="password" id="settings-current-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition" placeholder="Enter current password">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Current Password</label>
+                        <input type="password" id="settings-current-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="Enter current password">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">New Password</label>
-                        <input type="password" id="settings-new-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition" placeholder="At least 4 characters">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">New Password</label>
+                        <input type="password" id="settings-new-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="At least 4 characters">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Confirm New Password</label>
-                        <input type="password" id="settings-confirm-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition" placeholder="Repeat new password">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Confirm New Password</label>
+                        <input type="password" id="settings-confirm-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="Repeat new password">
                     </div>
-                    <div id="settingsError" class="text-xs text-red-400 hidden"></div>
-                    <button onclick="changePassword()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition shadow-lg shadow-blue-600/10">
+                    <div id="settingsError" class="text-[10px] sm:text-xs text-red-400 hidden"></div>
+                    <button onclick="changePassword()" class="w-full py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-blue-600/10">
                         Update Password
                     </button>
                 </div>
@@ -665,73 +819,67 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
             <!-- Path Settings Section -->
             <div>
-                <h4 class="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">
-                    <i data-lucide="folder-tree" class="w-4 h-4 text-purple-400"></i>
+                <h4 class="text-xs sm:text-sm font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2">
+                    <i data-lucide="folder-tree" class="w-3 h-3 sm:w-4 sm:h-4 text-purple-400"></i>
                     Dashboard Paths
                 </h4>
-                <div class="space-y-4">
+                <div class="space-y-3 sm:space-y-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dashboard Path</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="settings-dashboard-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition" placeholder="/dashboard">
-                            <button onclick="updatePath('dashboard')" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">
-                                Update
-                            </button>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Dashboard Path</label>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input type="text" id="settings-dashboard-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition input-focus-ring-purple" placeholder="/dashboard">
+                            <button onclick="updatePath('dashboard')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">Update</button>
                         </div>
-                        <p class="text-[10px] text-slate-500 mt-1.5">Current: <span id="current-dashboard-path" class="text-slate-400 font-mono">/dashboard</span></p>
+                        <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-dashboard-path" class="text-slate-400 font-mono">/dashboard</span></p>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Login Path</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="settings-login-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition" placeholder="/login">
-                            <button onclick="updatePath('login')" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">
-                                Update
-                            </button>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Login Path</label>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input type="text" id="settings-login-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition input-focus-ring-purple" placeholder="/login">
+                            <button onclick="updatePath('login')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">Update</button>
                         </div>
-                        <p class="text-[10px] text-slate-500 mt-1.5">Current: <span id="current-login-path" class="text-slate-400 font-mono">/login</span></p>
+                        <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-login-path" class="text-slate-400 font-mono">/login</span></p>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Subscription Path</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="settings-sub-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition" placeholder="/sub">
-                            <button onclick="updatePath('sub')" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">
-                                Update
-                            </button>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Subscription Path</label>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input type="text" id="settings-sub-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition input-focus-ring-purple" placeholder="/sub">
+                            <button onclick="updatePath('sub')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">Update</button>
                         </div>
-                        <p class="text-[10px] text-slate-500 mt-1.5">Current: <span id="current-sub-path" class="text-slate-400 font-mono">/sub</span></p>
+                        <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-sub-path" class="text-slate-400 font-mono">/sub</span></p>
                     </div>
 
-                    <div id="pathSettingsError" class="text-xs text-red-400 hidden"></div>
+                    <div id="pathSettingsError" class="text-[10px] sm:text-xs text-red-400 hidden"></div>
                 </div>
             </div>
         </div>
 
-        <div class="p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end shrink-0">
-            <button onclick="toggleModal('settingsModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-xl transition">Close</button>
+        <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end shrink-0">
+            <button onclick="toggleModal('settingsModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition">Close</button>
         </div>
     </div>
 </div>
 
-<!-- ===== ALERT ===== -->
-<div id="customAlert" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden modal-glow p-6 text-center space-y-4">
-        <div class="mx-auto w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/30 fill-none flex items-center justify-center text-blue-400">
-            <i id="alertIcon" data-lucide="info" class="w-6 h-6"></i>
+<!-- ===== MODAL: ALERT ===== -->
+<div id="customAlert" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 text-center space-y-3 sm:space-y-4">
+        <div class="mx-auto w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+            <i id="alertIcon" data-lucide="info" class="w-5 h-5 sm:w-6 sm:h-6"></i>
         </div>
         <div class="space-y-1">
-            <h3 id="alertTitle" class="text-base font-bold text-slate-100">Notification</h3>
-            <p id="alertMessage" class="text-xs text-slate-400 leading-relaxed px-2">Pipeline structural modifications updated successfully.</p>
+            <h3 id="alertTitle" class="text-sm sm:text-base font-bold text-slate-100">Notification</h3>
+            <p id="alertMessage" class="text-[11px] sm:text-xs text-slate-400 leading-relaxed px-2">Pipeline structural modifications updated successfully.</p>
         </div>
-        <button onclick="toggleModal('customAlert', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition">Acknowledge</button>
+        <button onclick="toggleModal('customAlert', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition">Acknowledge</button>
     </div>
 </div>
 
 <script>
 lucide.createIcons();
 
-// ---- Custom confirm (replaces window.confirm) ----
+// ---- Custom confirm ----
 let _confirmResolve = null;
 function customConfirm(message) {
     document.getElementById('confirmMessage').textContent = message;
@@ -752,8 +900,13 @@ function _confirmNo() {
 // Modal toggles
 function toggleModal(modalId, show) {
     const target = document.getElementById(modalId);
-    if (show) target.classList.add('active');
-    else target.classList.remove('active');
+    if (show) {
+        target.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    } else {
+        target.classList.remove('active');
+        document.body.style.overflow = '';
+    }
     if (modalId === 'settingsModal' && show) {
         loadSettingsPaths();
         document.getElementById('settings-current-pw').value = '';
@@ -791,7 +944,7 @@ function triggerAlert(title, message, iconName) {
     toggleModal('customAlert', true);
 }
 
-// QR Modal - now shows both config and subscription QR codes
+// QR Modal
 function openQrModal(label, uriPayload, subUrl) {
     document.getElementById('qrTargetLabel').textContent = label;
     
@@ -879,7 +1032,7 @@ async function logout() {
     }
 }
 
-// ---- Settings: change password with auto logout ----
+// ---- Settings: change password ----
 async function changePassword() {
     const cur = document.getElementById('settings-current-pw').value;
     const nw = document.getElementById('settings-new-pw').value;
@@ -912,13 +1065,9 @@ async function changePassword() {
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.detail || 'Failed to update password');
 
-        // Close settings modal
         toggleModal('settingsModal', false);
-        
-        // Show success message
         triggerAlert('Password Updated', 'Your password has been changed successfully. You will be logged out automatically.', 'check-circle');
         
-        // Auto logout after 2 seconds
         setTimeout(async () => {
             try {
                 await fetch('/api/logout', { method: 'POST' });
@@ -988,7 +1137,7 @@ async function updatePath(type) {
     }
 }
 
-// ---- Load current paths on settings modal open ----
+// ---- Load current paths ----
 async function loadSettingsPaths() {
     try {
         const res = await fetch('/api/get-paths');
@@ -1033,14 +1182,14 @@ async function loadConfigs() {
         const links = data.links || [];
         const container = document.getElementById('config-list');
         if (!links.length) {
-            container.innerHTML = '<div class="p-6 text-center text-slate-400">No configurations yet.</div>';
+            container.innerHTML = '<div class="p-6 text-center text-slate-400 text-sm">No configurations yet. Click "Add Config" to create one.</div>';
             return;
         }
         container.innerHTML = links.map(l => {
             const protoLabels = {
                 'vless-ws': 'VLESS',
-                'xhttp-packet-up': 'XHTTP (packet-up)',
-                'xhttp-stream-up': 'XHTTP (stream-up)'
+                'xhttp-packet-up': 'XHTTP',
+                'xhttp-stream-up': 'XHTTP'
             };
             const proto = l.protocol || 'vless-ws';
             const label = l.label || 'Unnamed';
@@ -1058,42 +1207,42 @@ async function loadConfigs() {
             const statusClass = active ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 'text-red-400 bg-red-500/10 border-red-500/20';
             
             return `
-            <div class="p-6 hover:bg-slate-800/10 transition duration-150">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                    <div class="flex items-start space-x-4">
-                        <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wide mt-1 font-mono">${protoLabels[proto] || proto}</span>
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <h3 class="text-base font-semibold text-slate-200">${label}</h3>
-                                <span class="text-[10px] px-1.5 py-0.5 rounded font-medium ${statusClass}">
+            <div class="p-4 sm:p-6 config-row">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-6">
+                    <div class="flex items-start space-x-3 sm:space-x-4 min-w-0">
+                        <span class="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-[9px] sm:text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wide mt-0.5 font-mono shrink-0">${protoLabels[proto] || proto}</span>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h3 class="text-sm sm:text-base font-semibold text-slate-200 truncate">${label}</h3>
+                                <span class="text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium ${statusClass} shrink-0">
                                     <span class="${statusDot}"></span>${statusText}
                                 </span>
                             </div>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-1 mt-2 text-xs text-slate-400">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-0.5 mt-1 text-[10px] sm:text-xs text-slate-400">
                                 <div>Network: <span class="text-slate-300 font-mono">${proto.includes('ws') ? 'ws' : 'tcp'}</span></div>
                                 <div>Security: <span class="text-slate-300 font-mono">tls</span></div>
-                                <div>Expiry: <span class="text-slate-300 font-mono">${l.expires_at ? new Date(l.expires_at).toISOString().slice(0,10) : 'Unlimited'}</span></div>
+                                <div class="col-span-2 sm:col-span-1">Expiry: <span class="text-slate-300 font-mono">${l.expires_at ? new Date(l.expires_at).toISOString().slice(0,10) : 'Unlimited'}</span></div>
                             </div>
-                            <div class="mt-2 flex items-center gap-4 text-xs text-slate-400">
+                            <div class="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-slate-400">
                                 <span>Usage: <span class="text-slate-300 font-mono">${used} / ${limit}</span></span>
-                                <span>IP Limit: <span class="text-slate-300 font-mono">${l.ip_limit || '∞'}</span></span>
+                                <span>IP: <span class="text-slate-300 font-mono">${l.ip_limit || '∞'}</span></span>
                                 <span>Speed: <span class="text-slate-300 font-mono">${speedDisplay}</span></span>
                             </div>
                             <div class="w-full max-w-xs mt-1.5 h-1.5 bg-slate-800/60 rounded-full overflow-hidden">
-                                <div class="h-full rounded-full" style="width: ${pct}%; background: ${color};"></div>
+                                <div class="h-full rounded-full transition-all duration-500" style="width: ${pct}%; background: ${color};"></div>
                             </div>
                         </div>
                     </div>
-                    <div class="flex flex-wrap items-center gap-2 lg:justify-end">
-                        <div class="relative flex-grow sm:flex-grow-0 min-w-[260px] max-w-xs">
-                            <input type="text" id="uri-${l.uuid}" readonly value="${l.vless_link}" class="w-full bg-slate-950 border border-slate-800/80 rounded-xl px-3 py-2 pr-10 text-xs font-mono text-slate-400 focus:outline-none select-all truncate">
-                            <button onclick="copyLink('uri-${l.uuid}')" class="absolute right-2 top-1.5 p-1 text-slate-500 hover:text-slate-300 transition" title="Copy URI"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                    <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 lg:justify-end">
+                        <div class="relative flex-grow sm:flex-grow-0 min-w-[180px] sm:min-w-[220px] max-w-full sm:max-w-xs">
+                            <input type="text" id="uri-${l.uuid}" readonly value="${l.vless_link}" class="w-full bg-slate-950 border border-slate-800/80 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 pr-7 sm:pr-10 text-[8px] sm:text-[10px] font-mono text-slate-400 focus:outline-none select-all truncate">
+                            <button onclick="copyLink('uri-${l.uuid}')" class="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 p-0.5 sm:p-1 text-slate-500 hover:text-slate-300 transition" title="Copy URI"><i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
                         </div>
-                        <button onclick="openQrModal('${label}', '${l.vless_link}', '${l.sub_url}')" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="QR"><i data-lucide="qr-code" class="w-4 h-4"></i></button>
-                        <button onclick="window.open('/sub/user?uuid=${l.uuid}', '_blank')" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Subscription Page"><i data-lucide="external-link" class="w-4 h-4"></i></button>
-                        <button onclick="openEditModal('${label}','${proto}','${l.fingerprint||'chrome'}','${l.alpn||''}',${l.limit_bytes ? (l.limit_bytes / 1024 / 1024) : 0},${l.expires_at ? Math.ceil((new Date(l.expires_at) - Date.now()) / (86400000)) : 0},${l.ip_limit||0},${l.speed_limit_bytes ? (l.speed_limit_bytes * 8 / 1024 / 1024) : 0},'${l.speed_limit_unit || 'MBIT'}','${l.uuid}')" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Edit"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                        <button onclick="resetTraffic('${l.uuid}')" class="p-2 bg-blue-800/20 hover:bg-blue-800/40 border border-blue-700/30 text-blue-300 rounded-xl transition" title="Reset Traffic"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
-                        <button onclick="deleteConfig('${l.uuid}')" class="p-2 bg-red-800/20 hover:bg-red-800/40 border border-red-700/30 text-red-300 rounded-xl transition" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        <button onclick="openQrModal('${label}', '${l.vless_link}', '${l.sub_url}')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="QR"><i data-lucide="qr-code" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                        <button onclick="window.open('/sub/user?uuid=${l.uuid}', '_blank')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Subscription"><i data-lucide="external-link" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                        <button onclick="openEditModal('${label}','${proto}','${l.fingerprint||'chrome'}','${l.alpn||''}',${l.limit_bytes ? (l.limit_bytes / 1024 / 1024) : 0},${l.expires_at ? Math.ceil((new Date(l.expires_at) - Date.now()) / (86400000)) : 0},${l.ip_limit||0},${l.speed_limit_bytes ? (l.speed_limit_bytes * 8 / 1024 / 1024) : 0},'${l.speed_limit_unit || 'MBIT'}','${l.uuid}')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Edit"><i data-lucide="edit-3" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                        <button onclick="resetTraffic('${l.uuid}')" class="p-1.5 sm:p-2 bg-blue-800/20 hover:bg-blue-800/40 border border-blue-700/30 text-blue-300 rounded-xl transition" title="Reset Traffic"><i data-lucide="rotate-ccw" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                        <button onclick="deleteConfig('${l.uuid}')" class="p-1.5 sm:p-2 bg-red-800/20 hover:bg-red-800/40 border border-red-700/30 text-red-300 rounded-xl transition" title="Delete"><i data-lucide="trash-2" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
                     </div>
                 </div>
             </div>`;
@@ -1119,7 +1268,6 @@ async function updateStats() {
         const d = await res.json();
         document.getElementById('uptime-display').textContent = d.uptime || '00:00:00';
         
-        // Update summary stats
         document.getElementById('total-traffic').textContent = d.total_traffic_mb ? d.total_traffic_mb.toFixed(1) + ' MB' : '0 MB';
         document.getElementById('total-usage').textContent = d.total_traffic_mb ? (d.total_traffic_mb / 1024).toFixed(2) + ' GB' : '0 GB';
         document.getElementById('total-inbounds').textContent = d.links_count || 0;
@@ -1137,7 +1285,7 @@ async function updateStats() {
         const ramUsed = d.ram_used_mb || 0;
         const ramTotal = d.ram_total_mb || 1;
         const ramPct = d.ram_percent || 0;
-        document.getElementById('ring-ram-val').textContent = (ramUsed/1024).toFixed(2) + ' GB / ' + (ramTotal/1024).toFixed(2) + ' GB';
+        document.getElementById('ring-ram-val').textContent = (ramUsed/1024).toFixed(2) + ' / ' + (ramTotal/1024).toFixed(2) + ' GB';
         document.getElementById('ring-ram-pct').textContent = ramPct.toFixed(1) + '%';
         const ramCircle = document.querySelector('.text-indigo-500.circle-chart');
         if (ramCircle) ramCircle.setAttribute('stroke-dasharray', Math.round(ramPct) + ', 100');
@@ -1146,7 +1294,7 @@ async function updateStats() {
         const swapUsed = d.swap_used_mb || 0;
         const swapTotal = d.swap_total_mb || 1;
         const swapPct = d.swap_percent || 0;
-        document.getElementById('ring-swap-val').textContent = (swapUsed/1024).toFixed(2) + ' GB / ' + (swapTotal/1024).toFixed(2) + ' GB';
+        document.getElementById('ring-swap-val').textContent = (swapUsed/1024).toFixed(2) + ' / ' + (swapTotal/1024).toFixed(2) + ' GB';
         document.getElementById('ring-swap-pct').textContent = swapPct.toFixed(1) + '%';
         const swapCircle = document.querySelector('.text-amber-500.circle-chart');
         if (swapCircle) swapCircle.setAttribute('stroke-dasharray', Math.round(swapPct) + ', 100');
@@ -1155,7 +1303,7 @@ async function updateStats() {
         const diskUsed = d.disk_used_gb || 0;
         const diskTotal = d.disk_total_gb || 1;
         const diskPct = d.disk_percent || 0;
-        document.getElementById('ring-disk-val').textContent = diskUsed.toFixed(2) + ' GB / ' + diskTotal.toFixed(2) + ' TB';
+        document.getElementById('ring-disk-val').textContent = diskUsed.toFixed(2) + ' / ' + diskTotal.toFixed(2) + ' TB';
         document.getElementById('ring-disk-pct').textContent = diskPct.toFixed(1) + '%';
         const diskCircle = document.querySelector('.text-rose-500.circle-chart');
         if (diskCircle) diskCircle.setAttribute('stroke-dasharray', Math.round(diskPct) + ', 100');
@@ -1199,6 +1347,9 @@ async function createConfig() {
         document.getElementById('new-label').value = '';
         document.getElementById('new-alpn').value = '';
         document.getElementById('new-speed').value = '0';
+        document.getElementById('new-limit').value = '0';
+        document.getElementById('new-expiry').value = '0';
+        document.getElementById('new-iplimit').value = '0';
     } catch(e) {
         toast('Error creating config', 'error');
     }
@@ -1245,7 +1396,7 @@ async function saveEdit() {
 }
 
 async function deleteConfig(uuid) {
-    const ok = await customConfirm('Delete this configuration?. This action cannot be undone.');
+    const ok = await customConfirm('Delete this configuration? This action cannot be undone.');
     if (!ok) return;
     try {
         const res = await fetch('/api/links/' + uuid, { method: 'DELETE' });
@@ -1262,6 +1413,22 @@ loadConfigs();
 setInterval(updateStats, 5000);
 setInterval(loadConfigs, 15000);
 
+// Close modals on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.custom-modal-overlay.active').forEach(modal => {
+            toggleModal(modal.id, false);
+        });
+    }
+});
+
+// Close modals on overlay click
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('custom-modal-overlay')) {
+        toggleModal(e.target.id, false);
+    }
+});
+
 </script>
 </body>
 </html>"""
@@ -1269,206 +1436,444 @@ setInterval(loadConfigs, 15000);
 SUB_USER_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Subscription · MX-UI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {{
-    theme: {{
-        extend: {{
-            fontFamily: {{
-                sans: ['Inter', 'sans-serif'],
-                mono: ['JetBrains Mono', 'monospace'],
-            }}
-        }}
-    }}
-}}
-</script>
-<style>
-body {{ background-color: #070a13; }}
-.glow-effect {{ box-shadow: 0 0 25px rgba(59, 130, 246, 0.12); }}
-.status-dot {{
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-right: 6px;
-}}
-.status-dot.active {{ background-color: #22c55e; }}
-.status-dot.inactive {{ background-color: #ef4444; }}
-.copy-btn {{
-    transition: all 0.2s ease;
-}}
-.copy-btn:hover {{
-    transform: scale(1.05);
-}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>Subscription · MX-UI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #070a13;
+        }
+        .glow-effect {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.12);
+        }
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+            flex-shrink: 0;
+        }
+        .status-dot.active {
+            background-color: #22c55e;
+        }
+        .status-dot.inactive {
+            background-color: #ef4444;
+        }
+        .copy-btn {
+            transition: all 0.2s ease;
+            min-height: 36px;
+            min-width: 36px;
+        }
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+        .progress-bar-fill {
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .qr-container {
+            transition: all 0.3s ease;
+        }
+        .qr-container:active {
+            transform: scale(0.98);
+        }
+        .detail-row {
+            transition: background-color 0.15s ease;
+        }
+        .detail-row:hover {
+            background-color: rgba(30, 41, 59, 0.3);
+        }
+        @media (max-width: 640px) {
+            .mobile-stack {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .mobile-text-center {
+                text-align: center;
+            }
+            .mobile-padding {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+            .mobile-gap {
+                gap: 0.5rem;
+            }
+            .qr-image {
+                width: 160px;
+                height: 160px;
+            }
+        }
+        @media (max-width: 480px) {
+            .xs-text-xs {
+                font-size: 0.65rem;
+            }
+            .xs-padding {
+                padding: 0.5rem;
+            }
+            .qr-image {
+                width: 140px;
+                height: 140px;
+            }
+            .detail-label {
+                font-size: 0.6rem;
+            }
+            .detail-value {
+                font-size: 0.65rem;
+            }
+        }
+        .input-focus-ring:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            color: #e2e8f0;
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-family: Inter, sans-serif;
+            opacity: 0;
+            transition: opacity 0.25s, transform 0.25s;
+            z-index: 9999;
+            pointer-events: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            max-width: 90vw;
+            text-align: center;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.success {
+            border-color: #22c55e;
+            color: #86efac;
+        }
+        .toast.error {
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+        }
+        .status-badge.active {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+        .status-badge.inactive {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+    </style>
 </head>
 <body class="font-sans text-slate-200 min-h-screen flex flex-col justify-between relative antialiased tracking-tight">
-<div class="max-w-2xl w-full mx-auto px-4 py-10 flex-grow">
-    <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-8 backdrop-blur-xl glow-effect">
-        <!-- Header -->
-        <div class="flex items-center gap-3 mb-6">
-            <div class="bg-blue-600 p-2 rounded-xl text-white glow-effect">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+    
+    <div class="max-w-2xl w-full mx-auto px-3 sm:px-4 py-6 sm:py-10 flex-grow mobile-padding">
+        <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5 sm:p-8 backdrop-blur-xl glow-effect transition-all duration-300 hover:border-slate-700/80">
+            
+            <!-- Header -->
+            <div class="flex items-center gap-3 mb-6">
+                <div class="bg-blue-600 p-2 rounded-xl text-white glow-effect flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <polyline points="9 12 11 14 15 10"/>
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="font-bold text-base sm:text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent block truncate">MX-UI PANEL</span>
+                    <span class="text-[10px] sm:text-xs text-slate-500 font-medium block truncate">v1.0.0</span>
+                </div>
             </div>
-            <div>
-                <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">MX-UI PANEL</span>
-                <span class="text-xs block text-slate-500 font-medium">v1.0.0</span>
-            </div>
-        </div>
 
-        <h2 class="text-2xl font-bold text-slate-100 mb-1">Subscription Info</h2>
-        <p class="text-sm text-slate-400 mb-6">Details for your configuration</p>
+            <!-- Title Section -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 sm:mb-6">
+                <div class="min-w-0">
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-100 truncate">Subscription Info</h2>
+                    <p class="text-xs sm:text-sm text-slate-400 truncate">Details for your configuration</p>
+                </div>
+                <span id="status-badge" class="status-badge active shrink-0 self-start sm:self-center">
+                    <span class="status-dot active"></span>
+                    Loading...
+                </span>
+            </div>
 
-        <!-- QR Code -->
-        <div class="mb-6 flex justify-center">
-            <div class="bg-white p-3 rounded-xl shadow-lg border-2 border-slate-700/50">
-                <img src="{qr_url}" alt="QR Code" class="w-48 h-48 object-contain">
+            <!-- QR Code -->
+            <div class="mb-5 sm:mb-6 flex justify-center">
+                <div class="bg-white p-2 sm:p-3 rounded-xl shadow-lg border-2 border-slate-700/50 qr-container">
+                    <img src="{qr_url}" alt="QR Code" class="qr-image w-36 h-36 sm:w-48 sm:h-48 object-contain">
+                </div>
             </div>
-        </div>
 
-        <!-- Details -->
-        <div class="space-y-3">
-            <div class="flex justify-between items-center border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400 text-sm">Label</span>
-                <span class="font-mono text-slate-200 text-sm font-semibold">{label}</span>
+            <!-- Details Grid -->
+            <div class="space-y-1.5 sm:space-y-2 mb-5 sm:mb-6">
+                <!-- Label -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Label</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-200 font-semibold truncate">{label}</span>
+                </div>
+                
+                <!-- Subscription ID -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Subscription ID</span>
+                    <span class="detail-value text-[10px] sm:text-xs font-mono text-slate-200 truncate">{uuid}</span>
+                </div>
+                
+                <!-- Status -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Status</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono font-semibold">{status}</span>
+                </div>
+                
+                <!-- Downloaded -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Downloaded</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-blue-300 font-semibold">{downloaded}</span>
+                </div>
+                
+                <!-- Uploaded -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Uploaded</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-purple-300 font-semibold">{uploaded}</span>
+                </div>
+                
+                <!-- Usage -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Usage</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-amber-300 font-semibold">{usage} / {total_quota}</span>
+                </div>
+                
+                <!-- Total Quota -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Total Quota</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-200 font-semibold">{total_quota}</span>
+                </div>
+                
+                <!-- Remained -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Remained</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-emerald-300 font-semibold">{remained}</span>
+                </div>
+                
+                <!-- Last Online -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Last Online</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-300">{last_online}</span>
+                </div>
+                
+                <!-- Expiry -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Expiry</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-rose-300 font-semibold">{expiry}</span>
+                </div>
+                
+                <!-- IPs Connected -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">IP(s) Connected</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-cyan-300">{ips}</span>
+                </div>
             </div>
-            <div class="flex justify-between items-center border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400 text-sm">Subscription ID</span>
-                <span class="font-mono text-slate-200 text-xs">{uuid}</span>
-            </div>
-            <div class="flex justify-between items-center border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400 text-sm">Status</span>
-                <span class="font-mono text-sm">{status}</span>
-            </div>
-            <div class="flex justify-between items-center border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400 text-sm">Downloaded</span>
-                <span class="font-mono text-blue-300 text-sm font-semibold">{downloaded}</span>
-            </div>
-            <div class="flex justify-between items-center border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400 text-sm">Uploaded</span>
-                <span class="font-mono text-purple-300 text-sm font-semibold">{uploaded}</span>
-            </div>
-            <div class="flex justify-between items-center border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400 text-sm">Usage</span>
-                <span class="font-mono text-amber-300 text-sm font-semibold">{usage} / {total_quota}</span>
-            </div>
-            <div class="flex justify-between items-center border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400 text-sm">Total Quota</span>
-                <span class="font-mono text-slate-200 text-sm font-semibold">{total_quota}</span>
-            </div>
-            <div class="flex justify-between items-center border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400 text-sm">Remained</span>
-                <span class="font-mono text-emerald-300 text-sm font-semibold">{remained}</span>
-            </div>
-            <div class="flex justify-between items-center border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400 text-sm">Last Online</span>
-                <span class="font-mono text-slate-300 text-sm">{last_online}</span>
-            </div>
-            <div class="flex justify-between items-center border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400 text-sm">Expiry</span>
-                <span class="font-mono text-rose-300 text-sm font-semibold">{expiry}</span>
-            </div>
-            <div class="flex justify-between items-center border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400 text-sm">IP(s) Connected</span>
-                <span class="font-mono text-cyan-300 text-sm">{ips}</span>
-            </div>
-        </div>
 
-        <!-- Name + Quota bar -->
-        <div class="mt-6">
-            <div class="flex justify-between text-sm mb-1">
-                <span class="text-slate-300 font-medium">{label}</span>
-                <span class="text-slate-400 font-mono text-xs">{used_fmt} / {limit_fmt}</span>
+            <!-- Progress Bar Section -->
+            <div class="mt-5 sm:mt-6 p-4 sm:p-5 bg-slate-950/60 border border-slate-800/60 rounded-xl">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 mb-2">
+                    <span class="text-xs sm:text-sm text-slate-300 font-medium truncate">{label}</span>
+                    <span class="text-[10px] sm:text-xs text-slate-400 font-mono">{used_fmt} / {limit_fmt}</span>
+                </div>
+                <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full progress-bar-fill" style="width: {usage_pct}%;"></div>
+                </div>
+                <div class="flex flex-col xs:flex-row xs:justify-between gap-0.5 xs:gap-0 mt-1.5">
+                    <span class="text-[10px] sm:text-xs text-slate-500">{usage_pct}% used</span>
+                    <span class="text-[10px] sm:text-xs text-slate-500">{remained} remaining</span>
+                </div>
             </div>
-            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
-                <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-500" style="width: {usage_pct}%;"></div>
-            </div>
-            <div class="flex justify-between mt-1">
-                <span class="text-xs text-slate-500">{usage_pct}% used</span>
-                <span class="text-xs text-slate-500">{remained} remaining</span>
-            </div>
-        </div>
 
-        <!-- VLESS Link -->
-        <div class="mt-6 p-4 bg-slate-950/60 border border-slate-800/60 rounded-xl">
-            <p class="text-xs text-slate-400 mb-2 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                VLESS Link (copy to client):
-            </p>
-            <div class="flex items-center gap-2">
-                <input type="text" readonly value="{vless_link}" id="vless-link-input" class="flex-1 bg-slate-950 border border-slate-800/80 rounded-xl px-3 py-2 text-xs font-mono text-slate-400 focus:outline-none select-all truncate">
-                <button onclick="copyToClipboard('{vless_link}')" class="copy-btn p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition shadow-lg shadow-blue-600/20" title="Copy to clipboard">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                </button>
+            <!-- VLESS Link -->
+            <div class="mt-5 sm:mt-6 p-3 sm:p-4 bg-slate-950/60 border border-slate-800/60 rounded-xl">
+                <p class="text-[10px] sm:text-xs text-slate-400 mb-2 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                    </svg>
+                    <span class="truncate">VLESS Link (copy to client):</span>
+                </p>
+                <div class="flex items-center gap-2 mobile-stack">
+                    <input type="text" readonly value="{vless_link}" id="vless-link-input" class="flex-1 min-w-0 bg-slate-950 border border-slate-800/80 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 text-[8px] sm:text-[10px] font-mono text-slate-400 focus:outline-none select-all truncate input-focus-ring">
+                    <button onclick="copyToClipboard('{vless_link}')" class="copy-btn px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition shadow-lg shadow-blue-600/20 flex items-center justify-center gap-1.5 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        <span class="hidden xs:inline text-[10px] sm:text-xs">Copy</span>
+                    </button>
+                </div>
             </div>
-        </div>
 
-        <!-- Footer -->
-        <div class="mt-8 text-center text-xs text-slate-500 border-t border-slate-800/60 pt-4">
-            {watermark}
+            <!-- Footer -->
+            <div class="mt-6 sm:mt-8 text-center text-[10px] sm:text-xs text-slate-500 border-t border-slate-800/60 pt-4">
+                {watermark}
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-function copyToClipboard(text) {{
-    if (navigator.clipboard && navigator.clipboard.writeText) {{
-        navigator.clipboard.writeText(text).then(() => {{
-            showToast('Copied to clipboard!', 'success');
-        }}).catch(() => {{
-            fallbackCopy(text);
-        }});
-    }} else {{
-        fallbackCopy(text);
-    }}
-}}
+    <script>
+        // Toast notification system
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show' + (type ? ' ' + type : '');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
 
-function fallbackCopy(text) {{
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    textarea.style.left = '-9999px';
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {{
-        document.execCommand('copy');
-        showToast('Copied to clipboard!', 'success');
-    }} catch (e) {{
-        showToast('Failed to copy', 'error');
-    }}
-    document.body.removeChild(textarea);
-}}
+        // Copy to clipboard with fallback
+        function copyToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('Copied to clipboard!', 'success');
+                }).catch(() => {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
 
-function showToast(message, type) {{
-    const toast = document.createElement('div');
-    let bgColor = 'bg-slate-800/90';
-    if (type === 'success') bgColor = 'bg-emerald-500/90';
-    if (type === 'error') bgColor = 'bg-red-500/90';
-    toast.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg text-sm font-medium z-50 transition-all duration-300 ' + bgColor + ' text-white shadow-lg backdrop-blur-sm';
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => {{
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(-50%) translateY(20px)';
-        setTimeout(() => toast.remove(), 300);
-    }}, 2500);
-}}
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            textarea.style.left = '-9999px';
+            textarea.style.top = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('Copied to clipboard!', 'success');
+            } catch (e) {
+                showToast('Failed to copy', 'error');
+            }
+            document.body.removeChild(textarea);
+        }
 
-document.addEventListener('DOMContentLoaded', function() {{
-    const input = document.getElementById('vless-link-input');
-    if (input) {{
-        input.addEventListener('click', function() {{
-            this.select();
-        }});
-    }}
-}});
-</script>
+        // Auto-select input on click
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('vless-link-input');
+            if (input) {
+                input.addEventListener('click', function() {
+                    this.select();
+                });
+                input.addEventListener('focus', function() {
+                    this.select();
+                });
+            }
+
+            // Update status badge based on status text
+            const statusBadge = document.getElementById('status-badge');
+            const statusText = document.querySelector('.detail-value:has(+ .status-badge)');
+            
+            // Check if status contains "Active" or "Inactive"
+            const statusValue = document.querySelector('.detail-row:nth-child(3) .detail-value');
+            if (statusValue) {
+                const isActive = statusValue.textContent.trim().toLowerCase().includes('active');
+                const dot = statusBadge.querySelector('.status-dot');
+                if (isActive) {
+                    statusBadge.className = 'status-badge active';
+                    dot.className = 'status-dot active';
+                    statusBadge.innerHTML = '<span class="status-dot active"></span> Active';
+                } else {
+                    statusBadge.className = 'status-badge inactive';
+                    dot.className = 'status-dot inactive';
+                    statusBadge.innerHTML = '<span class="status-dot inactive"></span> Inactive';
+                }
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+C or Cmd+C on the input field
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+                const input = document.getElementById('vless-link-input');
+                if (document.activeElement === input) {
+                    copyToClipboard(input.value);
+                }
+            }
+        });
+
+        // Handle page visibility change to refresh QR if needed
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                // Page became visible again
+                const qrImg = document.querySelector('.qr-image');
+                if (qrImg && qrImg.src && qrImg.src.includes('qrserver')) {
+                    // Refresh QR with cache-buster
+                    const url = new URL(qrImg.src);
+                    url.searchParams.set('t', Date.now());
+                    qrImg.src = url.toString();
+                }
+            }
+        });
+
+        // Touch feedback for copy button
+        document.querySelector('.copy-btn')?.addEventListener('touchstart', function() {
+            this.style.transform = 'scale(0.95)';
+        }, { passive: true });
+        
+        document.querySelector('.copy-btn')?.addEventListener('touchend', function() {
+            this.style.transform = 'scale(1)';
+        }, { passive: true });
+
+        // Handle responsive QR code loading
+        function handleQrLoading() {
+            const qrImg = document.querySelector('.qr-image');
+            if (qrImg) {
+                qrImg.addEventListener('error', function() {
+                    // QR failed to load, try with a different service
+                    const currentSrc = this.src;
+                    if (currentSrc.includes('api.qrserver.com')) {
+                        // Try alternative QR service
+                        const dataParam = new URL(currentSrc).searchParams.get('data');
+                        if (dataParam) {
+                            this.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + dataParam + '&t=' + Date.now();
+                        }
+                    }
+                });
+            }
+        }
+        document.addEventListener('DOMContentLoaded', handleQrLoading);
+    </script>
 </body>
 </html>"""
 # Helper function for SUB_INFO_HTML's status display
