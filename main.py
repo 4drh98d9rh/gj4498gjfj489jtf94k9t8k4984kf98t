@@ -10,6 +10,7 @@ from zoneinfo import ZoneInfo
 from urllib.parse import quote, parse_qs
 from collections import deque, defaultdict
 from pathlib import Path
+import random
 
 import psutil
 from typing import Optional
@@ -30,35 +31,95 @@ logger = logging.getLogger("MX-UI")
 IRAN_TZ = ZoneInfo("Asia/Tehran")
 
 app = FastAPI(title="MX-UI", docs_url=None, redoc_url=None)
-# اضافه کردن بعد از imports
-import random
 
-# Emoji lists for random selection
-COUNTRY_EMOJIS = [
-    "🇺🇸", "🇬🇧", "🇩🇪", "🇫🇷", "🇮🇹", "🇪🇸", "🇵🇹", "🇳🇱", "🇧🇪", "🇨🇭",
-    "🇦🇹", "🇸🇪", "🇳🇴", "🇩🇰", "🇫🇮", "🇮🇪", "🇬🇷", "🇹🇷", "🇷🇺", "🇺🇦",
-    "🇵🇱", "🇨🇿", "🇭🇺", "🇷🇴", "🇧🇬", "🇭🇷", "🇷🇸", "🇸🇰", "🇸🇮", "🇱🇹",
-    "🇱🇻", "🇪🇪", "🇨🇦", "🇲🇽", "🇧🇷", "🇦🇷", "🇨🇱", "🇨🇴", "🇵🇪", "🇻🇪",
-    "🇯🇵", "🇰🇷", "🇨🇳", "🇹🇼", "🇭🇰", "🇸🇬", "🇲🇾", "🇮🇩", "🇵🇭", "🇻🇳",
-    "🇹🇭", "🇮🇳", "🇵🇰", "🇧🇩", "🇦🇪", "🇸🇦", "🇮🇱", "🇪🇬", "🇿🇦", "🇳🇬",
-    "🇦🇺", "🇳🇿", "🇵🇬", "🇫🇯", "🇼🇸", "🇹🇴", "🇸🇧", "🇻🇺", "🇳🇨", "🇵🇫"
-]
+# ── Country Emoji Mapping ──────────────────────────────────────────────────────
+COUNTRY_EMOJIS = {
+    "United States": "🇺🇸", "US": "🇺🇸", "USA": "🇺🇸",
+    "United Kingdom": "🇬🇧", "UK": "🇬🇧", "GB": "🇬🇧",
+    "Germany": "🇩🇪", "DE": "🇩🇪",
+    "France": "🇫🇷", "FR": "🇫🇷",
+    "Italy": "🇮🇹", "IT": "🇮🇹",
+    "Spain": "🇪🇸", "ES": "🇪🇸",
+    "Portugal": "🇵🇹", "PT": "🇵🇹",
+    "Netherlands": "🇳🇱", "NL": "🇳🇱",
+    "Belgium": "🇧🇪", "BE": "🇧🇪",
+    "Switzerland": "🇨🇭", "CH": "🇨🇭",
+    "Austria": "🇦🇹", "AT": "🇦🇹",
+    "Sweden": "🇸🇪", "SE": "🇸🇪",
+    "Norway": "🇳🇴", "NO": "🇳🇴",
+    "Denmark": "🇩🇰", "DK": "🇩🇰",
+    "Finland": "🇫🇮", "FI": "🇫🇮",
+    "Ireland": "🇮🇪", "IE": "🇮🇪",
+    "Greece": "🇬🇷", "GR": "🇬🇷",
+    "Turkey": "🇹🇷", "TR": "🇹🇷",
+    "Russia": "🇷🇺", "RU": "🇷🇺",
+    "Ukraine": "🇺🇦", "UA": "🇺🇦",
+    "Poland": "🇵🇱", "PL": "🇵🇱",
+    "Czech Republic": "🇨🇿", "CZ": "🇨🇿",
+    "Hungary": "🇭🇺", "HU": "🇭🇺",
+    "Romania": "🇷🇴", "RO": "🇷🇴",
+    "Bulgaria": "🇧🇬", "BG": "🇧🇬",
+    "Croatia": "🇭🇷", "HR": "🇭🇷",
+    "Serbia": "🇷🇸", "RS": "🇷🇸",
+    "Slovakia": "🇸🇰", "SK": "🇸🇰",
+    "Slovenia": "🇸🇮", "SI": "🇸🇮",
+    "Lithuania": "🇱🇹", "LT": "🇱🇹",
+    "Latvia": "🇱🇻", "LV": "🇱🇻",
+    "Estonia": "🇪🇪", "EE": "🇪🇪",
+    "Canada": "🇨🇦", "CA": "🇨🇦",
+    "Mexico": "🇲🇽", "MX": "🇲🇽",
+    "Brazil": "🇧🇷", "BR": "🇧🇷",
+    "Argentina": "🇦🇷", "AR": "🇦🇷",
+    "Chile": "🇨🇱", "CL": "🇨🇱",
+    "Colombia": "🇨🇴", "CO": "🇨🇴",
+    "Peru": "🇵🇪", "PE": "🇵🇪",
+    "Venezuela": "🇻🇪", "VE": "🇻🇪",
+    "Japan": "🇯🇵", "JP": "🇯🇵",
+    "South Korea": "🇰🇷", "KR": "🇰🇷",
+    "China": "🇨🇳", "CN": "🇨🇳",
+    "Taiwan": "🇹🇼", "TW": "🇹🇼",
+    "Hong Kong": "🇭🇰", "HK": "🇭🇰",
+    "Singapore": "🇸🇬", "SG": "🇸🇬",
+    "Malaysia": "🇲🇾", "MY": "🇲🇾",
+    "Indonesia": "🇮🇩", "ID": "🇮🇩",
+    "Philippines": "🇵🇭", "PH": "🇵🇭",
+    "Vietnam": "🇻🇳", "VN": "🇻🇳",
+    "Thailand": "🇹🇭", "TH": "🇹🇭",
+    "India": "🇮🇳", "IN": "🇮🇳",
+    "Pakistan": "🇵🇰", "PK": "🇵🇰",
+    "Bangladesh": "🇧🇩", "BD": "🇧🇩",
+    "United Arab Emirates": "🇦🇪", "AE": "🇦🇪",
+    "Saudi Arabia": "🇸🇦", "SA": "🇸🇦",
+    "Israel": "🇮🇱", "IL": "🇮🇱",
+    "Egypt": "🇪🇬", "EG": "🇪🇬",
+    "South Africa": "🇿🇦", "ZA": "🇿🇦",
+    "Nigeria": "🇳🇬", "NG": "🇳🇬",
+    "Australia": "🇦🇺", "AU": "🇦🇺",
+    "New Zealand": "🇳🇿", "NZ": "🇳🇿",
+    "Iran": "🇮🇷", "IR": "🇮🇷",
+    "Iraq": "🇮🇶", "IQ": "🇮🇶",
+    "Afghanistan": "🇦🇫", "AF": "🇦🇫",
+    "Lebanon": "🇱🇧", "LB": "🇱🇧",
+    "Syria": "🇸🇾", "SY": "🇸🇾",
+    "Jordan": "🇯🇴", "JO": "🇯🇴",
+    "Kuwait": "🇰🇼", "KW": "🇰🇼",
+    "Qatar": "🇶🇦", "QA": "🇶🇦",
+    "Oman": "🇴🇲", "OM": "🇴🇲",
+    "Bahrain": "🇧🇭", "BH": "🇧🇭",
+    "Yemen": "🇾🇪", "YE": "🇾🇪",
+    "Palestine": "🇵🇸", "PS": "🇵🇸",
+}
 
-SPEED_EMOJIS = ["⚡", "🔥", "💨", "🚀", "⭐", "💎", "🌟", "✨", "🎯", "🏆"]
-STATUS_EMOJIS = ["✅", "🔰", "🛡️", "🔒", "🔐", "🛡️", "⚔️", "🎖️", "🏅", "📡"]
-FLOWER_EMOJIS = ["🌸", "🌺", "🌻", "🌹", "🌷", "🌿", "🍀", "🌴", "🌳", "🎋"]
-TECH_EMOJIS = ["💻", "🖥️", "📱", "📡", "🛰️", "🎮", "🕹️", "⌨️", "🖱️", "📀"]
-GAME_EMOJIS = ["🎮", "🕹️", "🎯", "🎲", "♟️", "🎪", "🎭", "🎨", "🎵", "🎶"]
+# Decorative emojis for variety
+DECORATIVE_EMOJIS = ["🌸", "🌺", "🌻", "🌹", "🌷", "🌿", "🍀", "🌴", "🌳", "🎋", 
+                     "💎", "🌟", "✨", "🎯", "🏆", "🔥", "💨", "🚀", "⭐", "💫",
+                     "🌈", "⚡", "🎉", "🎊", "💝", "🌊", "🍃", "🌺", "🌻", "🌹"]
 
-ALL_EMOJIS = COUNTRY_EMOJIS + SPEED_EMOJIS + STATUS_EMOJIS + FLOWER_EMOJIS + TECH_EMOJIS + GAME_EMOJIS
+# ── IP Cache ──────────────────────────────────────────────────────────────────
+IP_CACHE = {}
+IP_CACHE_LOCK = asyncio.Lock()
+IP_CACHE_TTL = 3600  # 1 hour
 
-def get_random_emoji() -> str:
-    """Get a random emoji from the list"""
-    return random.choice(ALL_EMOJIS)
-
-def get_random_country_emoji() -> str:
-    """Get a random country flag emoji"""
-    return random.choice(COUNTRY_EMOJIS)
 # ── Persistence ───────────────────────────────────────────────────────────────
 DATA_DIR = Path(os.environ.get("DATA_DIR", "/data"))
 DATA_FILE = DATA_DIR / "mxui_state.json"
@@ -218,6 +279,86 @@ async def require_auth(request: Request):
     if not await is_valid_session(token):
         raise HTTPException(status_code=401, detail="unauthorized")
     return token
+
+# ── Country Detection ────────────────────────────────────────────────────────
+async def get_client_country(request: Request) -> tuple[str, str]:
+    """Get client country and flag emoji from IP using ip-api.com"""
+    client_ip = client_ip(request)
+    
+    # Check cache first
+    async with IP_CACHE_LOCK:
+        if client_ip in IP_CACHE:
+            cached_time, country, emoji = IP_CACHE[client_ip]
+            if time.time() - cached_time < IP_CACHE_TTL:
+                return country, emoji
+    
+    try:
+        # Use ip-api.com for geolocation (free, no API key needed)
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.get(f"http://ip-api.com/json/{client_ip}")
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("status") == "success":
+                    country = data.get("country", "Unknown")
+                    country_code = data.get("countryCode", "XX")
+                    
+                    # Get emoji for country
+                    emoji = COUNTRY_EMOJIS.get(country, COUNTRY_EMOJIS.get(country_code, "🌍"))
+                    
+                    # Cache the result
+                    async with IP_CACHE_LOCK:
+                        IP_CACHE[client_ip] = (time.time(), country, emoji)
+                    
+                    return country, emoji
+    except Exception as e:
+        logger.warning(f"Failed to get country for IP {client_ip}: {e}")
+    
+    # Fallback: random country if detection fails
+    fallback_country = random.choice(list(COUNTRY_EMOJIS.keys()))
+    fallback_emoji = COUNTRY_EMOJIS.get(fallback_country, "🌍")
+    
+    # Cache fallback
+    async with IP_CACHE_LOCK:
+        IP_CACHE[client_ip] = (time.time(), "Unknown", "🌍")
+    
+    return "Unknown", "🌍"
+
+def get_random_decorative_emoji() -> str:
+    """Get a random decorative emoji"""
+    return random.choice(DECORATIVE_EMOJIS)
+
+def get_limit_emoji(limit_bytes: int) -> str:
+    """Get emoji based on traffic limit"""
+    if limit_bytes == 0:
+        return "♾️"
+    elif limit_bytes < 1024 ** 3:  # < 1GB
+        return "📦"
+    elif limit_bytes < 10 * 1024 ** 3:  # < 10GB
+        return "📦"
+    elif limit_bytes < 100 * 1024 ** 3:  # < 100GB
+        return "🚀"
+    else:
+        return "🌌"
+
+def format_limit(limit_bytes: int) -> str:
+    """Format limit as readable string"""
+    if limit_bytes == 0:
+        return "∞"
+    elif limit_bytes >= 1024 ** 3:
+        return f"{limit_bytes / 1024 ** 3:.1f}GB"
+    elif limit_bytes >= 1024 ** 2:
+        return f"{limit_bytes / 1024 ** 2:.0f}MB"
+    else:
+        return f"{limit_bytes / 1024:.0f}KB"
+
+def generate_emoji_label(base_label: str, limit_bytes: int, speed_limit_bytes: int, country_emoji: str) -> str:
+    """Generate a formatted label with emojis"""
+    random_emoji = get_random_decorative_emoji()
+    limit_emoji = get_limit_emoji(limit_bytes)
+    limit_str = format_limit(limit_bytes)
+    speed_emoji = "⚡" if speed_limit_bytes > 0 else "🐢"
+    
+    return f"{country_emoji} {random_emoji} {base_label} {limit_emoji} {limit_str} {speed_emoji}"
 
 # ── Startup / Shutdown ────────────────────────────────────────────────────────
 @app.on_event("startup")
@@ -402,7 +543,7 @@ async def ensure_default_link():
             uid = f"{uid[:8]}-{uid[8:12]}-{uid[12:16]}-{uid[16:20]}-{uid[20:32]}"
             if uid not in LINKS:
                 LINKS[uid] = {
-                    "label": "Default Link",
+                    "label": "🌍 Default Link ♾️ 🐢",
                     "limit_bytes": 0,
                     "used_bytes": 0,
                     "created_at": datetime.now().isoformat(),
@@ -416,6 +557,7 @@ async def ensure_default_link():
                     "ip_limit": 0,
                     "speed_limit_bytes": DEFAULT_SPEED_LIMIT,
                     "last_used": None,
+                    "country": "Default",
                 }
                 asyncio.create_task(save_state())
         _default_link_created = True
@@ -424,10 +566,8 @@ async def ensure_default_link():
 @app.get("/")
 async def root(request: Request):
     dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
-    # If dashboard path is "/", render directly (avoid loop)
     if dashboard_path == "/":
         return await render_dashboard(request)
-    # If requesting root and dashboard path is different, redirect
     if dashboard_path != "/":
         return RedirectResponse(url=dashboard_path, status_code=302)
     return await render_dashboard(request)
@@ -496,7 +636,6 @@ async def restore_database(request: Request, _=Depends(require_auth)):
     except:
         raise HTTPException(status_code=400, detail="Invalid JSON data")
     
-    # Validate data
     if "links" not in data:
         raise HTTPException(status_code=400, detail="Invalid database format")
     
@@ -504,25 +643,16 @@ async def restore_database(request: Request, _=Depends(require_auth)):
         raise HTTPException(status_code=400, detail="Invalid links format")
     
     async with LINKS_LOCK:
-        # Clear existing links
         LINKS.clear()
-        # Restore links
         LINKS.update(data.get("links", {}))
-        
-        # Reset password to default MUVIXO because old hash was created with different SECRET_KEY
         AUTH["password_hash"] = hash_password("MUVIXO")
-        
-        # Restore paths if present (only if they are valid)
         if "paths" in data:
             for key, value in data["paths"].items():
                 if key in CONFIG and value and isinstance(value, str):
-                    # Validate path before restoring
                     if value.startswith("/") and len(value) >= 2:
                         CONFIG[key] = value
     
-    # Clear all sessions to force re-login
     await clear_all_sessions()
-    
     await save_state()
     log_activity("database", f"Database restored from backup ({len(LINKS)} links). Password reset to MUVIXO", "ok")
     
@@ -531,7 +661,6 @@ async def restore_database(request: Request, _=Depends(require_auth)):
 # ── Subscription endpoints ────────────────────────────────────────────────────
 @app.get("/sub/user")
 async def subscription_user_old(request: Request, uuid: str = Query(...)):
-    """Redirect old /sub/user to new sub path if changed"""
     sub_path = CONFIG.get("sub_path", "/sub")
     if sub_path != "/sub":
         return RedirectResponse(url=f"{sub_path}/user?uuid={uuid}", status_code=302)
@@ -539,11 +668,9 @@ async def subscription_user_old(request: Request, uuid: str = Query(...)):
 
 @app.get(CONFIG.get("sub_path", "/sub") + "/user")
 async def subscription_user_new(request: Request, uuid: str = Query(...)):
-    """Handle new sub path /user"""
     return await subscription_user_handler(request, uuid)
 
 async def subscription_user_handler(request: Request, uuid: str):
-    """Handle subscription user page with local QR generation (no text)"""
     from pages import SUB_USER_HTML
     async with LINKS_LOCK:
         link = LINKS.get(uuid)
@@ -555,10 +682,7 @@ async def subscription_user_handler(request: Request, uuid: str):
     used = link.get("used_bytes", 0)
     limit = link.get("limit_bytes", 0)
     
-    # Check if quota is exceeded
     quota_exceeded = limit > 0 and used >= limit
-    
-    # If quota exceeded, deactivate the link
     if quota_exceeded and link.get("active", True):
         async with LINKS_LOCK:
             LINKS[uuid]["active"] = False
@@ -568,7 +692,6 @@ async def subscription_user_handler(request: Request, uuid: str):
             link = LINKS.get(uuid)
     
     active = is_link_allowed(link)
-    
     expiry = link.get("expires_at", "No expiry")
     last_online = link.get("last_used", "Never")
     ips = unique_ips_for_uuid(uuid)
@@ -585,7 +708,6 @@ async def subscription_user_handler(request: Request, uuid: str):
     downloaded = fmt_bytes(used)
     uploaded = "0 B"
     
-    # Generate QR code locally WITHOUT text
     qr_base64 = generate_qr_base64(vless, size=300)
     
     return HTMLResponse(content=SUB_USER_HTML.format(
@@ -611,7 +733,6 @@ async def subscription_user_handler(request: Request, uuid: str):
 
 @app.get("/sub/{uuid}")
 async def subscription_single_old(uuid: str, request: Request):
-    """Redirect old /sub/{uuid} to new sub path if changed"""
     sub_path = CONFIG.get("sub_path", "/sub")
     if sub_path != "/sub":
         return RedirectResponse(url=f"{sub_path}/{uuid}", status_code=302)
@@ -619,11 +740,9 @@ async def subscription_single_old(uuid: str, request: Request):
 
 @app.get(CONFIG.get("sub_path", "/sub") + "/{uuid}")
 async def subscription_single_new(uuid: str, request: Request):
-    """Handle new sub path /{uuid}"""
     return await subscription_single_handler(uuid, request)
 
 async def subscription_single_handler(uuid: str, request: Request):
-    """Handle single subscription"""
     import base64
     async with LINKS_LOCK:
         link = LINKS.get(uuid)
@@ -637,7 +756,6 @@ async def subscription_single_handler(uuid: str, request: Request):
 
 @app.get("/sub/{uuid}/info")
 async def subscription_info_old(uuid: str, request: Request):
-    """Redirect old /sub/{uuid}/info to new sub path if changed"""
     sub_path = CONFIG.get("sub_path", "/sub")
     if sub_path != "/sub":
         return RedirectResponse(url=f"{sub_path}/{uuid}/info", status_code=302)
@@ -645,11 +763,9 @@ async def subscription_info_old(uuid: str, request: Request):
 
 @app.get(CONFIG.get("sub_path", "/sub") + "/{uuid}/info")
 async def subscription_info_new(uuid: str, request: Request):
-    """Handle new sub path /{uuid}/info"""
     return await subscription_info_handler(uuid, request)
 
 async def subscription_info_handler(uuid: str, request: Request):
-    """Handle subscription info"""
     from pages import SUB_INFO_HTML
     async with LINKS_LOCK:
         link = LINKS.get(uuid)
@@ -671,7 +787,6 @@ async def subscription_info_handler(uuid: str, request: Request):
 # ── Subscription all (requires auth) ──────────────────────────────────────
 @app.get("/sub-all")
 async def subscription_all_old(request: Request, _=Depends(require_auth)):
-    """Redirect old /sub-all to new sub path if changed"""
     sub_path = CONFIG.get("sub_path", "/sub")
     if sub_path != "/sub":
         return RedirectResponse(url=f"{sub_path}-all", status_code=302)
@@ -679,11 +794,9 @@ async def subscription_all_old(request: Request, _=Depends(require_auth)):
 
 @app.get(CONFIG.get("sub_path", "/sub") + "-all")
 async def subscription_all_new(request: Request, _=Depends(require_auth)):
-    """Handle new sub path -all"""
     return await subscription_all_handler(request)
 
 async def subscription_all_handler(request: Request):
-    """Handle subscription all"""
     import base64
     host = get_host(request)
     async with LINKS_LOCK:
@@ -741,12 +854,8 @@ async def api_change_password(request: Request, token=Depends(require_auth)):
     if len(new) < 4:
         raise HTTPException(status_code=400, detail="New password must be at least 4 characters")
     
-    # Change password
     AUTH["password_hash"] = hash_password(new)
-    
-    # Clear all sessions
     await clear_all_sessions()
-    
     await save_state()
     log_activity("auth", "Panel password changed", "ok")
     
@@ -754,7 +863,6 @@ async def api_change_password(request: Request, token=Depends(require_auth)):
 
 @app.post("/api/force-logout")
 async def force_logout(request: Request):
-    """Force logout all users"""
     await clear_all_sessions()
     resp = JSONResponse({"ok": True})
     secure = request.url.scheme == "https"
@@ -785,16 +893,13 @@ async def update_path(request: Request, _=Depends(require_auth)):
     if len(new_path) < 2:
         raise HTTPException(status_code=400, detail="Path must be at least 2 characters")
     
-    # Reserved paths that cannot be used
     reserved_paths = ["/api", "/stats", "/health", "/dash", "/", "/proxy", "/ws", "/xhttp-siz10", "/sub-all", "/favicon", "/robots"]
     if new_path in reserved_paths:
         raise HTTPException(status_code=400, detail=f"Path '{new_path}' is reserved")
     
-    # Prevent paths that start with reserved prefixes
     if new_path.startswith("/api/") or new_path.startswith("/stats/") or new_path.startswith("/health/"):
         raise HTTPException(status_code=400, detail="Path cannot start with /api/, /stats/, or /health/")
     
-    # Check if the new path conflicts with other configured paths
     other_paths = {
         "dashboard": CONFIG.get("dashboard_path", "/dashboard"),
         "login": CONFIG.get("login_path", "/login"),
@@ -804,11 +909,9 @@ async def update_path(request: Request, _=Depends(require_auth)):
         if key != path_type and value == new_path:
             raise HTTPException(status_code=400, detail=f"Path conflicts with {key} path: {value}")
     
-    # Validate characters
     if not re.match(r'^/[a-zA-Z0-9\-_]+$', new_path):
         raise HTTPException(status_code=400, detail="Path must contain only letters, numbers, hyphens, and underscores")
     
-    # Prevent changing dashboard path to /login or /sub
     if path_type == "dashboard" and (new_path == CONFIG.get("login_path") or new_path == CONFIG.get("sub_path")):
         raise HTTPException(status_code=400, detail="Dashboard path cannot be the same as login or sub path")
     
@@ -841,7 +944,6 @@ async def get_link_status(uuid: str):
     limit = link.get("limit_bytes", 0)
     active = is_link_allowed(link)
     
-    # If quota exceeded
     if limit > 0 and used >= limit:
         active = False
     
@@ -859,7 +961,6 @@ async def get_stats(_=Depends(require_auth)):
     async with LINKS_LOCK:
         snap = dict(LINKS)
     
-    # Check and auto-deactivate links that exceeded quota
     for uid, link in snap.items():
         limit = link.get("limit_bytes", 0)
         used = link.get("used_bytes", 0)
@@ -958,6 +1059,8 @@ async def get_connections(_=Depends(require_auth)):
         "count": len(result),
         "raw_count": len(connections),
     }
+
+# ── Link Management ───────────────────────────────────────────────────────────
 async def make_link(
     label: str = "New Link",
     limit_bytes: int = 0,
@@ -968,6 +1071,8 @@ async def make_link(
     alpn: str = "",
     ip_limit: int = 0,
     speed_limit_bytes: int = 0,
+    request: Request = None,
+    country_emoji: str = "🌍",
 ) -> tuple[str, dict]:
     if protocol not in PROTOCOLS:
         protocol = DEFAULT_PROTOCOL
@@ -976,13 +1081,14 @@ async def make_link(
         fingerprint = DEFAULT_FINGERPRINT
     uid = generate_uuid()
     
-    # Generate random emoji for label
-    random_emoji = get_random_emoji()
-    country_emoji = get_random_country_emoji()
+    # Generate label with emojis
+    base_label = (label or "New Link").strip()[:60] or "New Link"
+    random_emoji = get_random_decorative_emoji()
+    limit_emoji = get_limit_emoji(limit_bytes)
+    limit_str = format_limit(limit_bytes)
+    speed_emoji = "⚡" if speed_limit_bytes > 0 else "🐢"
     
-    # Format label with emoji
-    label_text = (label or "New Link").strip()[:60] or "New Link"
-    formatted_label = f"{country_emoji} {random_emoji} {label_text}"
+    formatted_label = f"{country_emoji} {random_emoji} {base_label} {limit_emoji} {limit_str} {speed_emoji}"
     
     async with LINKS_LOCK:
         LINKS[uid] = {
@@ -1000,39 +1106,12 @@ async def make_link(
             "ip_limit": max(0, ip_limit),
             "speed_limit_bytes": max(0, speed_limit_bytes),
             "last_used": None,
+            "country": "Unknown",
         }
     asyncio.create_task(save_state())
     log_activity("link", f"Config «{LINKS[uid]['label']}» created", "ok")
     return uid, LINKS[uid]
-def get_emoji_by_limit(limit_bytes: int) -> str:
-    """Get emoji based on traffic limit"""
-    if limit_bytes == 0:
-        return "♾️"
-    elif limit_bytes < 1024 ** 3:  # < 1GB
-        return "📦"
-    elif limit_bytes < 10 * 1024 ** 3:  # < 10GB
-        return "📦"
-    elif limit_bytes < 100 * 1024 ** 3:  # < 100GB
-        return "🚀"
-    else:
-        return "🌌"
 
-def format_label_with_emoji(label: str, limit_bytes: int, speed_bytes: int) -> str:
-    """Format label with appropriate emojis based on limits"""
-    limit_emoji = get_emoji_by_limit(limit_bytes)
-    speed_emoji = "⚡" if speed_bytes > 0 else "🐢"
-    random_emoji = get_random_emoji()
-    country_emoji = get_random_country_emoji()
-    
-    # Format limit as GB or MB
-    if limit_bytes >= 1024 ** 3:
-        limit_str = f"{limit_bytes / 1024 ** 3:.1f}GB"
-    elif limit_bytes >= 1024 ** 2:
-        limit_str = f"{limit_bytes / 1024 ** 2:.0f}MB"
-    else:
-        limit_str = f"{limit_bytes / 1024:.0f}KB" if limit_bytes > 0 else "∞"
-    
-    return f"{country_emoji} {random_emoji} {label} {limit_emoji} {limit_str}"
 async def remove_link(uid: str) -> str | None:
     async with LINKS_LOCK:
         if uid not in LINKS:
@@ -1052,9 +1131,14 @@ async def set_link_active(uid: str, active: bool) -> dict | None:
     log_activity("link", f"Config «{label}» {'activated' if active else 'deactivated'}", "ok" if active else "warn")
     asyncio.create_task(save_state())
     return LINKS[uid]
+
 @app.post("/api/links")
 async def create_link(request: Request, _=Depends(require_auth)):
     body = await request.json()
+    
+    # Get real country from client IP
+    country_name, country_emoji = await get_client_country(request)
+    
     lv = float(body.get("limit_value") or 0)
     lu = body.get("limit_unit") or "GB"
     limit_bytes = 0 if lv <= 0 else parse_size_to_bytes(lv, lu)
@@ -1069,29 +1153,8 @@ async def create_link(request: Request, _=Depends(require_auth)):
     su = body.get("speed_limit_unit") or "MBIT"
     speed_limit_bytes = 0 if sv <= 0 else parse_speed_to_bytes(sv, su)
 
-    # Get base label
-    base_label = body.get("label") or "New Config"
-    
-    # Generate label with emojis
-    if limit_bytes > 0:
-        if limit_bytes >= 1024 ** 3:
-            limit_str = f"{limit_bytes / 1024 ** 3:.1f}GB"
-        elif limit_bytes >= 1024 ** 2:
-            limit_str = f"{limit_bytes / 1024 ** 2:.0f}MB"
-        else:
-            limit_str = f"{limit_bytes / 1024:.0f}KB"
-    else:
-        limit_str = "∞"
-    
-    country_emoji = get_random_country_emoji()
-    random_emoji = get_random_emoji()
-    limit_emoji = get_emoji_by_limit(limit_bytes)
-    speed_emoji = "⚡" if speed_limit_bytes > 0 else "🐢"
-    
-    formatted_label = f"{country_emoji} {random_emoji} {base_label} {limit_emoji} {limit_str} {speed_emoji}"
-
     uid, link = await make_link(
-        label=formatted_label,
+        label=body.get("label") or "New Config",
         limit_bytes=limit_bytes,
         expires_at=expires_at,
         note=body.get("note") or "",
@@ -1100,6 +1163,8 @@ async def create_link(request: Request, _=Depends(require_auth)):
         alpn=body.get("alpn") or "",
         ip_limit=ip_limit,
         speed_limit_bytes=speed_limit_bytes,
+        request=request,
+        country_emoji=country_emoji,
     )
 
     host = get_host(request)
@@ -1110,27 +1175,9 @@ async def create_link(request: Request, _=Depends(require_auth)):
         "vless_link": vless_link_for_link(link, uid, host),
         "sub_url": f"https://{host}/sub/{uid}",
         "info_url": f"https://{host}/sub/{uid}/info",
+        "country": country_name,
     }
-def generate_emoji_label(base_label: str, limit_bytes: int, speed_limit_bytes: int) -> str:
-    """Generate a formatted label with emojis"""
-    # Get limit string
-    if limit_bytes > 0:
-        if limit_bytes >= 1024 ** 3:
-            limit_str = f"{limit_bytes / 1024 ** 3:.1f}GB"
-        elif limit_bytes >= 1024 ** 2:
-            limit_str = f"{limit_bytes / 1024 ** 2:.0f}MB"
-        else:
-            limit_str = f"{limit_bytes / 1024:.0f}KB"
-    else:
-        limit_str = "∞"
-    
-    # Get emojis
-    country_emoji = get_random_country_emoji()
-    random_emoji = get_random_emoji()
-    limit_emoji = get_emoji_by_limit(limit_bytes)
-    speed_emoji = "⚡" if speed_limit_bytes > 0 else "🐢"
-    
-    return f"{country_emoji} {random_emoji} {base_label} {limit_emoji} {limit_str} {speed_emoji}"
+
 @app.get("/api/links")
 async def list_links(request: Request, _=Depends(require_auth)):
     host = get_host(request)
@@ -1139,7 +1186,6 @@ async def list_links(request: Request, _=Depends(require_auth)):
     result = []
     for uid, d in snap.items():
         proto = d.get("protocol", DEFAULT_PROTOCOL)
-        # Check if quota exceeded
         limit = d.get("limit_bytes", 0)
         used = d.get("used_bytes", 0)
         if limit > 0 and used >= limit and d.get("active", True):
@@ -1160,10 +1206,11 @@ async def list_links(request: Request, _=Depends(require_auth)):
             "sub_url": sub_url,
             "info_url": f"https://{host}/sub/{uid}/info",
             "connected_ips": len(unique_ips_for_uuid(uid)),
-            "is_default": d.get("is_default", False),  # اضافه شدن این خط
+            "is_default": d.get("is_default", False),
         })
     result.sort(key=lambda x: x["created_at"], reverse=True)
     return {"links": result}
+
 @app.patch("/api/links/{uid}")
 async def update_link(uid: str, request: Request, _=Depends(require_auth)):
     body = await request.json()
@@ -1184,30 +1231,23 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
             log_activity("link", f"Config «{label}» {'activated' if link['active'] else 'deactivated'}", "ok" if link["active"] else "warn")
         
         if "label" in body:
-            # Preserve emoji pattern when updating label
             new_label = str(body["label"])[:60]
-            # Check if the label already has emojis
+            # Keep existing emoji pattern by preserving emojis
             import re
-            emoji_pattern = re.compile(r'[🇦-🇿🌍-🌏🎌🏁🚩🇺🇸🇬🇧🇩🇪🇫🇷🇮🇹🇪🇸🇵🇹🇳🇱🇧🇪🇨🇭🇦🇹🇸🇪🇳🇴🇩🇰🇫🇮🇮🇪🇬🇷🇹🇷🇷🇺🇺🇦🇵🇱🇨🇿🇭🇺🇷🇴🇧🇬🇭🇷🇷🇸🇸🇰🇸🇮🇱🇹🇱🇻🇪🇪🇨🇦🇲🇽🇧🇷🇦🇷🇨🇱🇨🇴🇵🇪🇻🇪🇯🇵🇰🇷🇨🇳🇹🇼🇭🇰🇸🇬🇲🇾🇮🇩🇵🇭🇻🇳🇹🇭🇮🇳🇵🇰🇧🇩🇦🇪🇸🇦🇮🇱🇪🇬🇿🇦🇳🇬🇦🇺🇳🇿]')
+            emoji_pattern = re.compile(r'[🇦-🇿🌍-🌏🎌🏁🚩🇺🇸🇬🇧🇩🇪🇫🇷🇮🇹🇪🇸🇵🇹🇳🇱🇧🇪🇨🇭🇦🇹🇸🇪🇳🇴🇩🇰🇫🇮🇮🇪🇬🇷🇹🇷🇷🇺🇺🇦🇵🇱🇨🇿🇭🇺🇷🇴🇧🇬🇭🇷🇷🇸🇸🇰🇸🇮🇱🇹🇱🇻🇪🇪🇨🇦🇲🇽🇧🇷🇦🇷🇨🇱🇨🇴🇵🇪🇻🇪🇯🇵🇰🇷🇨🇳🇹🇼🇭🇰🇸🇬🇲🇾🇮🇩🇵🇭🇻🇳🇹🇭🇮🇳🇵🇰🇧🇩🇦🇪🇸🇦🇮🇱🇪🇬🇿🇦🇳🇬🇦🇺🇳🇿🌸🌺🌻🌹🌷🌿🍀🌴🌳🎋💎🌟✨🎯🏆🔥💨🚀⭐💫🌈⚡🎉🎊💝🌊🍃♾️📦🌌🐢]')
             
-            # If the label has emojis, keep them and just update the text part
-            if emoji_pattern.search(new_label):
-                # Extract the text part (after the emojis)
-                parts = new_label.split(' ', 2)
-                if len(parts) >= 3:
-                    # Keep first two parts (emojis) and update the rest
-                    text_part = ' '.join(parts[2:]) if len(parts) > 2 else ''
-                    # Rebuild with current limit info
-                    current_limit = link.get("limit_bytes", 0)
-                    current_speed = link.get("speed_limit_bytes", 0)
-                    link["label"] = generate_emoji_label(text_part, current_limit, current_speed)
-                else:
-                    link["label"] = new_label
-            else:
-                # No emojis, generate new emoji label
-                current_limit = link.get("limit_bytes", 0)
-                current_speed = link.get("speed_limit_bytes", 0)
-                link["label"] = generate_emoji_label(new_label, current_limit, current_speed)
+            # Extract text without emojis
+            text_part = emoji_pattern.sub('', new_label).strip()
+            if not text_part:
+                text_part = new_label
+            
+            # Keep country emoji if present
+            country_emoji_match = re.search(r'[🇦-🇿]', label)
+            country_emoji = country_emoji_match.group(0) if country_emoji_match else "🌍"
+            
+            current_limit = link.get("limit_bytes", 0)
+            current_speed = link.get("speed_limit_bytes", 0)
+            link["label"] = generate_emoji_label(text_part, current_limit, current_speed, country_emoji)
         
         if "note" in body:
             link["note"] = str(body["note"])[:200]
@@ -1222,16 +1262,17 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
             lv = float(body.get("limit_value") or 0)
             lu = body.get("limit_unit") or "GB"
             link["limit_bytes"] = 0 if lv <= 0 else parse_size_to_bytes(lv, lu)
-            # Update label with new limit info
+            # Update label with new limit
             current_label = link.get("label", "")
-            # Extract text part without emojis
             import re
-            emoji_pattern = re.compile(r'[🇦-🇿🌍-🌏🎌🏁🚩🇺🇸🇬🇧🇩🇪🇫🇷🇮🇹🇪🇸🇵🇹🇳🇱🇧🇪🇨🇭🇦🇹🇸🇪🇳🇴🇩🇰🇫🇮🇮🇪🇬🇷🇹🇷🇷🇺🇺🇦🇵🇱🇨🇿🇭🇺🇷🇴🇧🇬🇭🇷🇷🇸🇸🇰🇸🇮🇱🇹🇱🇻🇪🇪🇨🇦🇲🇽🇧🇷🇦🇷🇨🇱🇨🇴🇵🇪🇻🇪🇯🇵🇰🇷🇨🇳🇹🇼🇭🇰🇸🇬🇲🇾🇮🇩🇵🇭🇻🇳🇹🇭🇮🇳🇵🇰🇧🇩🇦🇪🇸🇦🇮🇱🇪🇬🇿🇦🇳🇬🇦🇺🇳🇿⚡🔥💨🚀⭐💎🌟✨🎯🏆✅🔰🛡️🔒🔐⚔️🎖️🏅📡🌸🌺🌻🌹🌷🌿🍀🌴🌳🎋💻🖥️📱📡🛰️🎮🕹️⌨️🖱️📀]')
+            emoji_pattern = re.compile(r'[🇦-🇿🌸🌺🌻🌹🌷🌿🍀🌴🌳🎋💎🌟✨🎯🏆🔥💨🚀⭐💫🌈⚡🎉🎊💝🌊🍃♾️📦🌌🐢]')
             text_part = emoji_pattern.sub('', current_label).strip()
             if not text_part:
                 text_part = link.get("label", "Config")
+            country_emoji_match = re.search(r'[🇦-🇿]', current_label)
+            country_emoji = country_emoji_match.group(0) if country_emoji_match else "🌍"
             current_speed = link.get("speed_limit_bytes", 0)
-            link["label"] = generate_emoji_label(text_part, link["limit_bytes"], current_speed)
+            link["label"] = generate_emoji_label(text_part, link["limit_bytes"], current_speed, country_emoji)
         
         if "expires_days" in body:
             ed = int(body["expires_days"] or 0)
@@ -1255,15 +1296,17 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
             sv = float(body.get("speed_limit_value") or 0)
             su = body.get("speed_limit_unit") or "MBIT"
             link["speed_limit_bytes"] = 0 if sv <= 0 else parse_speed_to_bytes(sv, su)
-            # Update label with new speed info
+            # Update label with new speed
             current_label = link.get("label", "")
             import re
-            emoji_pattern = re.compile(r'[🇦-🇿🌍-🌏🎌🏁🚩🇺🇸🇬🇧🇩🇪🇫🇷🇮🇹🇪🇸🇵🇹🇳🇱🇧🇪🇨🇭🇦🇹🇸🇪🇳🇴🇩🇰🇫🇮🇮🇪🇬🇷🇹🇷🇷🇺🇺🇦🇵🇱🇨🇿🇭🇺🇷🇴🇧🇬🇭🇷🇷🇸🇸🇰🇸🇮🇱🇹🇱🇻🇪🇪🇨🇦🇲🇽🇧🇷🇦🇷🇨🇱🇨🇴🇵🇪🇻🇪🇯🇵🇰🇷🇨🇳🇹🇼🇭🇰🇸🇬🇲🇾🇮🇩🇵🇭🇻🇳🇹🇭🇮🇳🇵🇰🇧🇩🇦🇪🇸🇦🇮🇱🇪🇬🇿🇦🇳🇬🇦🇺🇳🇿⚡🔥💨🚀⭐💎🌟✨🎯🏆✅🔰🛡️🔒🔐⚔️🎖️🏅📡🌸🌺🌻🌹🌷🌿🍀🌴🌳🎋💻🖥️📱📡🛰️🎮🕹️⌨️🖱️📀]')
+            emoji_pattern = re.compile(r'[🇦-🇿🌸🌺🌻🌹🌷🌿🍀🌴🌳🎋💎🌟✨🎯🏆🔥💨🚀⭐💫🌈⚡🎉🎊💝🌊🍃♾️📦🌌🐢]')
             text_part = emoji_pattern.sub('', current_label).strip()
             if not text_part:
                 text_part = link.get("label", "Config")
+            country_emoji_match = re.search(r'[🇦-🇿]', current_label)
+            country_emoji = country_emoji_match.group(0) if country_emoji_match else "🌍"
             current_limit = link.get("limit_bytes", 0)
-            link["label"] = generate_emoji_label(text_part, current_limit, link["speed_limit_bytes"])
+            link["label"] = generate_emoji_label(text_part, current_limit, link["speed_limit_bytes"], country_emoji)
             from speed_limit import reset_bucket
             reset_bucket(uid)
         
@@ -1272,27 +1315,8 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
     
     asyncio.create_task(save_state())
     return {"ok": True}
-@app.patch("/api/links/{uid}/toggle")
-async def toggle_link_status(uid: str, request: Request, _=Depends(require_auth)):
-    """Toggle the active status of a link"""
-    body = await request.json()
-    active = body.get("active", True)
-    
-    async with LINKS_LOCK:
-        if uid not in LINKS:
-            raise HTTPException(status_code=404, detail="link not found")
-        
-        # جلوگیری از تغییر وضعیت کانفیگ پیش‌فرض
-        if LINKS[uid].get("is_default", False):
-            raise HTTPException(status_code=403, detail="Default configuration status cannot be changed")
-        
-        LINKS[uid]["active"] = bool(active)
-        label = LINKS[uid]["label"]
-    
-    log_activity("link", f"Config «{label}» {'activated' if active else 'deactivated'}", "ok" if active else "warn")
-    asyncio.create_task(save_state())
-    
-    return {"ok": True, "uuid": uid, "active": bool(active)}
+
+# --- Toggle link active status ---
 @app.patch("/api/links/{uid}/toggle")
 async def toggle_link_status(uid: str, request: Request, _=Depends(require_auth)):
     """Toggle the active status of a link"""
@@ -1314,6 +1338,25 @@ async def toggle_link_status(uid: str, request: Request, _=Depends(require_auth)
     asyncio.create_task(save_state())
     
     return {"ok": True, "uuid": uid, "active": bool(active)}
+
+@app.delete("/api/links/{uid}")
+async def delete_link(uid: str, _=Depends(require_auth)):
+    async with LINKS_LOCK:
+        if uid not in LINKS:
+            raise HTTPException(status_code=404, detail="link not found")
+        
+        # Prevent deleting default configuration
+        if LINKS[uid].get("is_default", False):
+            raise HTTPException(status_code=403, detail="Default configuration cannot be deleted")
+        
+        label = LINKS[uid].get("label", uid)
+        del LINKS[uid]
+    
+    asyncio.create_task(save_state())
+    log_activity("link", f"Config «{label}» deleted", "err")
+    return {"ok": True, "deleted": uid}
+
+# ── Reset traffic endpoint ───────────────────────────────────────────────────
 @app.post("/api/links/{uid}/reset-traffic")
 async def reset_link_traffic(uid: str, _=Depends(require_auth)):
     async with LINKS_LOCK:
@@ -1325,7 +1368,6 @@ async def reset_link_traffic(uid: str, _=Depends(require_auth)):
             raise HTTPException(status_code=403, detail="Default configuration traffic cannot be reset")
         
         LINKS[uid]["used_bytes"] = 0
-        # Reactivate if it was deactivated
         if not LINKS[uid].get("active", True):
             LINKS[uid]["active"] = True
         label = LINKS[uid]["label"]
@@ -1370,25 +1412,20 @@ from pages import LOGIN_HTML, DASHBOARD_HTML
 # Dashboard and Login handlers
 @app.get("/dash")
 async def dash_redirect(request: Request):
-    """Redirect /dash to current dashboard path"""
     dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
-    # If dashboard path is "/dash", render directly (avoid loop)
     if dashboard_path == "/dash":
         return await render_dashboard(request)
     return RedirectResponse(url=dashboard_path, status_code=302)
 
 @app.get("/dashboard")
 async def dashboard_default(request: Request):
-    """Handle /dashboard"""
     dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
-    # If dashboard path was changed, redirect to new path
     if dashboard_path != "/dashboard":
         return RedirectResponse(url=dashboard_path, status_code=302)
     return await render_dashboard(request)
 
 @app.get("/login")
 async def login_default(request: Request):
-    """Handle /login"""
     login_path = CONFIG.get("login_path", "/login")
     if login_path != "/login":
         return RedirectResponse(url=login_path, status_code=302)
@@ -1396,17 +1433,13 @@ async def login_default(request: Request):
 
 @app.get("/sub")
 async def sub_default():
-    """Handle /sub"""
     sub_path = CONFIG.get("sub_path", "/sub")
     if sub_path != "/sub":
         return RedirectResponse(url=sub_path, status_code=302)
     return RedirectResponse(url=sub_path + "/user", status_code=302)
 
-# Dynamic path handler for custom paths
 @app.get("/{path:path}")
 async def dynamic_path_handler(request: Request, path: str):
-    """Handle dynamic paths"""
-    # Skip API, stats, health, and other system routes
     if path.startswith("api/") or path.startswith("stats") or path.startswith("health"):
         raise HTTPException(status_code=404, detail="Not Found")
     if path.startswith("favicon") or path.startswith("robots") or path.startswith(".well-known"):
@@ -1420,7 +1453,6 @@ async def dynamic_path_handler(request: Request, path: str):
     login_path = CONFIG.get("login_path", "/login")
     sub_path = CONFIG.get("sub_path", "/sub")
     
-    # Check if the current path matches any configured path
     if request.url.path == dashboard_path:
         return await render_dashboard(request)
     
@@ -1430,11 +1462,9 @@ async def dynamic_path_handler(request: Request, path: str):
     if request.url.path == sub_path:
         return RedirectResponse(url=sub_path + "/user", status_code=302)
     
-    # Check if it's a sub path with user or uuid
     if request.url.path.startswith(sub_path + "/user"):
         return await subscription_user_handler(request, request.query_params.get("uuid"))
     
-    # Check if it's a sub path with uuid
     if request.url.path.startswith(sub_path + "/"):
         parts = request.url.path.split("/")
         if len(parts) >= 2:
@@ -1446,7 +1476,6 @@ async def dynamic_path_handler(request: Request, path: str):
             if uuid:
                 return await subscription_info_handler(uuid, request)
     
-    # If it's the default paths but they've been changed, redirect with 302
     if request.url.path == "/dashboard" and dashboard_path != "/dashboard":
         return RedirectResponse(url=dashboard_path, status_code=302)
     if request.url.path == "/login" and login_path != "/login":
@@ -1454,21 +1483,16 @@ async def dynamic_path_handler(request: Request, path: str):
     if request.url.path == "/sub" and sub_path != "/sub":
         return RedirectResponse(url=sub_path, status_code=302)
     
-    # If it's /dash, redirect to dashboard path
     if request.url.path == "/dash":
         if dashboard_path == "/dash":
             return await render_dashboard(request)
         return RedirectResponse(url=dashboard_path, status_code=302)
     
-    # Default: redirect to dashboard
     return RedirectResponse(url=dashboard_path, status_code=302)
 
 async def render_dashboard(request: Request):
-    """Render the dashboard page"""
     token = request.cookies.get(SESSION_COOKIE)
-    logger.info(f"Dashboard received cookie: {token}")
     valid = await is_valid_session(token)
-    logger.info(f"Dashboard session valid: {valid}")
     if not valid:
         login_path = CONFIG.get("login_path", "/login")
         return RedirectResponse(url=login_path, status_code=302)
@@ -1476,7 +1500,6 @@ async def render_dashboard(request: Request):
     return HTMLResponse(content=DASHBOARD_HTML)
 
 async def render_login(request: Request):
-    """Render the login page"""
     if await is_valid_session(request.cookies.get(SESSION_COOKIE)):
         dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
         return RedirectResponse(url=dashboard_path, status_code=302)
