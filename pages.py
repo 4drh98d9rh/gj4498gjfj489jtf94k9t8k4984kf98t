@@ -227,14 +227,16 @@ LOGIN_HTML = r"""<!DOCTYPE html>
 DASHBOARD_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
     <title>MX-UI v1.0.0</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <script src="https://unpkg.com/lucide@latest">
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
     <script>
         tailwind.config = {
             theme: {
@@ -248,10 +250,20 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         }
     </script>
     <style>
-        body { background-color: #070a13; }
-        .glow-effect { box-shadow: 0 0 25px rgba(59, 130, 246, 0.12); }
-        .modal-glow { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 50px rgba(59, 130, 246, 0.05); }
-        .circle-chart { transition: stroke-dasharray 0.35s ease; transform: rotate(-90deg); transform-origin: 50% 50%; }
+        body {
+            background-color: #070a13;
+        }
+        .glow-effect {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.12);
+        }
+        .modal-glow {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 50px rgba(59, 130, 246, 0.05);
+        }
+        .circle-chart {
+            transition: stroke-dasharray 0.35s ease;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
         .custom-modal-overlay {
             transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.2s, visibility 0.2s;
             visibility: hidden;
@@ -279,13 +291,22 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             transition: opacity 0.25s, transform 0.25s;
             z-index: 9999;
             pointer-events: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             max-width: 90vw;
             text-align: center;
         }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        .toast.success { border-color: #22c55e; color: #86efac; }
-        .toast.error { border-color: #ef4444; color: #fca5a5; }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.success {
+            border-color: #22c55e;
+            color: #86efac;
+        }
+        .toast.error {
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
         .status-dot {
             display: inline-block;
             width: 6px;
@@ -293,8 +314,12 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             border-radius: 50%;
             margin-right: 4px;
         }
-        .status-dot.active { background-color: #22c55e; }
-        .status-dot.inactive { background-color: #ef4444; }
+        .status-dot.active {
+            background-color: #22c55e;
+        }
+        .status-dot.inactive {
+            background-color: #ef4444;
+        }
         .qr-code-container {
             transition: all 0.3s ease;
         }
@@ -362,1074 +387,1084 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 </head>
 <body class="font-sans text-slate-200 min-h-screen flex flex-col relative antialiased tracking-tight">
 
-<div class="toast" id="toast"></div>
+    <div class="toast" id="toast"></div>
 
-<!-- Top Navigation -->
-<header class="border-b border-slate-800/80 bg-slate-900/40 backdrop-blur-md sticky top-0 z-40">
-    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-2 mobile-padding">
-        <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
-            <div class="bg-blue-600 p-1.5 sm:p-2 rounded-xl text-white glow-effect flex-shrink-0">
-                <i data-lucide="shield-check" class="w-4 h-4 sm:w-5 sm:h-5"></i>
-            </div>
-            <div class="min-w-0">
-                <span class="font-bold text-sm sm:text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent font-sans truncate block">MX-UI PANEL</span>
-                <span class="text-[10px] sm:text-xs text-slate-500 font-medium tracking-normal block truncate">v1.0.0 • Core Matrix</span>
-            </div>
-        </div>
-        <div class="flex items-center space-x-1 sm:space-x-3 flex-shrink-0">
-            <span class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">
-                <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                Node Online
-            </span>
-            <button onclick="toggleModal('settingsModal', true)" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0">
-                <i data-lucide="settings" class="w-4 h-4"></i>
-                <span class="hidden xs:inline">Settings</span>
-            </button>
-            <button onclick="logout()" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0">
-                <i data-lucide="log-out" class="w-4 h-4"></i>
-                <span class="hidden xs:inline">Logout</span>
-            </button>
-        </div>
-    </div>
-</header>
-
-<!-- Main -->
-<main class="max-w-6xl w-full mx-auto px-4 py-6 sm:py-8 flex-grow mobile-padding">
-    
-    <!-- Stats Summary -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
-            <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Traffic</p>
-            <p class="text-sm sm:text-lg font-bold text-blue-400 font-mono truncate" id="total-traffic">0 MB</p>
-        </div>
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
-            <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Usage</p>
-            <p class="text-sm sm:text-lg font-bold text-amber-400 font-mono truncate" id="total-usage">0 GB</p>
-        </div>
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
-            <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Inbounds</p>
-            <p class="text-sm sm:text-lg font-bold text-emerald-400 font-mono truncate" id="total-inbounds">0</p>
-        </div>
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
-            <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Connections</p>
-            <p class="text-sm sm:text-lg font-bold text-purple-400 font-mono truncate" id="active-connections">0</p>
-        </div>
-    </div>
-
-    <!-- Hardware Diagnostic Rings -->
-    <h2 class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 px-1">System Diagnostics</h2>
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <!-- CPU -->
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
-            <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
-                <svg class="w-full h-full" viewBox="0 0 36 36">
-                    <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path class="text-blue-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                </svg>
-                <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-blue-400" id="ring-cpu-pct">0%</div>
-            </div>
-            <div class="text-right flex-1 min-w-0">
-                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">CPU</p>
-                <p class="text-xs sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-cpu-val">0 Cores</p>
-            </div>
-        </div>
-        <!-- RAM -->
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
-            <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
-                <svg class="w-full h-full" viewBox="0 0 36 36">
-                    <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path class="text-indigo-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                </svg>
-                <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-indigo-400" id="ring-ram-pct">0%</div>
-            </div>
-            <div class="text-right flex-1 min-w-0">
-                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">RAM</p>
-                <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-ram-val">0 GB</p>
-            </div>
-        </div>
-        <!-- Swap -->
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
-            <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
-                <svg class="w-full h-full" viewBox="0 0 36 36">
-                    <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path class="text-amber-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                </svg>
-                <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-amber-400" id="ring-swap-pct">0%</div>
-            </div>
-            <div class="text-right flex-1 min-w-0">
-                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Swap</p>
-                <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-swap-val">0 GB</p>
-            </div>
-        </div>
-        <!-- Storage -->
-        <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
-            <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
-                <svg class="w-full h-full" viewBox="0 0 36 36">
-                    <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path class="text-rose-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                </svg>
-                <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-rose-400" id="ring-disk-pct">0%</div>
-            </div>
-            <div class="text-right flex-1 min-w-0">
-                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Storage</p>
-                <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-disk-val">0 GB</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Configurations Container -->
-    <div class="bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden glow-effect">
-        <div class="p-4 sm:p-6 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-900/40">
-            <div class="min-w-0">
-                <h2 class="text-lg sm:text-xl font-bold text-slate-100 truncate">V2Ray Inbound Proxies</h2>
-                <p class="text-xs sm:text-sm text-slate-400 mt-0.5 truncate">Manage virtual server bridges, generate QR structures, or modify framework credentials.</p>
-            </div>
-            <button onclick="toggleModal('inboundModal', true)" class="flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition duration-200 shadow-lg shadow-blue-600/10 shrink-0">
-                <i data-lucide="plus" class="w-3 h-3 sm:w-4 sm:h-4"></i>
-                <span>Add Config</span>
-            </button>
-        </div>
-
-        <!-- Inbound Node Rows -->
-        <div class="divide-y divide-slate-800/60" id="config-list">
-            <!-- dynamically loaded -->
-        </div>
-    </div>
-</main>
-
-<!-- Footer -->
-<footer class="border-t border-slate-800/60 bg-slate-950 py-3 sm:py-4 text-[10px] sm:text-xs text-slate-500">
-    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 mobile-padding">
-        <div class="flex items-center space-x-2 sm:space-x-3 flex-wrap justify-center sm:justify-start">
-            <p>MX-UI v1.0.0</p>
-            <span class="text-[8px] sm:text-[9px] font-mono font-bold tracking-widest text-slate-400 border border-slate-800 px-1.5 py-0.5 rounded bg-slate-900/60 select-none">
-                Created by Muvixo
-            </span>
-        </div>
-        <div class="flex items-center space-x-3 sm:space-x-4 flex-wrap justify-center">
-            <span>Core: <strong class="text-slate-400 font-mono text-[10px] sm:text-[11px]" id="uptime-display">00:00:00</strong></span>
-            <span>API: <strong class="text-emerald-400">Connected</strong></span>
-        </div>
-    </div>
-</footer>
-
-<!-- ===== MODAL: CREATE CONFIG ===== -->
-<div id="inboundModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col">
-        <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
-            <div class="flex items-center space-x-3 min-w-0">
-                <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20 shrink-0"><i data-lucide="plus-circle" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
+    <!-- Top Navigation -->
+    <header class="border-b border-slate-800/80 bg-slate-900/40 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-2 mobile-padding">
+            <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
+                <div class="bg-blue-600 p-1.5 sm:p-2 rounded-xl text-white glow-effect flex-shrink-0">
+                    <i data-lucide="shield-check" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                </div>
                 <div class="min-w-0">
-                    <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">Add New Config</h3>
-                    <p class="text-[10px] sm:text-xs text-slate-400 truncate">Deploy a new VLESS or XHTTP configuration.</p>
+                    <span class="font-bold text-sm sm:text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent font-sans truncate block">MX-UI PANEL</span>
+                    <span class="text-[10px] sm:text-xs text-slate-500 font-medium tracking-normal block truncate">v1.0.0 • Core Matrix</span>
                 </div>
             </div>
-            <button onclick="toggleModal('inboundModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition shrink-0"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
+            <div class="flex items-center space-x-1 sm:space-x-3 flex-shrink-0">
+                <span class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">
+                    <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Node Online
+                </span>
+                <button onclick="toggleModal('settingsModal', true)" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span class="hidden xs:inline">Settings</span>
+                </button>
+                <button onclick="logout()" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    <span class="hidden xs:inline">Logout</span>
+                </button>
+            </div>
         </div>
-        <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-5">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Remark / Label</label>
-                    <input type="text" id="new-label" placeholder="e.g., US-Reality" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+    </header>
+
+    <!-- Main -->
+    <main class="max-w-6xl w-full mx-auto px-4 py-6 sm:py-8 flex-grow mobile-padding">
+
+        <!-- Stats Summary -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
+                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Traffic</p>
+                <p class="text-sm sm:text-lg font-bold text-blue-400 font-mono truncate" id="total-traffic">0 MB</p>
+            </div>
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
+                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Usage</p>
+                <p class="text-sm sm:text-lg font-bold text-amber-400 font-mono truncate" id="total-usage">0 GB</p>
+            </div>
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
+                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Inbounds</p>
+                <p class="text-sm sm:text-lg font-bold text-emerald-400 font-mono truncate" id="total-inbounds">0</p>
+            </div>
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
+                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Connections</p>
+                <p class="text-sm sm:text-lg font-bold text-purple-400 font-mono truncate" id="active-connections">0</p>
+            </div>
+        </div>
+
+        <!-- Hardware Diagnostic Rings -->
+        <h2 class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 px-1">System Diagnostics</h2>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <!-- CPU -->
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
+                <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
+                    <svg class="w-full h-full" viewBox="0 0 36 36">
+                        <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="text-blue-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-blue-400" id="ring-cpu-pct">0%</div>
                 </div>
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Protocol</label>
-                    <select id="new-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition font-mono text-xs">
-                        <option value="vless-ws">VLESS + WS</option>
-                        <option value="xhttp-packet-up">XHTTP (packet-up)</option>
-                        <option value="xhttp-stream-up">XHTTP (stream-up)</option>
-                    </select>
+                <div class="text-right flex-1 min-w-0">
+                    <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">CPU</p>
+                    <p class="text-xs sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-cpu-val">0 Cores</p>
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Fingerprint (uTLS)</label>
-                    <select id="new-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition font-mono text-xs">
-                        <option value="chrome">chrome</option>
-                        <option value="firefox">firefox</option>
-                        <option value="safari">safari</option>
-                        <option value="ios">ios</option>
-                        <option value="android">android</option>
-                        <option value="edge">edge</option>
-                        <option value="360">360</option>
-                        <option value="qq">qq</option>
-                        <option value="random">random</option>
-                        <option value="randomized">randomized</option>
-                    </select>
+            <!-- RAM -->
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
+                <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
+                    <svg class="w-full h-full" viewBox="0 0 36 36">
+                        <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="text-indigo-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-indigo-400" id="ring-ram-pct">0%</div>
                 </div>
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">ALPN (optional)</label>
-                    <input type="text" id="new-alpn" placeholder="e.g., h2,http/1.1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+                <div class="text-right flex-1 min-w-0">
+                    <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">RAM</p>
+                    <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-ram-val">0 GB</p>
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Traffic Limit (MB)</label>
-                    <input type="number" id="new-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+            <!-- Swap -->
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
+                <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
+                    <svg class="w-full h-full" viewBox="0 0 36 36">
+                        <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="text-amber-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-amber-400" id="ring-swap-pct">0%</div>
                 </div>
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Expiry (days, 0 = unlimited)</label>
-                    <input type="number" id="new-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+                <div class="text-right flex-1 min-w-0">
+                    <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Swap</p>
+                    <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-swap-val">0 GB</p>
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">IP Limit (0 = unlimited)</label>
-                    <input type="number" id="new-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+            <!-- Storage -->
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
+                <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
+                    <svg class="w-full h-full" viewBox="0 0 36 36">
+                        <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="text-rose-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-rose-400" id="ring-disk-pct">0%</div>
                 </div>
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Speed Limit (0 = unlimited)</label>
-                    <div class="flex gap-2">
-                        <input type="number" id="new-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
-                        <select id="new-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition font-mono">
-                            <option value="MBIT">Mbps</option>
-                            <option value="KB">KB/s</option>
-                            <option value="MB">MB/s</option>
+                <div class="text-right flex-1 min-w-0">
+                    <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Storage</p>
+                    <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-disk-val">0 GB</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configurations Container -->
+        <div class="bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden glow-effect">
+            <div class="p-4 sm:p-6 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-900/40">
+                <div class="min-w-0">
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-100 truncate">V2Ray Inbound Proxies</h2>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-0.5 truncate">Manage virtual server bridges, generate QR structures, or modify framework credentials.</p>
+                </div>
+                <button onclick="toggleModal('inboundModal', true)" class="flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition duration-200 shadow-lg shadow-blue-600/10 shrink-0">
+                    <i data-lucide="plus" class="w-3 h-3 sm:w-4 sm:h-4"></i>
+                    <span>Add Config</span>
+                </button>
+            </div>
+            <div class="divide-y divide-slate-800/60" id="config-list">
+                <!-- dynamically loaded -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/60 bg-slate-950 py-3 sm:py-4 text-[10px] sm:text-xs text-slate-500">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 mobile-padding">
+            <div class="flex items-center space-x-2 sm:space-x-3 flex-wrap justify-center sm:justify-start">
+                <p>MX-UI v1.0.0</p>
+                <span class="text-[8px] sm:text-[9px] font-mono font-bold tracking-widest text-slate-400 border border-slate-800 px-1.5 py-0.5 rounded bg-slate-900/60 select-none">
+                    Created by Muvixo
+                </span>
+            </div>
+            <div class="flex items-center space-x-3 sm:space-x-4 flex-wrap justify-center">
+                <span>Core: <strong class="text-slate-400 font-mono text-[10px] sm:text-[11px]" id="uptime-display">00:00:00</strong></span>
+                <span>API: <strong class="text-emerald-400">Connected</strong></span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== MODAL: CREATE CONFIG ===== -->
+    <div id="inboundModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col">
+            <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
+                <div class="flex items-center space-x-3 min-w-0">
+                    <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20 shrink-0"><i data-lucide="plus-circle" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
+                    <div class="min-w-0">
+                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">Add New Config</h3>
+                        <p class="text-[10px] sm:text-xs text-slate-400 truncate">Deploy a new VLESS or XHTTP configuration.</p>
+                    </div>
+                </div>
+                <button onclick="toggleModal('inboundModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition shrink-0"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
+            </div>
+            <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Remark / Label</label>
+                        <input type="text" id="new-label" placeholder="e.g., US-Reality" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Protocol</label>
+                        <select id="new-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition font-mono text-xs">
+                            <option value="vless-ws">VLESS + WS</option>
+                            <option value="xhttp-packet-up">XHTTP (packet-up)</option>
+                            <option value="xhttp-stream-up">XHTTP (stream-up)</option>
                         </select>
                     </div>
                 </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Fingerprint (uTLS)</label>
+                        <select id="new-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition font-mono text-xs">
+                            <option value="chrome">chrome</option>
+                            <option value="firefox">firefox</option>
+                            <option value="safari">safari</option>
+                            <option value="ios">ios</option>
+                            <option value="android">android</option>
+                            <option value="edge">edge</option>
+                            <option value="360">360</option>
+                            <option value="qq">qq</option>
+                            <option value="random">random</option>
+                            <option value="randomized">randomized</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">ALPN (optional)</label>
+                        <input type="text" id="new-alpn" placeholder="e.g., h2,http/1.1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Traffic Limit (MB)</label>
+                        <input type="number" id="new-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Expiry (days, 0 = unlimited)</label>
+                        <input type="number" id="new-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">IP Limit (0 = unlimited)</label>
+                        <input type="number" id="new-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Speed Limit (0 = unlimited)</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="new-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+                            <select id="new-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition font-mono">
+                                <option value="MBIT">Mbps</option>
+                                <option value="KB">KB/s</option>
+                                <option value="MB">MB/s</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex flex-col sm:flex-row items-center justify-end space-y-2 sm:space-y-0 sm:space-x-3 shrink-0">
-            <button onclick="toggleModal('inboundModal', false)" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition">Cancel</button>
-            <button onclick="createConfig()" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-blue-600/10">Deploy Config</button>
+            <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex flex-col sm:flex-row items-center justify-end space-y-2 sm:space-y-0 sm:space-x-3 shrink-0">
+                <button onclick="toggleModal('inboundModal', false)" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition">Cancel</button>
+                <button onclick="createConfig()" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-blue-600/10">Deploy Config</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- ===== MODAL: EDIT ===== -->
-<div id="editModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col">
-        <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
-            <div class="flex items-center space-x-3 min-w-0">
-                <div class="p-2 bg-amber-500/10 rounded-lg text-amber-400 border border-amber-500/20 shrink-0"><i data-lucide="edit" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
-                <div class="min-w-0">
-                    <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">Modify Config: <span id="editNodeTitle" class="text-amber-400">Node</span></h3>
-                    <p class="text-[10px] sm:text-xs text-slate-400 truncate">Altering production values resets live connection pipelines.</p>
+    <!-- ===== MODAL: EDIT ===== -->
+    <div id="editModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col">
+            <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
+                <div class="flex items-center space-x-3 min-w-0">
+                    <div class="p-2 bg-amber-500/10 rounded-lg text-amber-400 border border-amber-500/20 shrink-0"><i data-lucide="edit" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
+                    <div class="min-w-0">
+                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">Modify Config: <span id="editNodeTitle" class="text-amber-400">Node</span></h3>
+                        <p class="text-[10px] sm:text-xs text-slate-400 truncate">Altering production values resets live connection pipelines.</p>
+                    </div>
                 </div>
+                <button onclick="toggleModal('editModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition shrink-0"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
             </div>
-            <button onclick="toggleModal('editModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition shrink-0"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
-        </div>
-        <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-5">
-            <input type="hidden" id="edit-uuid">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Remark Label</label>
-                    <input type="text" id="edit-label" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono input-focus-ring-amber">
-                </div>
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Protocol</label>
-                    <select id="edit-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono text-xs">
-                        <option value="vless-ws">VLESS + WS</option>
-                        <option value="xhttp-packet-up">XHTTP (packet-up)</option>
-                        <option value="xhttp-stream-up">XHTTP (stream-up)</option>
-                    </select>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Fingerprint</label>
-                    <select id="edit-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono text-xs">
-                        <option value="chrome">chrome</option>
-                        <option value="firefox">firefox</option>
-                        <option value="safari">safari</option>
-                        <option value="ios">ios</option>
-                        <option value="android">android</option>
-                        <option value="edge">edge</option>
-                        <option value="360">360</option>
-                        <option value="qq">qq</option>
-                        <option value="random">random</option>
-                        <option value="randomized">randomized</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">ALPN (optional)</label>
-                    <input type="text" id="edit-alpn" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Traffic Limit (MB)</label>
-                    <input type="number" id="edit-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
-                </div>
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Expiry (days from now)</label>
-                    <input type="number" id="edit-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">IP Limit</label>
-                    <input type="number" id="edit-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
-                </div>
-                <div>
-                    <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Speed Limit</label>
-                    <div class="flex gap-2">
-                        <input type="number" id="edit-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
-                        <select id="edit-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono">
-                            <option value="MBIT">Mbps</option>
-                            <option value="KB">KB/s</option>
-                            <option value="MB">MB/s</option>
+            <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-5">
+                <input type="hidden" id="edit-uuid">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Remark Label</label>
+                        <input type="text" id="edit-label" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono input-focus-ring-amber">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Protocol</label>
+                        <select id="edit-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono text-xs">
+                            <option value="vless-ws">VLESS + WS</option>
+                            <option value="xhttp-packet-up">XHTTP (packet-up)</option>
+                            <option value="xhttp-stream-up">XHTTP (stream-up)</option>
                         </select>
                     </div>
                 </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Fingerprint</label>
+                        <select id="edit-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono text-xs">
+                            <option value="chrome">chrome</option>
+                            <option value="firefox">firefox</option>
+                            <option value="safari">safari</option>
+                            <option value="ios">ios</option>
+                            <option value="android">android</option>
+                            <option value="edge">edge</option>
+                            <option value="360">360</option>
+                            <option value="qq">qq</option>
+                            <option value="random">random</option>
+                            <option value="randomized">randomized</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">ALPN (optional)</label>
+                        <input type="text" id="edit-alpn" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Traffic Limit (MB)</label>
+                        <input type="number" id="edit-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Expiry (days from now)</label>
+                        <input type="number" id="edit-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">IP Limit</label>
+                        <input type="number" id="edit-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Speed Limit</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="edit-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
+                            <select id="edit-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono">
+                                <option value="MBIT">Mbps</option>
+                                <option value="KB">KB/s</option>
+                                <option value="MB">MB/s</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex flex-col sm:flex-row items-center justify-end space-y-2 sm:space-y-0 sm:space-x-3 shrink-0">
-            <button onclick="toggleModal('editModal', false)" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition">Discard</button>
-            <button onclick="saveEdit()" class="w-full sm:w-auto px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-amber-600/10">Commit Changes</button>
+            <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex flex-col sm:flex-row items-center justify-end space-y-2 sm:space-y-0 sm:space-x-3 shrink-0">
+                <button onclick="toggleModal('editModal', false)" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition">Discard</button>
+                <button onclick="saveEdit()" class="w-full sm:w-auto px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-amber-600/10">Commit Changes</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- ===== MODAL: QR ===== -->
-<div id="qrModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 space-y-3 max-h-[95vh] overflow-y-auto">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2 flex-wrap gap-2">
-            <div class="min-w-0">
-                <h3 class="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2">
-                    <i data-lucide="qrcode" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-400"></i>
-                    QR Codes
-                </h3>
-                <p class="text-[10px] sm:text-xs text-slate-400 font-mono truncate" id="qrTargetLabel">Default Link</p>
-            </div>
-            <button onclick="toggleModal('qrModal', false)" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition shrink-0"><i data-lucide="x" class="w-4 h-4"></i></button>
-        </div>
-
-        <!-- Two columns: Config QR and Sub QR -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <!-- Config QR -->
-            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3 sm:p-4 text-center qr-code-container">
-                <p class="text-[10px] sm:text-xs text-slate-400 mb-2 sm:mb-3 font-medium flex items-center justify-center gap-1">
-                    <i data-lucide="link" class="w-3 h-3"></i>
-                    Config Link QR
-                </p>
-                <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50">
-                    <img id="qrImage" src="" alt="Config QR Code" class="w-full h-full object-contain">
-                </div>
-                <div class="mt-2 sm:mt-3">
-                    <button onclick="copyText(document.getElementById('qrTextPayload').textContent)" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition flex items-center justify-center gap-1">
-                        <i data-lucide="copy" class="w-3 h-3"></i>
-                        Copy Config Link
-                    </button>
-                </div>
-            </div>
-
-            <!-- Subscription QR -->
-            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3 sm:p-4 text-center qr-code-container">
-                <p class="text-[10px] sm:text-xs text-slate-400 mb-2 sm:mb-3 font-medium flex items-center justify-center gap-1">
-                    <i data-lucide="folder-tree" class="w-3 h-3"></i>
-                    Subscription Link QR
-                </p>
-                <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50">
-                    <img id="qrSubImage" src="" alt="Subscription QR Code" class="w-full h-full object-contain">
-                </div>
-                <div class="mt-2 sm:mt-3">
-                    <button onclick="copyText(document.getElementById('qrSubPayload').textContent)" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition flex items-center justify-center gap-1">
-                        <i data-lucide="copy" class="w-3 h-3"></i>
-                        Copy Sub Link
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Links display -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-2 sm:p-3">
-                <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-0.5 sm:mb-1 flex items-center gap-1">
-                    <i data-lucide="link" class="w-3 h-3"></i>
-                    Config Link
-                </span>
-                <p id="qrTextPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate"></p>
-            </div>
-            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-2 sm:p-3">
-                <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-0.5 sm:mb-1 flex items-center gap-1">
-                    <i data-lucide="folder-tree" class="w-3 h-3"></i>
-                    Subscription Link
-                </span>
-                <p id="qrSubPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate"></p>
-            </div>
-        </div>
-
-        <button onclick="toggleModal('qrModal', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition">
-            Close
-        </button>
-    </div>
-</div>
-
-<!-- ===== MODAL: CONFIRM ===== -->
-<div id="confirmModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 text-center space-y-3 sm:space-y-4">
-        <div class="mx-auto w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
-            <i data-lucide="alert-triangle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
-        </div>
-        <div class="space-y-1">
-            <h3 class="text-sm sm:text-base font-bold text-slate-100">Confirm Action</h3>
-            <p id="confirmMessage" class="text-[11px] sm:text-xs text-slate-400 leading-relaxed px-2">Are you sure?</p>
-        </div>
-        <div class="flex gap-3">
-            <button onclick="_confirmNo()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition">Cancel</button>
-            <button onclick="_confirmYes()" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-[10px] sm:text-xs font-semibold rounded-xl transition">Delete</button>
-        </div>
-    </div>
-</div>
-
-<!-- ===== MODAL: SETTINGS ===== -->
-<div id="settingsModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col">
-        <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
-            <div class="flex items-center space-x-3 min-w-0">
-                <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20 shrink-0"><i data-lucide="settings" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
+    <!-- ===== MODAL: QR (FULLY FIXED) ===== -->
+    <div id="qrModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 space-y-4 max-h-[95vh] overflow-y-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2 flex-wrap gap-2">
                 <div class="min-w-0">
-                    <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">Settings</h3>
-                    <p class="text-[10px] sm:text-xs text-slate-400 truncate">Manage dashboard paths and security</p>
+                    <h3 class="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2">
+                        <i data-lucide="qrcode" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-400"></i>
+                        QR Codes
+                    </h3>
+                    <p class="text-[10px] sm:text-xs text-slate-400 font-mono truncate" id="qrTargetLabel">Default Link</p>
                 </div>
-            </div>
-            <button onclick="toggleModal('settingsModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition shrink-0"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
-        </div>
-        
-        <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-6">
-            <!-- Change Password Section -->
-            <div>
-                <h4 class="text-xs sm:text-sm font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2">
-                    <i data-lucide="key" class="w-3 h-3 sm:w-4 sm:h-4 text-blue-400"></i>
-                    Change Password
-                </h4>
-                <div class="space-y-3 sm:space-y-4">
-                    <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Current Password</label>
-                        <input type="password" id="settings-current-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="Enter current password">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">New Password</label>
-                        <input type="password" id="settings-new-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="At least 4 characters">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Confirm New Password</label>
-                        <input type="password" id="settings-confirm-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="Repeat new password">
-                    </div>
-                    <div id="settingsError" class="text-[10px] sm:text-xs text-red-400 hidden"></div>
-                    <button onclick="changePassword()" class="w-full py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-blue-600/10">
-                        Update Password
-                    </button>
-                </div>
+                <button onclick="toggleModal('qrModal', false)" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition shrink-0">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
             </div>
 
-            <div class="border-t border-slate-800/60"></div>
-
-            <!-- Path Settings Section -->
-            <div>
-                <h4 class="text-xs sm:text-sm font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2">
-                    <i data-lucide="folder-tree" class="w-3 h-3 sm:w-4 sm:h-4 text-purple-400"></i>
-                    Dashboard Paths
-                </h4>
-                <div class="space-y-3 sm:space-y-4">
-                    <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Dashboard Path</label>
-                        <div class="flex flex-col sm:flex-row gap-2">
-                            <input type="text" id="settings-dashboard-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition input-focus-ring-purple" placeholder="/dashboard">
-                            <button onclick="updatePath('dashboard')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">Update</button>
-                        </div>
-                        <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-dashboard-path" class="text-slate-400 font-mono">/dashboard</span></p>
+            <!-- Two columns: Config QR and Sub QR -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Config QR -->
+                <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3 sm:p-4 text-center qr-code-container">
+                    <p class="text-[10px] sm:text-xs text-slate-400 mb-2 sm:mb-3 font-medium flex items-center justify-center gap-1">
+                        <i data-lucide="link" class="w-3 h-3"></i>
+                        Config Link QR
+                    </p>
+                    <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50">
+                        <img id="qrImage" src="" alt="Config QR Code" class="w-full h-full object-contain">
                     </div>
-
-                    <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Login Path</label>
-                        <div class="flex flex-col sm:flex-row gap-2">
-                            <input type="text" id="settings-login-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition input-focus-ring-purple" placeholder="/login">
-                            <button onclick="updatePath('login')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">Update</button>
-                        </div>
-                        <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-login-path" class="text-slate-400 font-mono">/login</span></p>
+                    <div class="mt-2 sm:mt-3">
+                        <button onclick="copyText(document.getElementById('qrTextPayload').textContent)" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition flex items-center justify-center gap-1">
+                            <i data-lucide="copy" class="w-3 h-3"></i>
+                            Copy Config Link
+                        </button>
                     </div>
+                </div>
 
-                    <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Subscription Path</label>
-                        <div class="flex flex-col sm:flex-row gap-2">
-                            <input type="text" id="settings-sub-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition input-focus-ring-purple" placeholder="/sub">
-                            <button onclick="updatePath('sub')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">Update</button>
-                        </div>
-                        <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-sub-path" class="text-slate-400 font-mono">/sub</span></p>
+                <!-- Subscription QR -->
+                <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3 sm:p-4 text-center qr-code-container">
+                    <p class="text-[10px] sm:text-xs text-slate-400 mb-2 sm:mb-3 font-medium flex items-center justify-center gap-1">
+                        <i data-lucide="folder-tree" class="w-3 h-3"></i>
+                        Subscription Link QR
+                    </p>
+                    <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50">
+                        <img id="qrSubImage" src="" alt="Subscription QR Code" class="w-full h-full object-contain">
                     </div>
-
-                    <div id="pathSettingsError" class="text-[10px] sm:text-xs text-red-400 hidden"></div>
+                    <div class="mt-2 sm:mt-3">
+                        <button onclick="copyText(document.getElementById('qrSubPayload').textContent)" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition flex items-center justify-center gap-1">
+                            <i data-lucide="copy" class="w-3 h-3"></i>
+                            Copy Sub Link
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end shrink-0">
-            <button onclick="toggleModal('settingsModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition">Close</button>
+            <!-- Links display (two columns) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-2 sm:p-3">
+                    <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-0.5 sm:mb-1 flex items-center gap-1">
+                        <i data-lucide="link" class="w-3 h-3"></i>
+                        Config Link
+                    </span>
+                    <p id="qrTextPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate">https://example.com/config</p>
+                </div>
+                <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-2 sm:p-3">
+                    <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-0.5 sm:mb-1 flex items-center gap-1">
+                        <i data-lucide="folder-tree" class="w-3 h-3"></i>
+                        Subscription Link
+                    </span>
+                    <p id="qrSubPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate">https://example.com/sub</p>
+                </div>
+            </div>
+
+            <!-- Close button -->
+            <button onclick="toggleModal('qrModal', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition">
+                Close
+            </button>
         </div>
     </div>
-</div>
 
-<!-- ===== MODAL: ALERT ===== -->
-<div id="customAlert" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 text-center space-y-3 sm:space-y-4">
-        <div class="mx-auto w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
-            <i id="alertIcon" data-lucide="info" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+    <!-- ===== MODAL: CONFIRM ===== -->
+    <div id="confirmModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 text-center space-y-3 sm:space-y-4">
+            <div class="mx-auto w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
+                <i data-lucide="alert-triangle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-sm sm:text-base font-bold text-slate-100">Confirm Action</h3>
+                <p id="confirmMessage" class="text-[11px] sm:text-xs text-slate-400 leading-relaxed px-2">Are you sure?</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="_confirmNo()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition">Cancel</button>
+                <button onclick="_confirmYes()" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-[10px] sm:text-xs font-semibold rounded-xl transition">Delete</button>
+            </div>
         </div>
-        <div class="space-y-1">
-            <h3 id="alertTitle" class="text-sm sm:text-base font-bold text-slate-100">Notification</h3>
-            <p id="alertMessage" class="text-[11px] sm:text-xs text-slate-400 leading-relaxed px-2">Pipeline structural modifications updated successfully.</p>
-        </div>
-        <button onclick="toggleModal('customAlert', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition">Acknowledge</button>
     </div>
-</div>
 
-<script>
-lucide.createIcons();
+    <!-- ===== MODAL: SETTINGS ===== -->
+    <div id="settingsModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col">
+            <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
+                <div class="flex items-center space-x-3 min-w-0">
+                    <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20 shrink-0"><i data-lucide="settings" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
+                    <div class="min-w-0">
+                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">Settings</h3>
+                        <p class="text-[10px] sm:text-xs text-slate-400 truncate">Manage dashboard paths and security</p>
+                    </div>
+                </div>
+                <button onclick="toggleModal('settingsModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition shrink-0"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
+            </div>
 
-// ---- Custom confirm ----
-let _confirmResolve = null;
-function customConfirm(message) {
-    document.getElementById('confirmMessage').textContent = message;
-    toggleModal('confirmModal', true);
-    return new Promise((resolve) => { _confirmResolve = resolve; });
-}
-function _confirmYes() {
-    toggleModal('confirmModal', false);
-    if (_confirmResolve) _confirmResolve(true);
-    _confirmResolve = null;
-}
-function _confirmNo() {
-    toggleModal('confirmModal', false);
-    if (_confirmResolve) _confirmResolve(false);
-    _confirmResolve = null;
-}
+            <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-6">
+                <!-- Change Password Section -->
+                <div>
+                    <h4 class="text-xs sm:text-sm font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2">
+                        <i data-lucide="key" class="w-3 h-3 sm:w-4 sm:h-4 text-blue-400"></i>
+                        Change Password
+                    </h4>
+                    <div class="space-y-3 sm:space-y-4">
+                        <div>
+                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Current Password</label>
+                            <input type="password" id="settings-current-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="Enter current password">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">New Password</label>
+                            <input type="password" id="settings-new-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="At least 4 characters">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Confirm New Password</label>
+                            <input type="password" id="settings-confirm-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="Repeat new password">
+                        </div>
+                        <div id="settingsError" class="text-[10px] sm:text-xs text-red-400 hidden"></div>
+                        <button onclick="changePassword()" class="w-full py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-blue-600/10">
+                            Update Password
+                        </button>
+                    </div>
+                </div>
 
-// Modal toggles
-function toggleModal(modalId, show) {
-    const target = document.getElementById(modalId);
-    if (show) {
-        target.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    } else {
-        target.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-    if (modalId === 'settingsModal' && show) {
-        loadSettingsPaths();
-        document.getElementById('settings-current-pw').value = '';
-        document.getElementById('settings-new-pw').value = '';
-        document.getElementById('settings-confirm-pw').value = '';
-        document.getElementById('settingsError').classList.add('hidden');
-        document.getElementById('pathSettingsError').classList.add('hidden');
-    }
-}
+                <div class="border-t border-slate-800/60"></div>
 
-// Toast
-function toast(msg, type='') {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.className = 'toast show' + (type ? ' ' + type : '');
-    clearTimeout(el._timeout);
-    el._timeout = setTimeout(() => el.classList.remove('show'), 2500);
-}
+                <!-- Path Settings Section -->
+                <div>
+                    <h4 class="text-xs sm:text-sm font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2">
+                        <i data-lucide="folder-tree" class="w-3 h-3 sm:w-4 sm:h-4 text-purple-400"></i>
+                        Dashboard Paths
+                    </h4>
+                    <div class="space-y-3 sm:space-y-4">
+                        <div>
+                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Dashboard Path</label>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="text" id="settings-dashboard-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition input-focus-ring-purple" placeholder="/dashboard">
+                                <button onclick="updatePath('dashboard')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">Update</button>
+                            </div>
+                            <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-dashboard-path" class="text-slate-400 font-mono">/dashboard</span></p>
+                        </div>
 
-// Copy
-function copyLink(inputId) {
-    const inp = document.getElementById(inputId);
-    inp.select();
-    navigator.clipboard.writeText(inp.value);
-    triggerAlert('Token Copied', 'Configuration token copied to clipboard.', 'check-circle');
-}
+                        <div>
+                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Login Path</label>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="text" id="settings-login-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition input-focus-ring-purple" placeholder="/login">
+                                <button onclick="updatePath('login')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">Update</button>
+                            </div>
+                            <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-login-path" class="text-slate-400 font-mono">/login</span></p>
+                        </div>
 
-// Alert
-function triggerAlert(title, message, iconName) {
-    document.getElementById('alertTitle').textContent = title;
-    document.getElementById('alertMessage').textContent = message;
-    const icon = document.getElementById('alertIcon');
-    icon.setAttribute('data-lucide', iconName);
-    lucide.createIcons();
-    toggleModal('customAlert', true);
-}
+                        <div>
+                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Subscription Path</label>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="text" id="settings-sub-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition input-focus-ring-purple" placeholder="/sub">
+                                <button onclick="updatePath('sub')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">Update</button>
+                            </div>
+                            <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-sub-path" class="text-slate-400 font-mono">/sub</span></p>
+                        </div>
 
-// QR Modal
-function openQrModal(label, uriPayload, subUrl) {
-    document.getElementById('qrTargetLabel').textContent = label;
-    
-    // Config QR
-    document.getElementById('qrTextPayload').textContent = uriPayload;
-    const qrImg = document.getElementById('qrImage');
-    qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(uriPayload);
-    
-    // Subscription QR
-    document.getElementById('qrSubPayload').textContent = subUrl;
-    const qrSubImg = document.getElementById('qrSubImage');
-    qrSubImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(subUrl);
-    
-    toggleModal('qrModal', true);
-}
+                        <div id="pathSettingsError" class="text-[10px] sm:text-xs text-red-400 hidden"></div>
+                    </div>
+                </div>
+            </div>
 
-// Copy text function
-function copyText(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(() => {
-            toast('Copied to clipboard!', 'success');
-        }).catch(() => {
-            fallbackCopyText(text);
-        });
-    } else {
-        fallbackCopyText(text);
-    }
-}
+            <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end shrink-0">
+                <button onclick="toggleModal('settingsModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition">Close</button>
+            </div>
+        </div>
+    </div>
 
-function fallbackCopyText(text) {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    textarea.style.left = '-9999px';
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {
-        document.execCommand('copy');
-        toast('Copied to clipboard!', 'success');
-    } catch (e) {
-        toast('Failed to copy', 'error');
-    }
-    document.body.removeChild(textarea);
-}
+    <!-- ===== MODAL: ALERT ===== -->
+    <div id="customAlert" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 text-center space-y-3 sm:space-y-4">
+            <div class="mx-auto w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                <i id="alertIcon" data-lucide="info" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+            </div>
+            <div class="space-y-1">
+                <h3 id="alertTitle" class="text-sm sm:text-base font-bold text-slate-100">Notification</h3>
+                <p id="alertMessage" class="text-[11px] sm:text-xs text-slate-400 leading-relaxed px-2">Pipeline structural modifications updated successfully.</p>
+            </div>
+            <button onclick="toggleModal('customAlert', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition">Acknowledge</button>
+        </div>
+    </div>
 
-// Edit modal
-function openEditModal(label, protocol, fingerprint, alpn, limit, expiry, iplimit, speed, unit, uuid) {
-    document.getElementById('editNodeTitle').textContent = label;
-    document.getElementById('edit-uuid').value = uuid;
-    document.getElementById('edit-label').value = label;
-    document.getElementById('edit-protocol').value = protocol;
-    document.getElementById('edit-fp').value = fingerprint;
-    document.getElementById('edit-alpn').value = alpn || '';
-    document.getElementById('edit-limit').value = limit;
-    document.getElementById('edit-expiry').value = expiry;
-    document.getElementById('edit-iplimit').value = iplimit;
-    document.getElementById('edit-speed').value = speed;
-    document.getElementById('edit-speed-unit').value = unit || 'MBIT';
-    toggleModal('editModal', true);
-}
+    <script>
+        lucide.createIcons();
 
-// Get current paths
-async function getCurrentPaths() {
-    try {
-        const res = await fetch('/api/current-paths');
-        if (!res.ok) throw new Error('Failed to fetch paths');
-        const data = await res.json();
-        return data;
-    } catch(e) {
-        console.error('Error fetching paths:', e);
-        return { dashboard: '/dashboard', login: '/login', sub: '/sub' };
-    }
-}
+        // ---- Custom confirm ----
+        let _confirmResolve = null;
 
-// Logout
-async function logout() {
-    try {
-        const paths = await getCurrentPaths();
-        await fetch('/api/logout', { method: 'POST' });
-        location.href = paths.login;
-    } catch(e) {
-        await fetch('/api/logout', { method: 'POST' });
-        location.href = '/login';
-    }
-}
+        function customConfirm(message) {
+            document.getElementById('confirmMessage').textContent = message;
+            toggleModal('confirmModal', true);
+            return new Promise((resolve) => { _confirmResolve = resolve; });
+        }
 
-// ---- Settings: change password ----
-async function changePassword() {
-    const cur = document.getElementById('settings-current-pw').value;
-    const nw = document.getElementById('settings-new-pw').value;
-    const confirmPw = document.getElementById('settings-confirm-pw').value;
-    const errEl = document.getElementById('settingsError');
-    errEl.classList.add('hidden');
+        function _confirmYes() {
+            toggleModal('confirmModal', false);
+            if (_confirmResolve) _confirmResolve(true);
+            _confirmResolve = null;
+        }
 
-    if (!cur || !nw || !confirmPw) {
-        errEl.textContent = 'All fields are required.';
-        errEl.classList.remove('hidden');
-        return;
-    }
-    if (nw.length < 4) {
-        errEl.textContent = 'New password must be at least 4 characters.';
-        errEl.classList.remove('hidden');
-        return;
-    }
-    if (nw !== confirmPw) {
-        errEl.textContent = 'New password and confirmation do not match.';
-        errEl.classList.remove('hidden');
-        return;
-    }
+        function _confirmNo() {
+            toggleModal('confirmModal', false);
+            if (_confirmResolve) _confirmResolve(false);
+            _confirmResolve = null;
+        }
 
-    try {
-        const res = await fetch('/api/change-password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ current_password: cur, new_password: nw })
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.detail || 'Failed to update password');
+        // Modal toggles
+        function toggleModal(modalId, show) {
+            const target = document.getElementById(modalId);
+            if (show) {
+                target.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                target.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            if (modalId === 'settingsModal' && show) {
+                loadSettingsPaths();
+                document.getElementById('settings-current-pw').value = '';
+                document.getElementById('settings-new-pw').value = '';
+                document.getElementById('settings-confirm-pw').value = '';
+                document.getElementById('settingsError').classList.add('hidden');
+                document.getElementById('pathSettingsError').classList.add('hidden');
+            }
+        }
 
-        toggleModal('settingsModal', false);
-        triggerAlert('Password Updated', 'Your password has been changed successfully. You will be logged out automatically.', 'check-circle');
-        
-        setTimeout(async () => {
+        // Toast
+        function toast(msg, type = '') {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'toast show' + (type ? ' ' + type : '');
+            clearTimeout(el._timeout);
+            el._timeout = setTimeout(() => el.classList.remove('show'), 2500);
+        }
+
+        // Copy
+        function copyLink(inputId) {
+            const inp = document.getElementById(inputId);
+            inp.select();
+            navigator.clipboard.writeText(inp.value);
+            triggerAlert('Token Copied', 'Configuration token copied to clipboard.', 'check-circle');
+        }
+
+        // Alert
+        function triggerAlert(title, message, iconName) {
+            document.getElementById('alertTitle').textContent = title;
+            document.getElementById('alertMessage').textContent = message;
+            const icon = document.getElementById('alertIcon');
+            icon.setAttribute('data-lucide', iconName);
+            lucide.createIcons();
+            toggleModal('customAlert', true);
+        }
+
+        // QR Modal
+        function openQrModal(label, uriPayload, subUrl) {
+            document.getElementById('qrTargetLabel').textContent = label;
+
+            // Config QR
+            document.getElementById('qrTextPayload').textContent = uriPayload;
+            const qrImg = document.getElementById('qrImage');
+            qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(uriPayload);
+
+            // Subscription QR
+            document.getElementById('qrSubPayload').textContent = subUrl;
+            const qrSubImg = document.getElementById('qrSubImage');
+            qrSubImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(subUrl);
+
+            toggleModal('qrModal', true);
+        }
+
+        // Copy text function
+        function copyText(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    toast('Copied to clipboard!', 'success');
+                }).catch(() => {
+                    fallbackCopyText(text);
+                });
+            } else {
+                fallbackCopyText(text);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
             try {
-                await fetch('/api/logout', { method: 'POST' });
+                document.execCommand('copy');
+                toast('Copied to clipboard!', 'success');
+            } catch (e) {
+                toast('Failed to copy', 'error');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // Edit modal
+        function openEditModal(label, protocol, fingerprint, alpn, limit, expiry, iplimit, speed, unit, uuid) {
+            document.getElementById('editNodeTitle').textContent = label;
+            document.getElementById('edit-uuid').value = uuid;
+            document.getElementById('edit-label').value = label;
+            document.getElementById('edit-protocol').value = protocol;
+            document.getElementById('edit-fp').value = fingerprint;
+            document.getElementById('edit-alpn').value = alpn || '';
+            document.getElementById('edit-limit').value = limit;
+            document.getElementById('edit-expiry').value = expiry;
+            document.getElementById('edit-iplimit').value = iplimit;
+            document.getElementById('edit-speed').value = speed;
+            document.getElementById('edit-speed-unit').value = unit || 'MBIT';
+            toggleModal('editModal', true);
+        }
+
+        // Get current paths
+        async function getCurrentPaths() {
+            try {
+                const res = await fetch('/api/current-paths');
+                if (!res.ok) throw new Error('Failed to fetch paths');
+                const data = await res.json();
+                return data;
+            } catch (e) {
+                console.error('Error fetching paths:', e);
+                return { dashboard: '/dashboard', login: '/login', sub: '/sub' };
+            }
+        }
+
+        // Logout
+        async function logout() {
+            try {
                 const paths = await getCurrentPaths();
+                await fetch('/api/logout', { method: 'POST' });
                 location.href = paths.login;
-            } catch(e) {
+            } catch (e) {
+                await fetch('/api/logout', { method: 'POST' });
                 location.href = '/login';
             }
-        }, 2000);
-        
-    } catch (e) {
-        errEl.textContent = e.message;
-        errEl.classList.remove('hidden');
-    }
-}
-
-// ---- Settings: update paths ----
-async function updatePath(type) {
-    const errEl = document.getElementById('pathSettingsError');
-    errEl.classList.add('hidden');
-
-    let pathInput;
-    if (type === 'dashboard') {
-        pathInput = document.getElementById('settings-dashboard-path');
-    } else if (type === 'login') {
-        pathInput = document.getElementById('settings-login-path');
-    } else if (type === 'sub') {
-        pathInput = document.getElementById('settings-sub-path');
-    }
-
-    let newPath = pathInput.value.trim();
-    if (!newPath) {
-        errEl.textContent = 'Path cannot be empty.';
-        errEl.classList.remove('hidden');
-        return;
-    }
-    if (!newPath.startsWith('/')) {
-        newPath = '/' + newPath;
-    }
-    if (!/^\/[a-zA-Z0-9\-_/]*$/.test(newPath)) {
-        errEl.textContent = 'Path must start with / and contain only letters, numbers, hyphens, underscores, and slashes.';
-        errEl.classList.remove('hidden');
-        return;
-    }
-
-    try {
-        const res = await fetch('/api/update-path', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path_type: type, new_path: newPath })
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.detail || 'Failed to update path');
-
-        document.getElementById('current-' + type + '-path').textContent = newPath;
-        pathInput.value = '';
-        triggerAlert('Path Updated', type.charAt(0).toUpperCase() + type.slice(1) + ' path changed to: ' + newPath, 'check-circle');
-
-        if (type === 'dashboard') {
-            setTimeout(() => {
-                location.href = newPath;
-            }, 1500);
         }
-    } catch (e) {
-        errEl.textContent = e.message;
-        errEl.classList.remove('hidden');
-    }
-}
 
-// ---- Load current paths ----
-async function loadSettingsPaths() {
-    try {
-        const res = await fetch('/api/get-paths');
-        const data = await res.json();
-        
-        document.getElementById('current-dashboard-path').textContent = data.dashboard_path || '/dashboard';
-        document.getElementById('current-login-path').textContent = data.login_path || '/login';
-        document.getElementById('current-sub-path').textContent = data.sub_path || '/sub';
-        
-        const dashboardInput = document.getElementById('settings-dashboard-path');
-        const loginInput = document.getElementById('settings-login-path');
-        const subInput = document.getElementById('settings-sub-path');
-        
-        if (dashboardInput) dashboardInput.placeholder = data.dashboard_path || '/dashboard';
-        if (loginInput) loginInput.placeholder = data.login_path || '/login';
-        if (subInput) subInput.placeholder = data.sub_path || '/sub';
-    } catch(e) {
-        console.error('Error loading paths:', e);
-    }
-}
+        // ---- Settings: change password ----
+        async function changePassword() {
+            const cur = document.getElementById('settings-current-pw').value;
+            const nw = document.getElementById('settings-new-pw').value;
+            const confirmPw = document.getElementById('settings-confirm-pw').value;
+            const errEl = document.getElementById('settingsError');
+            errEl.classList.add('hidden');
 
-// ---- Reset Traffic ----
-async function resetTraffic(uuid) {
-    const ok = await customConfirm('Reset traffic for this configuration?');
-    if (!ok) return;
-    try {
-        const res = await fetch('/api/links/' + uuid + '/reset-traffic', { method: 'POST' });
-        if (!res.ok) throw new Error('Failed');
-        toast('Traffic reset successfully', 'success');
-        loadConfigs();
-    } catch(e) {
-        toast('Error resetting traffic', 'error');
-    }
-}
-
-// Fetch and render configs
-async function loadConfigs() {
-    try {
-        const res = await fetch('/api/links');
-        if (!res.ok) throw new Error('Unauthorized');
-        const data = await res.json();
-        const links = data.links || [];
-        const container = document.getElementById('config-list');
-        if (!links.length) {
-            container.innerHTML = '<div class="p-6 text-center text-slate-400 text-sm">No configurations yet. Click "Add Config" to create one.</div>';
-            return;
-        }
-        container.innerHTML = links.map(l => {
-            const protoLabels = {
-                'vless-ws': 'VLESS',
-                'xhttp-packet-up': 'XHTTP',
-                'xhttp-stream-up': 'XHTTP'
-            };
-            const proto = l.protocol || 'vless-ws';
-            const label = l.label || 'Unnamed';
-            const active = l.active && !l.expired;
-            const limit = l.limit_bytes === 0 ? '∞' : fmtBytes(l.limit_bytes);
-            const used = fmtBytes(l.used_bytes || 0);
-            const pct = l.limit_bytes === 0 ? 0 : Math.min(100, (l.used_bytes / l.limit_bytes) * 100);
-            const color = pct > 90 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#3b82f6';
-            let speedDisplay = '∞';
-            if (l.speed_limit_bytes && l.speed_limit_bytes > 0) {
-                speedDisplay = (l.speed_limit_bytes * 8 / 1024 / 1024).toFixed(1) + ' Mbps';
+            if (!cur || !nw || !confirmPw) {
+                errEl.textContent = 'All fields are required.';
+                errEl.classList.remove('hidden');
+                return;
             }
-            const statusDot = active ? 'status-dot active' : 'status-dot inactive';
-            const statusText = active ? 'Active' : 'Inactive';
-            const statusClass = active ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 'text-red-400 bg-red-500/10 border-red-500/20';
-            
-            return `
-            <div class="p-4 sm:p-6 config-row">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-6">
-                    <div class="flex items-start space-x-3 sm:space-x-4 min-w-0">
-                        <span class="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-[9px] sm:text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wide mt-0.5 font-mono shrink-0">${protoLabels[proto] || proto}</span>
-                        <div class="min-w-0 flex-1">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <h3 class="text-sm sm:text-base font-semibold text-slate-200 truncate">${label}</h3>
-                                <span class="text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium ${statusClass} shrink-0">
-                                    <span class="${statusDot}"></span>${statusText}
-                                </span>
+            if (nw.length < 4) {
+                errEl.textContent = 'New password must be at least 4 characters.';
+                errEl.classList.remove('hidden');
+                return;
+            }
+            if (nw !== confirmPw) {
+                errEl.textContent = 'New password and confirmation do not match.';
+                errEl.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ current_password: cur, new_password: nw })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.detail || 'Failed to update password');
+
+                toggleModal('settingsModal', false);
+                triggerAlert('Password Updated', 'Your password has been changed successfully. You will be logged out automatically.', 'check-circle');
+
+                setTimeout(async () => {
+                    try {
+                        await fetch('/api/logout', { method: 'POST' });
+                        const paths = await getCurrentPaths();
+                        location.href = paths.login;
+                    } catch (e) {
+                        location.href = '/login';
+                    }
+                }, 2000);
+
+            } catch (e) {
+                errEl.textContent = e.message;
+                errEl.classList.remove('hidden');
+            }
+        }
+
+        // ---- Settings: update paths ----
+        async function updatePath(type) {
+            const errEl = document.getElementById('pathSettingsError');
+            errEl.classList.add('hidden');
+
+            let pathInput;
+            if (type === 'dashboard') {
+                pathInput = document.getElementById('settings-dashboard-path');
+            } else if (type === 'login') {
+                pathInput = document.getElementById('settings-login-path');
+            } else if (type === 'sub') {
+                pathInput = document.getElementById('settings-sub-path');
+            }
+
+            let newPath = pathInput.value.trim();
+            if (!newPath) {
+                errEl.textContent = 'Path cannot be empty.';
+                errEl.classList.remove('hidden');
+                return;
+            }
+            if (!newPath.startsWith('/')) {
+                newPath = '/' + newPath;
+            }
+            if (!/^\/[a-zA-Z0-9\-_/]*$/.test(newPath)) {
+                errEl.textContent = 'Path must start with / and contain only letters, numbers, hyphens, underscores, and slashes.';
+                errEl.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/update-path', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path_type: type, new_path: newPath })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.detail || 'Failed to update path');
+
+                document.getElementById('current-' + type + '-path').textContent = newPath;
+                pathInput.value = '';
+                triggerAlert('Path Updated', type.charAt(0).toUpperCase() + type.slice(1) + ' path changed to: ' + newPath, 'check-circle');
+
+                if (type === 'dashboard') {
+                    setTimeout(() => {
+                        location.href = newPath;
+                    }, 1500);
+                }
+            } catch (e) {
+                errEl.textContent = e.message;
+                errEl.classList.remove('hidden');
+            }
+        }
+
+        // ---- Load current paths ----
+        async function loadSettingsPaths() {
+            try {
+                const res = await fetch('/api/get-paths');
+                const data = await res.json();
+
+                document.getElementById('current-dashboard-path').textContent = data.dashboard_path || '/dashboard';
+                document.getElementById('current-login-path').textContent = data.login_path || '/login';
+                document.getElementById('current-sub-path').textContent = data.sub_path || '/sub';
+
+                const dashboardInput = document.getElementById('settings-dashboard-path');
+                const loginInput = document.getElementById('settings-login-path');
+                const subInput = document.getElementById('settings-sub-path');
+
+                if (dashboardInput) dashboardInput.placeholder = data.dashboard_path || '/dashboard';
+                if (loginInput) loginInput.placeholder = data.login_path || '/login';
+                if (subInput) subInput.placeholder = data.sub_path || '/sub';
+            } catch (e) {
+                console.error('Error loading paths:', e);
+            }
+        }
+
+        // ---- Reset Traffic ----
+        async function resetTraffic(uuid) {
+            const ok = await customConfirm('Reset traffic for this configuration?');
+            if (!ok) return;
+            try {
+                const res = await fetch('/api/links/' + uuid + '/reset-traffic', { method: 'POST' });
+                if (!res.ok) throw new Error('Failed');
+                toast('Traffic reset successfully', 'success');
+                loadConfigs();
+            } catch (e) {
+                toast('Error resetting traffic', 'error');
+            }
+        }
+
+        // Fetch and render configs
+        async function loadConfigs() {
+            try {
+                const res = await fetch('/api/links');
+                if (!res.ok) throw new Error('Unauthorized');
+                const data = await res.json();
+                const links = data.links || [];
+                const container = document.getElementById('config-list');
+                if (!links.length) {
+                    container.innerHTML = '<div class="p-6 text-center text-slate-400 text-sm">No configurations yet. Click "Add Config" to create one.</div>';
+                    return;
+                }
+                container.innerHTML = links.map(l => {
+                    const protoLabels = {
+                        'vless-ws': 'VLESS',
+                        'xhttp-packet-up': 'XHTTP',
+                        'xhttp-stream-up': 'XHTTP'
+                    };
+                    const proto = l.protocol || 'vless-ws';
+                    const label = l.label || 'Unnamed';
+                    const active = l.active && !l.expired;
+                    const limit = l.limit_bytes === 0 ? '∞' : fmtBytes(l.limit_bytes);
+                    const used = fmtBytes(l.used_bytes || 0);
+                    const pct = l.limit_bytes === 0 ? 0 : Math.min(100, (l.used_bytes / l.limit_bytes) * 100);
+                    const color = pct > 90 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#3b82f6';
+                    let speedDisplay = '∞';
+                    if (l.speed_limit_bytes && l.speed_limit_bytes > 0) {
+                        speedDisplay = (l.speed_limit_bytes * 8 / 1024 / 1024).toFixed(1) + ' Mbps';
+                    }
+                    const statusDot = active ? 'status-dot active' : 'status-dot inactive';
+                    const statusText = active ? 'Active' : 'Inactive';
+                    const statusClass = active ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' :
+                        'text-red-400 bg-red-500/10 border-red-500/20';
+
+                    return `
+                    <div class="p-4 sm:p-6 config-row">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-6">
+                            <div class="flex items-start space-x-3 sm:space-x-4 min-w-0">
+                                <span class="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-[9px] sm:text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wide mt-0.5 font-mono shrink-0">${protoLabels[proto] || proto}</span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <h3 class="text-sm sm:text-base font-semibold text-slate-200 truncate">${label}</h3>
+                                        <span class="text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium ${statusClass} shrink-0">
+                                            <span class="${statusDot}"></span>${statusText}
+                                        </span>
+                                    </div>
+                                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-0.5 mt-1 text-[10px] sm:text-xs text-slate-400">
+                                        <div>Network: <span class="text-slate-300 font-mono">${proto.includes('ws') ? 'ws' : 'tcp'}</span></div>
+                                        <div>Security: <span class="text-slate-300 font-mono">tls</span></div>
+                                        <div class="col-span-2 sm:col-span-1">Expiry: <span class="text-slate-300 font-mono">${l.expires_at ? new Date(l.expires_at).toISOString().slice(0,10) : 'Unlimited'}</span></div>
+                                    </div>
+                                    <div class="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-slate-400">
+                                        <span>Usage: <span class="text-slate-300 font-mono">${used} / ${limit}</span></span>
+                                        <span>IP: <span class="text-slate-300 font-mono">${l.ip_limit || '∞'}</span></span>
+                                        <span>Speed: <span class="text-slate-300 font-mono">${speedDisplay}</span></span>
+                                    </div>
+                                    <div class="w-full max-w-xs mt-1.5 h-1.5 bg-slate-800/60 rounded-full overflow-hidden">
+                                        <div class="h-full rounded-full transition-all duration-500" style="width: ${pct}%; background: ${color};"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-0.5 mt-1 text-[10px] sm:text-xs text-slate-400">
-                                <div>Network: <span class="text-slate-300 font-mono">${proto.includes('ws') ? 'ws' : 'tcp'}</span></div>
-                                <div>Security: <span class="text-slate-300 font-mono">tls</span></div>
-                                <div class="col-span-2 sm:col-span-1">Expiry: <span class="text-slate-300 font-mono">${l.expires_at ? new Date(l.expires_at).toISOString().slice(0,10) : 'Unlimited'}</span></div>
-                            </div>
-                            <div class="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-slate-400">
-                                <span>Usage: <span class="text-slate-300 font-mono">${used} / ${limit}</span></span>
-                                <span>IP: <span class="text-slate-300 font-mono">${l.ip_limit || '∞'}</span></span>
-                                <span>Speed: <span class="text-slate-300 font-mono">${speedDisplay}</span></span>
-                            </div>
-                            <div class="w-full max-w-xs mt-1.5 h-1.5 bg-slate-800/60 rounded-full overflow-hidden">
-                                <div class="h-full rounded-full transition-all duration-500" style="width: ${pct}%; background: ${color};"></div>
+                            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 lg:justify-end">
+                                <div class="relative flex-grow sm:flex-grow-0 min-w-[180px] sm:min-w-[220px] max-w-full sm:max-w-xs">
+                                    <input type="text" id="uri-${l.uuid}" readonly value="${l.vless_link}" class="w-full bg-slate-950 border border-slate-800/80 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 pr-7 sm:pr-10 text-[8px] sm:text-[10px] font-mono text-slate-400 focus:outline-none select-all truncate">
+                                    <button onclick="copyLink('uri-${l.uuid}')" class="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 p-0.5 sm:p-1 text-slate-500 hover:text-slate-300 transition" title="Copy URI"><i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                                </div>
+                                <button onclick="openQrModal('${label}', '${l.vless_link}', '${l.sub_url}')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="QR"><i data-lucide="qr-code" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                                <button onclick="window.open('/sub/user?uuid=${l.uuid}', '_blank')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Subscription"><i data-lucide="external-link" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                                <button onclick="openEditModal('${label}','${proto}','${l.fingerprint||'chrome'}','${l.alpn||''}',${l.limit_bytes ? (l.limit_bytes / 1024 / 1024) : 0},${l.expires_at ? Math.ceil((new Date(l.expires_at) - Date.now()) / (86400000)) : 0},${l.ip_limit||0},${l.speed_limit_bytes ? (l.speed_limit_bytes * 8 / 1024 / 1024) : 0},'${l.speed_limit_unit || 'MBIT'}','${l.uuid}')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Edit"><i data-lucide="edit-3" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                                <button onclick="resetTraffic('${l.uuid}')" class="p-1.5 sm:p-2 bg-blue-800/20 hover:bg-blue-800/40 border border-blue-700/30 text-blue-300 rounded-xl transition" title="Reset Traffic"><i data-lucide="rotate-ccw" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                                <button onclick="deleteConfig('${l.uuid}')" class="p-1.5 sm:p-2 bg-red-800/20 hover:bg-red-800/40 border border-red-700/30 text-red-300 rounded-xl transition" title="Delete"><i data-lucide="trash-2" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
                             </div>
                         </div>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 lg:justify-end">
-                        <div class="relative flex-grow sm:flex-grow-0 min-w-[180px] sm:min-w-[220px] max-w-full sm:max-w-xs">
-                            <input type="text" id="uri-${l.uuid}" readonly value="${l.vless_link}" class="w-full bg-slate-950 border border-slate-800/80 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 pr-7 sm:pr-10 text-[8px] sm:text-[10px] font-mono text-slate-400 focus:outline-none select-all truncate">
-                            <button onclick="copyLink('uri-${l.uuid}')" class="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 p-0.5 sm:p-1 text-slate-500 hover:text-slate-300 transition" title="Copy URI"><i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
-                        </div>
-                        <button onclick="openQrModal('${label}', '${l.vless_link}', '${l.sub_url}')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="QR"><i data-lucide="qr-code" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
-                        <button onclick="window.open('/sub/user?uuid=${l.uuid}', '_blank')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Subscription"><i data-lucide="external-link" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
-                        <button onclick="openEditModal('${label}','${proto}','${l.fingerprint||'chrome'}','${l.alpn||''}',${l.limit_bytes ? (l.limit_bytes / 1024 / 1024) : 0},${l.expires_at ? Math.ceil((new Date(l.expires_at) - Date.now()) / (86400000)) : 0},${l.ip_limit||0},${l.speed_limit_bytes ? (l.speed_limit_bytes * 8 / 1024 / 1024) : 0},'${l.speed_limit_unit || 'MBIT'}','${l.uuid}')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Edit"><i data-lucide="edit-3" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
-                        <button onclick="resetTraffic('${l.uuid}')" class="p-1.5 sm:p-2 bg-blue-800/20 hover:bg-blue-800/40 border border-blue-700/30 text-blue-300 rounded-xl transition" title="Reset Traffic"><i data-lucide="rotate-ccw" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
-                        <button onclick="deleteConfig('${l.uuid}')" class="p-1.5 sm:p-2 bg-red-800/20 hover:bg-red-800/40 border border-red-700/30 text-red-300 rounded-xl transition" title="Delete"><i data-lucide="trash-2" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
-                    </div>
-                </div>
-            </div>`;
-        }).join('');
-        lucide.createIcons();
-        updateStats();
-    } catch (e) {
-        if (e.message.includes('Unauthorized')) location.href = '/login';
-    }
-}
+                    </div>`;
+                }).join('');
+                lucide.createIcons();
+                updateStats();
+            } catch (e) {
+                if (e.message.includes('Unauthorized')) location.href = '/login';
+            }
+        }
 
-function fmtBytes(b) {
-    if (b === 0) return '0 B';
-    if (b < 1024) return b + ' B';
-    if (b < 1024**2) return (b/1024).toFixed(1) + ' KB';
-    if (b < 1024**3) return (b/1024**2).toFixed(2) + ' MB';
-    return (b/1024**3).toFixed(2) + ' GB';
-}
+        function fmtBytes(b) {
+            if (b === 0) return '0 B';
+            if (b < 1024) return b + ' B';
+            if (b < 1024 ** 2) return (b / 1024).toFixed(1) + ' KB';
+            if (b < 1024 ** 3) return (b / 1024 ** 2).toFixed(2) + ' MB';
+            return (b / 1024 ** 3).toFixed(2) + ' GB';
+        }
 
-async function updateStats() {
-    try {
-        const res = await fetch('/stats');
-        const d = await res.json();
-        document.getElementById('uptime-display').textContent = d.uptime || '00:00:00';
-        
-        document.getElementById('total-traffic').textContent = d.total_traffic_mb ? d.total_traffic_mb.toFixed(1) + ' MB' : '0 MB';
-        document.getElementById('total-usage').textContent = d.total_traffic_mb ? (d.total_traffic_mb / 1024).toFixed(2) + ' GB' : '0 GB';
-        document.getElementById('total-inbounds').textContent = d.links_count || 0;
-        document.getElementById('active-connections').textContent = d.active_connections || 0;
-        
-        // CPU
-        const cpuPct = d.cpu_percent || 0;
-        const cpuCores = d.cpu_cores || 0;
-        document.getElementById('ring-cpu-val').textContent = cpuCores + ' Cores';
-        document.getElementById('ring-cpu-pct').textContent = cpuPct.toFixed(1) + '%';
-        const cpuCircle = document.querySelector('.text-blue-500.circle-chart');
-        if (cpuCircle) cpuCircle.setAttribute('stroke-dasharray', Math.round(cpuPct) + ', 100');
-        
-        // RAM
-        const ramUsed = d.ram_used_mb || 0;
-        const ramTotal = d.ram_total_mb || 1;
-        const ramPct = d.ram_percent || 0;
-        document.getElementById('ring-ram-val').textContent = (ramUsed/1024).toFixed(2) + ' / ' + (ramTotal/1024).toFixed(2) + ' GB';
-        document.getElementById('ring-ram-pct').textContent = ramPct.toFixed(1) + '%';
-        const ramCircle = document.querySelector('.text-indigo-500.circle-chart');
-        if (ramCircle) ramCircle.setAttribute('stroke-dasharray', Math.round(ramPct) + ', 100');
-        
-        // Swap
-        const swapUsed = d.swap_used_mb || 0;
-        const swapTotal = d.swap_total_mb || 1;
-        const swapPct = d.swap_percent || 0;
-        document.getElementById('ring-swap-val').textContent = (swapUsed/1024).toFixed(2) + ' / ' + (swapTotal/1024).toFixed(2) + ' GB';
-        document.getElementById('ring-swap-pct').textContent = swapPct.toFixed(1) + '%';
-        const swapCircle = document.querySelector('.text-amber-500.circle-chart');
-        if (swapCircle) swapCircle.setAttribute('stroke-dasharray', Math.round(swapPct) + ', 100');
-        
-        // Storage
-        const diskUsed = d.disk_used_gb || 0;
-        const diskTotal = d.disk_total_gb || 1;
-        const diskPct = d.disk_percent || 0;
-        document.getElementById('ring-disk-val').textContent = diskUsed.toFixed(2) + ' / ' + diskTotal.toFixed(2) + ' TB';
-        document.getElementById('ring-disk-pct').textContent = diskPct.toFixed(1) + '%';
-        const diskCircle = document.querySelector('.text-rose-500.circle-chart');
-        if (diskCircle) diskCircle.setAttribute('stroke-dasharray', Math.round(diskPct) + ', 100');
-    } catch(e) { console.error(e); }
-}
+        async function updateStats() {
+            try {
+                const res = await fetch('/stats');
+                const d = await res.json();
+                document.getElementById('uptime-display').textContent = d.uptime || '00:00:00';
 
-async function createConfig() {
-    const label = document.getElementById('new-label').value.trim() || 'New Config';
-    const protocol = document.getElementById('new-protocol').value;
-    const fp = document.getElementById('new-fp').value;
-    const alpn = document.getElementById('new-alpn').value.trim();
-    const limitMB = parseFloat(document.getElementById('new-limit').value) || 0;
-    const expiryDays = parseInt(document.getElementById('new-expiry').value) || 0;
-    const ipLimit = parseInt(document.getElementById('new-iplimit').value) || 0;
-    const speedVal = parseFloat(document.getElementById('new-speed').value) || 0;
-    const speedUnit = document.getElementById('new-speed-unit').value;
+                document.getElementById('total-traffic').textContent = d.total_traffic_mb ? d.total_traffic_mb.toFixed(1) +
+                    ' MB' : '0 MB';
+                document.getElementById('total-usage').textContent = d.total_traffic_mb ? (d.total_traffic_mb / 1024).toFixed(
+                    2) + ' GB' : '0 GB';
+                document.getElementById('total-inbounds').textContent = d.links_count || 0;
+                document.getElementById('active-connections').textContent = d.active_connections || 0;
 
-    const body = {
-        label,
-        protocol,
-        fingerprint: fp,
-        alpn,
-        limit_value: limitMB,
-        limit_unit: 'MB',
-        expires_days: expiryDays,
-        ip_limit: ipLimit,
-        speed_limit_value: speedVal,
-        speed_limit_unit: speedUnit
-    };
+                // CPU
+                const cpuPct = d.cpu_percent || 0;
+                const cpuCores = d.cpu_cores || 0;
+                document.getElementById('ring-cpu-val').textContent = cpuCores + ' Cores';
+                document.getElementById('ring-cpu-pct').textContent = cpuPct.toFixed(1) + '%';
+                const cpuCircle = document.querySelector('.text-blue-500.circle-chart');
+                if (cpuCircle) cpuCircle.setAttribute('stroke-dasharray', Math.round(cpuPct) + ', 100');
 
-    try {
-        const res = await fetch('/api/links', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-        });
-        if (!res.ok) throw new Error('Failed');
-        toggleModal('inboundModal', false);
-        toast('Config created successfully', 'success');
+                // RAM
+                const ramUsed = d.ram_used_mb || 0;
+                const ramTotal = d.ram_total_mb || 1;
+                const ramPct = d.ram_percent || 0;
+                document.getElementById('ring-ram-val').textContent = (ramUsed / 1024).toFixed(2) + ' / ' + (ramTotal /
+                    1024).toFixed(2) + ' GB';
+                document.getElementById('ring-ram-pct').textContent = ramPct.toFixed(1) + '%';
+                const ramCircle = document.querySelector('.text-indigo-500.circle-chart');
+                if (ramCircle) ramCircle.setAttribute('stroke-dasharray', Math.round(ramPct) + ', 100');
+
+                // Swap
+                const swapUsed = d.swap_used_mb || 0;
+                const swapTotal = d.swap_total_mb || 1;
+                const swapPct = d.swap_percent || 0;
+                document.getElementById('ring-swap-val').textContent = (swapUsed / 1024).toFixed(2) + ' / ' + (swapTotal /
+                    1024).toFixed(2) + ' GB';
+                document.getElementById('ring-swap-pct').textContent = swapPct.toFixed(1) + '%';
+                const swapCircle = document.querySelector('.text-amber-500.circle-chart');
+                if (swapCircle) swapCircle.setAttribute('stroke-dasharray', Math.round(swapPct) + ', 100');
+
+                // Storage
+                const diskUsed = d.disk_used_gb || 0;
+                const diskTotal = d.disk_total_gb || 1;
+                const diskPct = d.disk_percent || 0;
+                document.getElementById('ring-disk-val').textContent = diskUsed.toFixed(2) + ' / ' + diskTotal.toFixed(
+                    2) + ' TB';
+                document.getElementById('ring-disk-pct').textContent = diskPct.toFixed(1) + '%';
+                const diskCircle = document.querySelector('.text-rose-500.circle-chart');
+                if (diskCircle) diskCircle.setAttribute('stroke-dasharray', Math.round(diskPct) + ', 100');
+            } catch (e) { console.error(e); }
+        }
+
+        async function createConfig() {
+            const label = document.getElementById('new-label').value.trim() || 'New Config';
+            const protocol = document.getElementById('new-protocol').value;
+            const fp = document.getElementById('new-fp').value;
+            const alpn = document.getElementById('new-alpn').value.trim();
+            const limitMB = parseFloat(document.getElementById('new-limit').value) || 0;
+            const expiryDays = parseInt(document.getElementById('new-expiry').value) || 0;
+            const ipLimit = parseInt(document.getElementById('new-iplimit').value) || 0;
+            const speedVal = parseFloat(document.getElementById('new-speed').value) || 0;
+            const speedUnit = document.getElementById('new-speed-unit').value;
+
+            const body = {
+                label,
+                protocol,
+                fingerprint: fp,
+                alpn,
+                limit_value: limitMB,
+                limit_unit: 'MB',
+                expires_days: expiryDays,
+                ip_limit: ipLimit,
+                speed_limit_value: speedVal,
+                speed_limit_unit: speedUnit
+            };
+
+            try {
+                const res = await fetch('/api/links', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                if (!res.ok) throw new Error('Failed');
+                toggleModal('inboundModal', false);
+                toast('Config created successfully', 'success');
+                loadConfigs();
+                document.getElementById('new-label').value = '';
+                document.getElementById('new-alpn').value = '';
+                document.getElementById('new-speed').value = '0';
+                document.getElementById('new-limit').value = '0';
+                document.getElementById('new-expiry').value = '0';
+                document.getElementById('new-iplimit').value = '0';
+            } catch (e) {
+                toast('Error creating config', 'error');
+            }
+        }
+
+        async function saveEdit() {
+            const uuid = document.getElementById('edit-uuid').value;
+            const label = document.getElementById('edit-label').value.trim();
+            const protocol = document.getElementById('edit-protocol').value;
+            const fp = document.getElementById('edit-fp').value;
+            const alpn = document.getElementById('edit-alpn').value.trim();
+            const limitMB = parseFloat(document.getElementById('edit-limit').value) || 0;
+            const expiryDays = parseInt(document.getElementById('edit-expiry').value) || 0;
+            const ipLimit = parseInt(document.getElementById('edit-iplimit').value) || 0;
+            const speedVal = parseFloat(document.getElementById('edit-speed').value) || 0;
+            const speedUnit = document.getElementById('edit-speed-unit').value;
+
+            const body = {
+                label,
+                protocol,
+                fingerprint: fp,
+                alpn,
+                limit_value: limitMB,
+                limit_unit: 'MB',
+                expires_days: expiryDays,
+                ip_limit: ipLimit,
+                speed_limit_value: speedVal,
+                speed_limit_unit: speedUnit
+            };
+
+            try {
+                const res = await fetch('/api/links/' + uuid, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                if (!res.ok) throw new Error('Failed');
+                toggleModal('editModal', false);
+                toast('Config updated', 'success');
+                loadConfigs();
+            } catch (e) {
+                toast('Error updating config', 'error');
+            }
+        }
+
+        async function deleteConfig(uuid) {
+            const ok = await customConfirm('Delete this configuration? This action cannot be undone.');
+            if (!ok) return;
+            try {
+                const res = await fetch('/api/links/' + uuid, { method: 'DELETE' });
+                if (!res.ok) throw new Error('Failed');
+                toast('Config deleted', 'success');
+                loadConfigs();
+            } catch (e) {
+                toast('Error deleting', 'error');
+            }
+        }
+
+        // Initial load
         loadConfigs();
-        document.getElementById('new-label').value = '';
-        document.getElementById('new-alpn').value = '';
-        document.getElementById('new-speed').value = '0';
-        document.getElementById('new-limit').value = '0';
-        document.getElementById('new-expiry').value = '0';
-        document.getElementById('new-iplimit').value = '0';
-    } catch(e) {
-        toast('Error creating config', 'error');
-    }
-}
+        setInterval(updateStats, 5000);
+        setInterval(loadConfigs, 15000);
 
-async function saveEdit() {
-    const uuid = document.getElementById('edit-uuid').value;
-    const label = document.getElementById('edit-label').value.trim();
-    const protocol = document.getElementById('edit-protocol').value;
-    const fp = document.getElementById('edit-fp').value;
-    const alpn = document.getElementById('edit-alpn').value.trim();
-    const limitMB = parseFloat(document.getElementById('edit-limit').value) || 0;
-    const expiryDays = parseInt(document.getElementById('edit-expiry').value) || 0;
-    const ipLimit = parseInt(document.getElementById('edit-iplimit').value) || 0;
-    const speedVal = parseFloat(document.getElementById('edit-speed').value) || 0;
-    const speedUnit = document.getElementById('edit-speed-unit').value;
-
-    const body = {
-        label,
-        protocol,
-        fingerprint: fp,
-        alpn,
-        limit_value: limitMB,
-        limit_unit: 'MB',
-        expires_days: expiryDays,
-        ip_limit: ipLimit,
-        speed_limit_value: speedVal,
-        speed_limit_unit: speedUnit
-    };
-
-    try {
-        const res = await fetch('/api/links/' + uuid, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
+        // Close modals on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.custom-modal-overlay.active').forEach(modal => {
+                    toggleModal(modal.id, false);
+                });
+            }
         });
-        if (!res.ok) throw new Error('Failed');
-        toggleModal('editModal', false);
-        toast('Config updated', 'success');
-        loadConfigs();
-    } catch(e) {
-        toast('Error updating config', 'error');
-    }
-}
 
-async function deleteConfig(uuid) {
-    const ok = await customConfirm('Delete this configuration? This action cannot be undone.');
-    if (!ok) return;
-    try {
-        const res = await fetch('/api/links/' + uuid, { method: 'DELETE' });
-        if (!res.ok) throw new Error('Failed');
-        toast('Config deleted', 'success');
-        loadConfigs();
-    } catch(e) {
-        toast('Error deleting', 'error');
-    }
-}
-
-// Initial load
-loadConfigs();
-setInterval(updateStats, 5000);
-setInterval(loadConfigs, 15000);
-
-// Close modals on escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        document.querySelectorAll('.custom-modal-overlay.active').forEach(modal => {
-            toggleModal(modal.id, false);
+        // Close modals on overlay click
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('custom-modal-overlay')) {
+                toggleModal(e.target.id, false);
+            }
         });
-    }
-});
-
-// Close modals on overlay click
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('custom-modal-overlay')) {
-        toggleModal(e.target.id, false);
-    }
-});
-
-</script>
+    </script>
 </body>
 </html>"""
 # ---------- SUB_USER_HTML (for /sub/user) ----------
