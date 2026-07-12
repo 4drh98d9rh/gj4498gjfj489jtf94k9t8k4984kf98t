@@ -3233,8 +3233,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
 </body>
 </html>"""
 
-# ---------- SETUP_HTML (صفحه تنظیم رمز عبور) ----------
-# ---------- SETUP_HTML (Setup Page - Fully Fixed) ----------
+# ---------- SETUP_HTML (Setup Page - No Loader) ----------
 SETUP_HTML = r"""<!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -3267,13 +3266,6 @@ SETUP_HTML = r"""<!DOCTYPE html>
         .input-focus-ring:focus {
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
         }
-        @keyframes pulse-slow {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .pulse-slow {
-            animation: pulse-slow 2s ease-in-out infinite;
-        }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -3281,7 +3273,6 @@ SETUP_HTML = r"""<!DOCTYPE html>
         .fade-in {
             animation: fadeIn 0.5s ease-out;
         }
-        /* Font classes */
         .font-persian {
             font-family: 'Vazirmatn', 'Inter', sans-serif;
         }
@@ -3297,7 +3288,6 @@ SETUP_HTML = r"""<!DOCTYPE html>
                 padding-right: 1rem;
             }
         }
-        /* Password strength indicator */
         .strength-bar {
             height: 3px;
             border-radius: 2px;
@@ -3327,6 +3317,12 @@ SETUP_HTML = r"""<!DOCTYPE html>
         .strength-text.medium { color: #f59e0b; }
         .strength-text.strong { color: #22c55e; }
         .strength-text.very-strong { color: #22c55e; }
+        .btn-transition {
+            transition: all 0.2s ease;
+        }
+        .btn-transition:active {
+            transform: scale(0.97);
+        }
     </style>
 </head>
 <body class="font-sans text-slate-200 min-h-screen flex items-center justify-center bg-[#070a13] relative antialiased tracking-tight p-4 mobile-padding">
@@ -3394,10 +3390,10 @@ SETUP_HTML = r"""<!DOCTYPE html>
                 </div>
                 
                 <div class="flex gap-3 mb-4">
-                    <button type="button" onclick="useDefaultPassword()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-sm font-medium rounded-xl transition-all duration-300 font-english">
+                    <button type="button" onclick="useDefaultPassword()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-sm font-medium rounded-xl transition-all duration-300 btn-transition font-english">
                         Use Default
                     </button>
-                    <button type="submit" id="setupButton" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition duration-200 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25 flex items-center justify-center gap-2 font-english">
+                    <button type="submit" id="setupButton" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25 flex items-center justify-center gap-2 btn-transition font-english">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
                             <polyline points="10 17 15 12 10 7"/>
@@ -3443,7 +3439,6 @@ SETUP_HTML = r"""<!DOCTYPE html>
             
             const score = checkPasswordStrength(password);
             
-            // Remove all classes
             bar.className = 'strength-bar';
             text.className = 'strength-text font-english';
             
@@ -3466,18 +3461,14 @@ SETUP_HTML = r"""<!DOCTYPE html>
             }
         }
 
-        // Password input listeners
         document.getElementById('new-pw').addEventListener('input', function() {
             updateStrengthIndicator(this.value);
         });
 
-        // Use default password (MUVIXO)
         function useDefaultPassword() {
             document.getElementById('new-pw').value = 'MUVIXO';
             document.getElementById('confirm-pw').value = 'MUVIXO';
             updateStrengthIndicator('MUVIXO');
-            
-            // Trigger submit
             document.getElementById('setupForm').dispatchEvent(new Event('submit'));
         }
 
@@ -3492,18 +3483,17 @@ SETUP_HTML = r"""<!DOCTYPE html>
             success.classList.add('hidden');
             btn.disabled = true;
             
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Setting...';
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Setting...';
             
             const password = document.getElementById('new-pw').value;
             const confirm = document.getElementById('confirm-pw').value;
             
-            // Validate
             if (password.length < 4) {
                 err.textContent = 'Password must be at least 4 characters';
                 err.classList.remove('hidden');
                 btn.disabled = false;
-                btn.innerHTML = originalContent;
+                btn.innerHTML = originalText;
                 return;
             }
             
@@ -3511,7 +3501,7 @@ SETUP_HTML = r"""<!DOCTYPE html>
                 err.textContent = 'Passwords do not match';
                 err.classList.remove('hidden');
                 btn.disabled = false;
-                btn.innerHTML = originalContent;
+                btn.innerHTML = originalText;
                 return;
             }
             
@@ -3527,7 +3517,7 @@ SETUP_HTML = r"""<!DOCTYPE html>
                     throw new Error(data.detail || 'Setup failed');
                 }
                 
-                success.textContent = '✅ Password set successfully! Redirecting to login...';
+                success.textContent = '✅ Password set successfully! Redirecting...';
                 success.classList.remove('hidden');
                 
                 btn.innerHTML = '✅ Done!';
@@ -3540,11 +3530,10 @@ SETUP_HTML = r"""<!DOCTYPE html>
                 err.textContent = e.message || 'Setup failed. Please try again.';
                 err.classList.remove('hidden');
                 btn.disabled = false;
-                btn.innerHTML = originalContent;
+                btn.innerHTML = originalText;
             }
         });
 
-        // Enter key support
         document.getElementById('new-pw').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -3559,7 +3548,6 @@ SETUP_HTML = r"""<!DOCTYPE html>
             }
         });
 
-        // Focus on load
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 document.getElementById('new-pw').focus();
