@@ -2008,6 +2008,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 </body>
 </html>"""
 # ---------- SUB_USER_HTML (for /sub/user) ----------
+# ---------- SUB_USER_HTML (for /sub/user with Base64 QR) ----------
 SUB_USER_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2063,6 +2064,8 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
         }}
         .qr-container {{
             transition: all 0.3s ease;
+            background: white;
+            border-radius: 12px;
         }}
         .qr-container:active {{
             transform: scale(0.98);
@@ -2165,6 +2168,10 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             color: #f87171;
             border: 1px solid rgba(239, 68, 68, 0.2);
         }}
+        .qr-image {{
+            max-width: 100%;
+            height: auto;
+        }}
     </style>
 </head>
 <body class="font-sans text-slate-200 min-h-screen flex flex-col justify-between relative antialiased tracking-tight">
@@ -2201,9 +2208,9 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                 </span>
             </div>
 
-            <!-- QR Code -->
+            <!-- QR Code - Using Base64 image directly -->
             <div class="mb-5 sm:mb-6 flex justify-center">
-                <div class="bg-white p-2 sm:p-3 rounded-xl shadow-lg border-2 border-slate-700/50 qr-container">
+                <div class="qr-container p-2 sm:p-3 shadow-lg border-2 border-slate-700/50">
                     <img src="{qr_url}" alt="QR Code" class="qr-image w-36 h-36 sm:w-48 sm:h-48 object-contain">
                 </div>
             </div>
@@ -2403,18 +2410,6 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             }}
         }});
 
-        // Handle page visibility change to refresh QR if needed
-        document.addEventListener('visibilitychange', function() {{
-            if (!document.hidden) {{
-                const qrImg = document.querySelector('.qr-image');
-                if (qrImg && qrImg.src && qrImg.src.includes('qrserver')) {{
-                    const url = new URL(qrImg.src);
-                    url.searchParams.set('t', Date.now());
-                    qrImg.src = url.toString();
-                }}
-            }}
-        }});
-
         // Touch feedback for copy button
         document.querySelector('.copy-btn')?.addEventListener('touchstart', function() {{
             this.style.transform = 'scale(0.95)';
@@ -2423,23 +2418,6 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
         document.querySelector('.copy-btn')?.addEventListener('touchend', function() {{
             this.style.transform = 'scale(1)';
         }}, {{ passive: true }});
-
-        // Handle responsive QR code loading
-        function handleQrLoading() {{
-            const qrImg = document.querySelector('.qr-image');
-            if (qrImg) {{
-                qrImg.addEventListener('error', function() {{
-                    const currentSrc = this.src;
-                    if (currentSrc.includes('api.qrserver.com')) {{
-                        const dataParam = new URL(currentSrc).searchParams.get('data');
-                        if (dataParam) {{
-                            this.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + dataParam + '&t=' + Date.now();
-                        }}
-                    }}
-                }});
-            }}
-        }}
-        document.addEventListener('DOMContentLoaded', handleQrLoading);
     </script>
 </body>
 </html>"""

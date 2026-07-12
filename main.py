@@ -10,6 +10,7 @@ from zoneinfo import ZoneInfo
 from urllib.parse import quote, parse_qs
 from collections import deque, defaultdict
 from pathlib import Path
+from qr_generator import generate_qr_base64
 
 import psutil
 from typing import Optional
@@ -411,7 +412,7 @@ async def subscription_user_new(request: Request, uuid: str = Query(...)):
     return await subscription_user_handler(request, uuid)
 
 async def subscription_user_handler(request: Request, uuid: str):
-    """Handle subscription user page"""
+    """Handle subscription user page with local QR generation"""
     from pages import SUB_USER_HTML
     async with LINKS_LOCK:
         link = LINKS.get(uuid)
@@ -454,13 +455,15 @@ async def subscription_user_handler(request: Request, uuid: str):
     usage_pct = 0 if limit == 0 else min(100, (used / limit) * 100)
     downloaded = fmt_bytes(used)
     uploaded = "0 B"
-    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={quote(vless)}"
+    
+    # Generate QR code locally
+    qr_base64 = generate_qr_base64(vless, size=300, with_text=True, text=f"{link.get('label', 'Unknown')} - MX-UI")
     
     return HTMLResponse(content=SUB_USER_HTML.format(
         uuid=uuid,
         label=link.get("label", "Unknown"),
         vless_link=vless,
-        qr_url=qr_url,
+        qr_url=qr_base64,  # Now using local Base64 QR
         status=status_html,
         downloaded=downloaded,
         uploaded=uploaded,
@@ -476,7 +479,21 @@ async def subscription_user_handler(request: Request, uuid: str):
         watermark="Created by Muvixo",
         theme=""
     ))
-
+@app.get("/api/qr/{uuid}")
+async def get_qr_code(uuid: str, request: Request):
+    """Generate QR code for a config (requires auth)"""
+    from qr_generator import generate_qr_base64
+    async with LINKS_LOCK:
+        link = LINKS.get(uuid)
+    if not link:
+        raise HTTPException(status_code=404, detail="not found")
+    
+    host = get_host(request)
+    vless = vless_link_for_link(link, uuid, host)
+    
+    qr_base64 = generate_qr_base64(vless, size=400, with_text=True, text=f"{link.get('label', 'Unknown')}")
+    
+    return {"qr": qr_base64, "uuid": uuid, "label": link.get("label", "Unknown")}
 @app.get("/sub/{uuid}")
 async def subscription_single_old(uuid: str, request: Request):
     """Redirect old /sub/{uuid} to new sub path if changed"""
