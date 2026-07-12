@@ -124,6 +124,7 @@ IP_CACHE_TTL = 3600  # 1 hour
 DATA_DIR = Path(os.environ.get("DATA_DIR", "/data"))
 DATA_FILE = DATA_DIR / "mxui_state.json"
 SECRET_FILE = DATA_DIR / "mxui_secret.key"
+SETUP_COMPLETE_FILE = DATA_DIR / "setup_complete.lock"
 SAVE_LOCK = asyncio.Lock()
 
 def _load_or_create_secret() -> str:
@@ -150,6 +151,7 @@ CONFIG = {
     "dashboard_path": "/dashboard",
     "login_path": "/login",
     "sub_path": "/sub",
+    "setup_path": "/setup",
 }
 
 app.add_middleware(
@@ -173,7 +175,8 @@ async def load_state():
                 AUTH["password_hash"] = data["password_hash"]
             if "paths" in data:
                 for key, value in data["paths"].items():
-                    CONFIG[key] = value
+                    if key in CONFIG:
+                        CONFIG[key] = value
             logger.info(f"State loaded: {len(LINKS)} links")
     except Exception as e:
         logger.warning(f"Could not load state: {e}")
@@ -190,6 +193,7 @@ async def save_state():
                     "dashboard_path": CONFIG.get("dashboard_path", "/dashboard"),
                     "login_path": CONFIG.get("login_path", "/login"),
                     "sub_path": CONFIG.get("sub_path", "/sub"),
+                    "setup_path": CONFIG.get("setup_path", "/setup"),
                 }
             }
             tmp = DATA_FILE.with_suffix(".tmp")
@@ -341,7 +345,6 @@ def format_limit(limit_bytes: int) -> tuple[str, str]:
         return "♾️", "∞"
     elif limit_bytes >= 1024 ** 3:
         gb = limit_bytes / 1024 ** 3
-        # نمایش با یک رقم اعشار
         if gb >= 100:
             display = f"{gb:.0f} GB"
         else:
@@ -355,7 +358,6 @@ def format_limit(limit_bytes: int) -> tuple[str, str]:
         return emoji, display
     elif limit_bytes >= 1024 ** 2:
         mb = limit_bytes / 1024 ** 2
-        # نمایش با یک رقم اعشار برای MB
         if mb >= 100:
             display = f"{mb:.0f} MB"
         else:
@@ -392,6 +394,28 @@ def generate_emoji_label(base_label: str, limit_bytes: int, speed_limit_bytes: i
     
     # Format: 🇺🇸 🌸 My Server 📦 50 GB ⚡
     return f"{country_emoji} {random_emoji} {clean_label} {limit_emoji} {limit_display} {speed_emoji}"
+
+# ── Setup Check ─────────────────────────────────────────────────────────────
+def is_setup_complete() -> bool:
+    """Check if setup has been completed (password has been set)"""
+    try:
+        # Check if setup file exists OR password is not default
+        if SETUP_COMPLETE_FILE.exists():
+            return True
+        # If password is not default (MUVIXO), consider setup complete
+        if AUTH["password_hash"] != hash_password("MUVIXO"):
+            return True
+        return False
+    except Exception:
+        return False
+
+async def mark_setup_complete():
+    """Mark setup as complete"""
+    try:
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        SETUP_COMPLETE_FILE.write_text("setup_complete", encoding="utf-8")
+    except Exception as e:
+        logger.warning(f"Could not mark setup complete: {e}")
 
 # ── Startup / Shutdown ────────────────────────────────────────────────────────
 @app.on_event("startup")
@@ -657,6 +681,7 @@ async def export_database(_=Depends(require_auth)):
                 "dashboard_path": CONFIG.get("dashboard_path", "/dashboard"),
                 "login_path": CONFIG.get("login_path", "/login"),
                 "sub_path": CONFIG.get("sub_path", "/sub"),
+                "setup_path": CONFIG.get("setup_path", "/setup"),
             }
         }
     return data
@@ -690,6 +715,61 @@ async def restore_database(request: Request, _=Depends(require_auth)):
     log_activity("database", f"Database restored from backup ({len(LINKS)} links). Password reset to MUVIXO", "ok")
     
     return {"ok": True, "restored": len(LINKS), "requires_login": True, "password_reset": True}
+
+# ── Setup endpoints ──────────────────────────────────────────────────────────
+from pages import SETUP_HTML
+
+@app.get("/setup")
+async def setup_page(request: Request):
+    """Show setup page if not completed"""
+    setup_path = CONFIG.get("setup_path", "/setup")
+    if request.url.path != setup_path:
+        return RedirectResponse(url=setup_path, status_code=302)
+    if is_setup_complete():
+        login_path = CONFIG.get("login_path", "/login")
+        return RedirectResponse(url=login_path, status_code=302)
+    return HTMLResponse(content=SETUP_HTML)
+
+@app.get(CONFIG.get("setup_path", "/setup"))
+async def setup_page_dynamic(request: Request):
+    """Handle dynamic setup path"""
+    setup_path = CONFIG.get("setup_path", "/setup")
+    if request.url.path != setup_path:
+        return RedirectResponse(url=setup_path, status_code=302)
+    if is_setup_complete():
+        login_path = CONFIG.get("login_path", "/login")
+        return RedirectResponse(url=login_path, status_code=302)
+    return HTMLResponse(content=SETUP_HTML)
+
+@app.post("/api/setup")
+async def setup_admin(request: Request):
+    """Set admin password during setup"""
+    try:
+        body = await request.json()
+        password = str(body.get("password", ""))
+        
+        if len(password) < 4:
+            raise HTTPException(status_code=400, detail="Password must be at least 4 characters")
+        
+        # Set new password
+        AUTH["password_hash"] = hash_password(password)
+        
+        # Mark setup as complete
+        await mark_setup_complete()
+        
+        # Clear any existing sessions
+        await clear_all_sessions()
+        
+        await save_state()
+        log_activity("auth", "Initial admin password set during setup", "ok")
+        
+        return {"ok": True, "message": "Password set successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Setup error: {e}")
+        raise HTTPException(status_code=500, detail="Setup failed")
 
 # ── Subscription endpoints ────────────────────────────────────────────────────
 @app.get("/sub/user")
@@ -881,6 +961,7 @@ async def api_logout(request: Request):
 @app.get("/api/me")
 async def api_me(request: Request):
     return {"authenticated": await is_valid_session(request.cookies.get(SESSION_COOKIE))}
+
 @app.post("/api/change-password")
 async def api_change_password(request: Request, token=Depends(require_auth)):
     body = await request.json()
@@ -916,6 +997,7 @@ async def get_paths(_=Depends(require_auth)):
         "dashboard_path": CONFIG.get("dashboard_path", "/dashboard"),
         "login_path": CONFIG.get("login_path", "/login"),
         "sub_path": CONFIG.get("sub_path", "/sub"),
+        "setup_path": CONFIG.get("setup_path", "/setup"),
     }
 
 @app.post("/api/update-path")
@@ -924,7 +1006,7 @@ async def update_path(request: Request, _=Depends(require_auth)):
     path_type = body.get("path_type")
     new_path = body.get("new_path", "").strip()
     
-    if not path_type or path_type not in ["dashboard", "login", "sub"]:
+    if not path_type or path_type not in ["dashboard", "login", "sub", "setup"]:
         raise HTTPException(status_code=400, detail="Invalid path type")
     
     if not new_path or not new_path.startswith("/"):
@@ -944,6 +1026,7 @@ async def update_path(request: Request, _=Depends(require_auth)):
         "dashboard": CONFIG.get("dashboard_path", "/dashboard"),
         "login": CONFIG.get("login_path", "/login"),
         "sub": CONFIG.get("sub_path", "/sub"),
+        "setup": CONFIG.get("setup_path", "/setup"),
     }
     for key, value in other_paths.items():
         if key != path_type and value == new_path:
@@ -951,9 +1034,6 @@ async def update_path(request: Request, _=Depends(require_auth)):
     
     if not re.match(r'^/[a-zA-Z0-9\-_]+$', new_path):
         raise HTTPException(status_code=400, detail="Path must contain only letters, numbers, hyphens, and underscores")
-    
-    if path_type == "dashboard" and (new_path == CONFIG.get("login_path") or new_path == CONFIG.get("sub_path")):
-        raise HTTPException(status_code=400, detail="Dashboard path cannot be the same as login or sub path")
     
     CONFIG[f"{path_type}_path"] = new_path
     await save_state()
@@ -971,6 +1051,7 @@ async def get_current_paths():
         "dashboard": CONFIG.get("dashboard_path", "/dashboard"),
         "login": CONFIG.get("login_path", "/login"),
         "sub": CONFIG.get("sub_path", "/sub"),
+        "setup": CONFIG.get("setup_path", "/setup"),
     }
 
 @app.get("/api/link-status/{uuid}")
@@ -1297,25 +1378,16 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
         # Handle label update
         if "label" in body:
             import re
-            # Get the new label from user input
             new_label = str(body["label"]).strip()
-            
-            # Clean the label - keep only letters, spaces, hyphens, and dots
             clean_label = re.sub(r'[^a-zA-Z\s\-\.]', '', new_label).strip()
-            
-            # If label is empty after cleaning, use default
             if not clean_label:
                 clean_label = "Config"
             
-            # Keep the existing country emoji from the current label
             country_match = re.search(r'[🇦-🇿]', label)
             country_emoji = country_match.group(0) if country_match else "🌍"
             
-            # Get current limit and speed values from the link
             current_limit = link.get("limit_bytes", 0)
             current_speed = link.get("speed_limit_bytes", 0)
-            
-            # Generate new label with emojis
             link["label"] = generate_emoji_label(clean_label, current_limit, current_speed, country_emoji)
             log_activity("link", f"Label changed for «{label}» to «{link['label']}»", "info")
         
@@ -1334,14 +1406,11 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
             lu = body.get("limit_unit") or "GB"
             link["limit_bytes"] = 0 if lv <= 0 else parse_size_to_bytes(lv, lu)
             
-            # Update label with new limit
             import re
-            # Get clean text from current label
             clean_label = re.sub(r'[^a-zA-Z\s\-\.]', '', label).strip()
             if not clean_label:
                 clean_label = "Config"
             
-            # Keep country emoji
             country_match = re.search(r'[🇦-🇿]', label)
             country_emoji = country_match.group(0) if country_match else "🌍"
             
@@ -1373,14 +1442,11 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
             su = body.get("speed_limit_unit") or "MBIT"
             link["speed_limit_bytes"] = 0 if sv <= 0 else parse_speed_to_bytes(sv, su)
             
-            # Update label with new speed
             import re
-            # Get clean text from current label
             clean_label = re.sub(r'[^a-zA-Z\s\-\.]', '', label).strip()
             if not clean_label:
                 clean_label = "Config"
             
-            # Keep country emoji
             country_match = re.search(r'[🇦-🇿]', label)
             country_emoji = country_match.group(0) if country_match else "🌍"
             
@@ -1408,7 +1474,6 @@ async def toggle_link_status(uid: str, request: Request, _=Depends(require_auth)
         if uid not in LINKS:
             raise HTTPException(status_code=404, detail="link not found")
         
-        # Prevent toggling default configuration
         if LINKS[uid].get("is_default", False):
             raise HTTPException(status_code=403, detail="Default configuration status cannot be changed")
         
@@ -1426,7 +1491,6 @@ async def delete_link(uid: str, _=Depends(require_auth)):
         if uid not in LINKS:
             raise HTTPException(status_code=404, detail="link not found")
         
-        # Prevent deleting default configuration
         if LINKS[uid].get("is_default", False):
             raise HTTPException(status_code=403, detail="Default configuration cannot be deleted")
         
@@ -1444,7 +1508,6 @@ async def reset_link_traffic(uid: str, _=Depends(require_auth)):
         if uid not in LINKS:
             raise HTTPException(status_code=404, detail="link not found")
         
-        # Prevent resetting default configuration
         if LINKS[uid].get("is_default", False):
             raise HTTPException(status_code=403, detail="Default configuration traffic cannot be reset")
         
@@ -1488,74 +1551,8 @@ async def http_proxy(target_url: str, request: Request):
         raise HTTPException(status_code=502, detail=f"Proxy error: {exc}")
 
 # ── HTML Pages ─────────────────────────────────────────────────────────────────
-from pages import LOGIN_HTML, DASHBOARD_HTML, SETUP_HTML
-# اضافه کردن به main.py بعد از imports
+from pages import LOGIN_HTML, DASHBOARD_HTML
 
-# ── Setup Check ─────────────────────────────────────────────────────────────
-SETUP_COMPLETE_FILE = DATA_DIR / "setup_complete.lock"
-
-def is_setup_complete() -> bool:
-    """Check if setup has been completed (password has been set)"""
-    try:
-        # Check if setup file exists OR password is not default
-        if SETUP_COMPLETE_FILE.exists():
-            return True
-        # If password is not default (MUVIXO), consider setup complete
-        if AUTH["password_hash"] != hash_password("MUVIXO"):
-            return True
-        return False
-    except Exception:
-        return False
-
-async def mark_setup_complete():
-    """Mark setup as complete"""
-    try:
-        DATA_DIR.mkdir(parents=True, exist_ok=True)
-        SETUP_COMPLETE_FILE.write_text("setup_complete", encoding="utf-8")
-    except Exception as e:
-        logger.warning(f"Could not mark setup complete: {e}")
-
-# ── Setup endpoint ────────────────────────────────────────────────────────────
-from pages import SETUP_HTML
-
-@app.get("/setup")
-async def setup_page(request: Request):
-    """Show setup page if not completed"""
-    # If setup is already complete, redirect to login
-    if is_setup_complete():
-        login_path = CONFIG.get("login_path", "/login")
-        return RedirectResponse(url=login_path, status_code=302)
-    return HTMLResponse(content=SETUP_HTML)
-
-@app.post("/api/setup")
-async def setup_admin(request: Request):
-    """Set admin password during setup"""
-    try:
-        body = await request.json()
-        password = str(body.get("password", ""))
-        
-        if len(password) < 4:
-            raise HTTPException(status_code=400, detail="Password must be at least 4 characters")
-        
-        # Set new password
-        AUTH["password_hash"] = hash_password(password)
-        
-        # Mark setup as complete
-        await mark_setup_complete()
-        
-        # Clear any existing sessions
-        await clear_all_sessions()
-        
-        await save_state()
-        log_activity("auth", "Initial admin password set during setup", "ok")
-        
-        return {"ok": True, "message": "Password set successfully"}
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Setup error: {e}")
-        raise HTTPException(status_code=500, detail="Setup failed")
 # Dashboard and Login handlers
 @app.get("/dash")
 async def dash_redirect(request: Request):
@@ -1599,6 +1596,7 @@ async def dynamic_path_handler(request: Request, path: str):
     dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
     login_path = CONFIG.get("login_path", "/login")
     sub_path = CONFIG.get("sub_path", "/sub")
+    setup_path = CONFIG.get("setup_path", "/setup")
     
     if request.url.path == dashboard_path:
         return await render_dashboard(request)
@@ -1608,6 +1606,9 @@ async def dynamic_path_handler(request: Request, path: str):
     
     if request.url.path == sub_path:
         return RedirectResponse(url=sub_path + "/user", status_code=302)
+    
+    if request.url.path == setup_path:
+        return await setup_page(request)
     
     if request.url.path.startswith(sub_path + "/user"):
         return await subscription_user_handler(request, request.query_params.get("uuid"))
@@ -1629,6 +1630,8 @@ async def dynamic_path_handler(request: Request, path: str):
         return RedirectResponse(url=login_path, status_code=302)
     if request.url.path == "/sub" and sub_path != "/sub":
         return RedirectResponse(url=sub_path, status_code=302)
+    if request.url.path == "/setup" and setup_path != "/setup":
+        return RedirectResponse(url=setup_path, status_code=302)
     
     if request.url.path == "/dash":
         if dashboard_path == "/dash":
@@ -1639,9 +1642,10 @@ async def dynamic_path_handler(request: Request, path: str):
 
 async def render_dashboard(request: Request):
     """Render the dashboard page"""
+    setup_path = CONFIG.get("setup_path", "/setup")
+    
     # Check if setup is required
     if not is_setup_complete():
-        setup_path = "/setup"
         return RedirectResponse(url=setup_path, status_code=302)
     
     token = request.cookies.get(SESSION_COOKIE)
@@ -1651,11 +1655,13 @@ async def render_dashboard(request: Request):
         return RedirectResponse(url=login_path, status_code=302)
     await ensure_default_link()
     return HTMLResponse(content=DASHBOARD_HTML)
+
 async def render_login(request: Request):
     """Render the login page"""
+    setup_path = CONFIG.get("setup_path", "/setup")
+    
     # Check if setup is required
     if not is_setup_complete():
-        setup_path = "/setup"
         return RedirectResponse(url=setup_path, status_code=302)
     
     if await is_valid_session(request.cookies.get(SESSION_COOKIE)):
@@ -1672,7 +1678,6 @@ async def render_login(request: Request):
         )
     
     return HTMLResponse(content=login_html)
-
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=CONFIG["port"], log_level="info", workers=1)
