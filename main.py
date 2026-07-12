@@ -334,17 +334,17 @@ async def get_client_country(request: Request) -> tuple[str, str]:
 def get_random_decorative_emoji() -> str:
     """Get a random decorative emoji"""
     return random.choice(DECORATIVE_EMOJIS)
-
 def format_limit(limit_bytes: int) -> tuple[str, str]:
     """Format limit as readable string and return emoji + display text"""
     if limit_bytes == 0:
         return "♾️", "∞"
     elif limit_bytes >= 1024 ** 3:
         gb = limit_bytes / 1024 ** 3
+        # نمایش با یک رقم اعشار
         if gb >= 100:
-            display = f"{gb:.0f}GB"
+            display = f"{gb:.0f} GB"
         else:
-            display = f"{gb:.1f}GB"
+            display = f"{gb:.1f} GB"
         if gb < 10:
             emoji = "📦"
         elif gb < 100:
@@ -354,14 +354,15 @@ def format_limit(limit_bytes: int) -> tuple[str, str]:
         return emoji, display
     elif limit_bytes >= 1024 ** 2:
         mb = limit_bytes / 1024 ** 2
+        # نمایش با یک رقم اعشار برای MB
         if mb >= 100:
-            display = f"{mb:.0f}MB"
+            display = f"{mb:.0f} MB"
         else:
-            display = f"{mb:.0f}MB"
+            display = f"{mb:.0f} MB"
         return "📦", display
     else:
         kb = limit_bytes / 1024
-        display = f"{kb:.0f}KB"
+        display = f"{kb:.0f} KB"
         return "📦", display
 def generate_emoji_label(base_label: str, limit_bytes: int, speed_limit_bytes: int, country_emoji: str) -> str:
     """Generate a formatted label with emojis - clean and proper format"""
@@ -378,7 +379,7 @@ def generate_emoji_label(base_label: str, limit_bytes: int, speed_limit_bytes: i
     if not country_emoji or len(country_emoji) < 2:
         country_emoji = "🌍"
     
-    # Get decorative emoji (random each time)
+    # Get decorative emoji
     random_emoji = get_random_decorative_emoji()
     
     # Format limit
@@ -388,9 +389,9 @@ def generate_emoji_label(base_label: str, limit_bytes: int, speed_limit_bytes: i
     elif limit_bytes >= 1024 ** 3:
         gb = limit_bytes / 1024 ** 3
         if gb >= 100:
-            limit_display = f"{gb:.0f}GB"
+            limit_display = f"{gb:.0f} GB"
         else:
-            limit_display = f"{gb:.1f}GB"
+            limit_display = f"{gb:.1f} GB"
         if gb < 10:
             limit_emoji = "📦"
         elif gb < 100:
@@ -400,19 +401,19 @@ def generate_emoji_label(base_label: str, limit_bytes: int, speed_limit_bytes: i
     elif limit_bytes >= 1024 ** 2:
         mb = limit_bytes / 1024 ** 2
         if mb >= 100:
-            limit_display = f"{mb:.0f}MB"
+            limit_display = f"{mb:.0f} MB"
         else:
-            limit_display = f"{mb:.0f}MB"
+            limit_display = f"{mb:.0f} MB"
         limit_emoji = "📦"
     else:
         kb = limit_bytes / 1024
-        limit_display = f"{kb:.0f}KB"
+        limit_display = f"{kb:.0f} KB"
         limit_emoji = "📦"
     
     # Speed emoji
     speed_emoji = "⚡" if speed_limit_bytes > 0 else "🐢"
     
-    # Format: 🇺🇸 🌸 My Server 📦 50GB ⚡
+    # Format: 🇺🇸 🌸 My Server 📦 50 GB ⚡
     return f"{country_emoji} {random_emoji} {clean_label} {limit_emoji} {limit_display} {speed_emoji}"
 # ── Startup / Shutdown ────────────────────────────────────────────────────────
 @app.on_event("startup")
