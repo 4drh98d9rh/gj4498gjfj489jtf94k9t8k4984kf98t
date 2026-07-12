@@ -463,7 +463,8 @@ async def subscription_user(request: Request, uuid: str = Query(...)):
         usage_pct=round(usage_pct, 1),
         used_fmt=fmt_bytes(used),
         limit_fmt=quota_str,
-        watermark="Created by Muvixo"
+        watermark="Created by Muvixo",
+        theme=""
     ))
 
 @app.get("/sub/{uuid}")
@@ -561,6 +562,7 @@ async def api_logout(request: Request):
 @app.get("/api/me")
 async def api_me(request: Request):
     return {"authenticated": await is_valid_session(request.cookies.get(SESSION_COOKIE))}
+
 @app.post("/api/change-password")
 async def api_change_password(request: Request, token=Depends(require_auth)):
     body = await request.json()
@@ -585,6 +587,7 @@ async def api_change_password(request: Request, token=Depends(require_auth)):
     
     # Return new token in response
     return {"ok": True, "new_token": new_token}
+
 @app.post("/api/force-logout")
 async def force_logout(request: Request):
     """Force logout all users (used after password change)"""
@@ -594,6 +597,7 @@ async def force_logout(request: Request):
     secure = request.url.scheme == "https"
     resp.delete_cookie(SESSION_COOKIE, path="/", secure=secure)
     return resp
+
 # ── Settings endpoints ────────────────────────────────────────────────────────
 @app.get("/api/get-paths")
 async def get_paths(_=Depends(require_auth)):
@@ -862,6 +866,7 @@ async def create_link(request: Request, _=Depends(require_auth)):
         "sub_url": f"https://{host}/sub/{uid}",
         "info_url": f"https://{host}/sub/{uid}/info",
     }
+
 @app.get("/api/links")
 async def list_links(request: Request, _=Depends(require_auth)):
     host = get_host(request)
@@ -894,6 +899,7 @@ async def list_links(request: Request, _=Depends(require_auth)):
         })
     result.sort(key=lambda x: x["created_at"], reverse=True)
     return {"links": result}
+
 @app.patch("/api/links/{uid}")
 async def update_link(uid: str, request: Request, _=Depends(require_auth)):
     body = await request.json()
@@ -944,6 +950,23 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
     asyncio.create_task(save_state())
     return {"ok": True}
 
+# --- NEW: Toggle link active status ---
+@app.patch("/api/links/{uid}/toggle")
+async def toggle_link_status(uid: str, request: Request, _=Depends(require_auth)):
+    """Toggle the active status of a link"""
+    body = await request.json()
+    active = body.get("active", True)
+    
+    async with LINKS_LOCK:
+        if uid not in LINKS:
+            raise HTTPException(status_code=404, detail="link not found")
+        LINKS[uid]["active"] = bool(active)
+        label = LINKS[uid]["label"]
+    
+    log_activity("link", f"Config «{label}» {'activated' if active else 'deactivated'}", "ok" if active else "warn")
+    asyncio.create_task(save_state())
+    
+    return {"ok": True, "uuid": uid, "active": bool(active)}
 @app.delete("/api/links/{uid}")
 async def delete_link(uid: str, _=Depends(require_auth)):
     label = await remove_link(uid)

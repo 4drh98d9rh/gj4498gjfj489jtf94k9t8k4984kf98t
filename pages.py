@@ -223,7 +223,7 @@ LOGIN_HTML = r"""<!DOCTYPE html>
     </script>
 </body>
 </html>"""
-# ---------- DASHBOARD_HTML (escaped braces) ----------
+# ---------- DASHBOARD_HTML (complete with toggle switch) ----------
 DASHBOARD_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -382,6 +382,59 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         }
         .input-focus-ring-purple:focus {
             box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+        }
+        /* Toggle Switch Styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #475569;
+            transition: .3s;
+            border-radius: 20px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #22c55e;
+        }
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(16px);
+        }
+        .toggle-switch input:focus + .toggle-slider {
+            box-shadow: 0 0 1px #22c55e;
+        }
+        .toggle-label {
+            font-size: 10px;
+            font-weight: 500;
+            color: #94a3b8;
+            margin-left: 8px;
+            transition: color 0.2s;
+        }
+        .group:hover .toggle-label {
+            color: #e2e8f0;
         }
     </style>
 </head>
@@ -705,10 +758,9 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         </div>
     </div>
 
-    <!-- ===== MODAL: QR (FULLY FIXED) ===== -->
+    <!-- ===== MODAL: QR ===== -->
     <div id="qrModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 space-y-4 max-h-[95vh] overflow-y-auto">
-            <!-- Header -->
             <div class="flex items-center justify-between border-b border-slate-800 pb-2 flex-wrap gap-2">
                 <div class="min-w-0">
                     <h3 class="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2">
@@ -721,10 +773,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
-
-            <!-- Two columns: Config QR and Sub QR -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Config QR -->
                 <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3 sm:p-4 text-center qr-code-container">
                     <p class="text-[10px] sm:text-xs text-slate-400 mb-2 sm:mb-3 font-medium flex items-center justify-center gap-1">
                         <i data-lucide="link" class="w-3 h-3"></i>
@@ -740,8 +789,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         </button>
                     </div>
                 </div>
-
-                <!-- Subscription QR -->
                 <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3 sm:p-4 text-center qr-code-container">
                     <p class="text-[10px] sm:text-xs text-slate-400 mb-2 sm:mb-3 font-medium flex items-center justify-center gap-1">
                         <i data-lucide="folder-tree" class="w-3 h-3"></i>
@@ -758,8 +805,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     </div>
                 </div>
             </div>
-
-            <!-- Links display (two columns) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-2 sm:p-3">
                     <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-0.5 sm:mb-1 flex items-center gap-1">
@@ -776,8 +821,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     <p id="qrSubPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate">https://example.com/sub</p>
                 </div>
             </div>
-
-            <!-- Close button -->
             <button onclick="toggleModal('qrModal', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition">
                 Close
             </button>
@@ -814,7 +857,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 </div>
                 <button onclick="toggleModal('settingsModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition shrink-0"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
             </div>
-
             <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-6">
                 <!-- Change Password Section -->
                 <div>
@@ -841,9 +883,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         </button>
                     </div>
                 </div>
-
                 <div class="border-t border-slate-800/60"></div>
-
                 <!-- Path Settings Section -->
                 <div>
                     <h4 class="text-xs sm:text-sm font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2">
@@ -859,7 +899,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                             </div>
                             <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-dashboard-path" class="text-slate-400 font-mono">/dashboard</span></p>
                         </div>
-
                         <div>
                             <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Login Path</label>
                             <div class="flex flex-col sm:flex-row gap-2">
@@ -868,7 +907,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                             </div>
                             <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-login-path" class="text-slate-400 font-mono">/login</span></p>
                         </div>
-
                         <div>
                             <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Subscription Path</label>
                             <div class="flex flex-col sm:flex-row gap-2">
@@ -877,12 +915,10 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                             </div>
                             <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-sub-path" class="text-slate-400 font-mono">/sub</span></p>
                         </div>
-
                         <div id="pathSettingsError" class="text-[10px] sm:text-xs text-red-400 hidden"></div>
                     </div>
                 </div>
             </div>
-
             <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end shrink-0">
                 <button onclick="toggleModal('settingsModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition">Close</button>
             </div>
@@ -977,17 +1013,12 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         // QR Modal
         function openQrModal(label, uriPayload, subUrl) {
             document.getElementById('qrTargetLabel').textContent = label;
-
-            // Config QR
             document.getElementById('qrTextPayload').textContent = uriPayload;
             const qrImg = document.getElementById('qrImage');
             qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(uriPayload);
-
-            // Subscription QR
             document.getElementById('qrSubPayload').textContent = subUrl;
             const qrSubImg = document.getElementById('qrSubImage');
             qrSubImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(subUrl);
-
             toggleModal('qrModal', true);
         }
 
@@ -1203,6 +1234,54 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             }
         }
 
+        // ---- Toggle Config Status ----
+        async function toggleConfigStatus(uuid, enabled) {
+            try {
+                const res = await fetch('/api/links/' + uuid + '/toggle', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ active: enabled })
+                });
+                if (!res.ok) throw new Error('Failed to toggle status');
+                const data = await res.json();
+                
+                // Update the UI
+                const row = document.querySelector(`.config-row[data-uuid="${uuid}"]`);
+                if (row) {
+                    // Update status badge
+                    const statusSpan = row.querySelector('.text-emerald-400, .text-red-400');
+                    const statusDot = statusSpan?.querySelector('.status-dot');
+                    
+                    if (statusSpan && statusDot) {
+                        if (enabled) {
+                            statusSpan.className = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20 text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0';
+                            statusSpan.innerHTML = `<span class="status-dot active"></span>Active`;
+                            statusDot.className = 'status-dot active';
+                        } else {
+                            statusSpan.className = 'text-red-400 bg-red-500/10 border-red-500/20 text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0';
+                            statusSpan.innerHTML = `<span class="status-dot inactive"></span>Inactive`;
+                            statusDot.className = 'status-dot inactive';
+                        }
+                    }
+                    
+                    // Update toggle label
+                    const toggleLabel = row.querySelector('.group .toggle-label');
+                    if (toggleLabel) {
+                        toggleLabel.textContent = enabled ? 'Enabled' : 'Disabled';
+                    }
+                }
+                
+                toast('Config ' + (enabled ? 'enabled' : 'disabled'), 'success');
+            } catch (e) {
+                toast('Error toggling status', 'error');
+                // Revert the checkbox
+                const checkbox = document.querySelector(`.config-row[data-uuid="${uuid}"] input[type="checkbox"]`);
+                if (checkbox) {
+                    checkbox.checked = !enabled;
+                }
+            }
+        }
+
         // Fetch and render configs
         async function loadConfigs() {
             try {
@@ -1238,7 +1317,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         'text-red-400 bg-red-500/10 border-red-500/20';
 
                     return `
-                    <div class="p-4 sm:p-6 config-row">
+                    <div class="p-4 sm:p-6 config-row" data-uuid="${l.uuid}">
                         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-6">
                             <div class="flex items-start space-x-3 sm:space-x-4 min-w-0">
                                 <span class="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-[9px] sm:text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wide mt-0.5 font-mono shrink-0">${protoLabels[proto] || proto}</span>
@@ -1265,6 +1344,13 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                                 </div>
                             </div>
                             <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 lg:justify-end">
+                                <!-- Toggle Switch -->
+                                <label class="relative inline-flex items-center cursor-pointer group shrink-0">
+                                    <input type="checkbox" class="sr-only peer" ${active ? 'checked' : ''} onchange="toggleConfigStatus('${l.uuid}', this.checked)">
+                                    <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600 peer-checked:border-emerald-600"></div>
+                                    <span class="toggle-label">${active ? 'Enabled' : 'Disabled'}</span>
+                                </label>
+                                
                                 <div class="relative flex-grow sm:flex-grow-0 min-w-[180px] sm:min-w-[220px] max-w-full sm:max-w-xs">
                                     <input type="text" id="uri-${l.uuid}" readonly value="${l.vless_link}" class="w-full bg-slate-950 border border-slate-800/80 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 pr-7 sm:pr-10 text-[8px] sm:text-[10px] font-mono text-slate-400 focus:outline-none select-all truncate">
                                     <button onclick="copyLink('uri-${l.uuid}')" class="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 p-0.5 sm:p-1 text-slate-500 hover:text-slate-300 transition" title="Copy URI"><i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
