@@ -460,7 +460,16 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         .group:hover .toggle-label {
             color: #e2e8f0;
         }
-        
+        /* Persian font support - Vazirmatn for Persian characters */
+.font-persian {
+    font-family: 'Vazirmatn', 'Inter', sans-serif;
+}
+.font-english {
+    font-family: 'Inter', 'Vazirmatn', sans-serif;
+}
+.font-mixed {
+    font-family: 'Inter', 'Vazirmatn', sans-serif;
+}
         .system-details-wrapper {
             overflow: hidden;
             max-height: 0;
@@ -1095,8 +1104,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             </div>
         </div>
     </div>
-
-    <!-- ===== MODAL: CREATE CONFIG ===== -->
+# ===== MODAL: CREATE CONFIG =====
     <div id="inboundModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
             <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
@@ -1113,7 +1121,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Remark / Label</label>
-                        <input type="text" id="new-label" placeholder="e.g., US-Reality" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english">
+                        <input type="text" id="new-label" placeholder="e.g., US-Reality" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-mixed">
                     </div>
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Protocol</label>
@@ -1142,7 +1150,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     </div>
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">ALPN (optional)</label>
-                        <input type="text" id="new-alpn" placeholder="e.g., h2,http/1.1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english">
+                        <input type="text" id="new-alpn" placeholder="e.g., h2,http/1.1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mixed text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -1179,8 +1187,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             </div>
         </div>
     </div>
-
-    <!-- ===== MODAL: EDIT ===== -->
+# ===== MODAL: EDIT =====
     <div id="editModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
             <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
@@ -1198,7 +1205,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Remark Label</label>
-                        <input type="text" id="edit-label" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 font-mono input-focus-ring-amber font-english">
+                        <input type="text" id="edit-label" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 font-mixed input-focus-ring-amber" placeholder="Enter label name">
                     </div>
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Protocol</label>
@@ -1227,7 +1234,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     </div>
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">ALPN (optional)</label>
-                        <input type="text" id="edit-alpn" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber font-english">
+                        <input type="text" id="edit-alpn" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mixed text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber" placeholder="e.g., h2,http/1.1">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
