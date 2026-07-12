@@ -436,28 +436,51 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         .group:hover .toggle-label {
             color: #e2e8f0;
         }
-        /* Expanded details animation */
-        #systemDetails {
+        /* Slide Animation for System Details */
+        .system-details-wrapper {
             overflow: hidden;
-            transition: all 0.3s ease-in-out;
-        }
-        #systemDetails.hidden {
             max-height: 0;
             opacity: 0;
-            margin: 0;
-            padding: 0;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                        opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        margin 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 0;
         }
-        #systemDetails:not(.hidden) {
-            max-height: 2000px;
+        .system-details-wrapper.open {
+            max-height: 2500px;
             opacity: 1;
             margin-bottom: 1rem;
         }
+        .system-details-wrapper .detail-card {
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                        opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .system-details-wrapper.open .detail-card {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        /* Staggered delay for each card */
+        .system-details-wrapper.open .detail-card:nth-child(1) { transition-delay: 0.05s; }
+        .system-details-wrapper.open .detail-card:nth-child(2) { transition-delay: 0.10s; }
+        .system-details-wrapper.open .detail-card:nth-child(3) { transition-delay: 0.15s; }
+        .system-details-wrapper.open .detail-card:nth-child(4) { transition-delay: 0.20s; }
+        .system-details-wrapper.open .detail-card:nth-child(5) { transition-delay: 0.25s; }
+        .system-details-wrapper.open .detail-card:nth-child(6) { transition-delay: 0.30s; }
         .detail-card {
             transition: transform 0.2s ease, border-color 0.2s ease;
         }
         .detail-card:hover {
             transform: translateY(-2px);
             border-color: rgba(59, 130, 246, 0.3);
+        }
+        /* Toggle button rotation */
+        #toggleSystemIcon {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #toggleSystemIcon.rotated {
+            transform: rotate(180deg);
         }
     </style>
 </head>
@@ -520,9 +543,9 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         <!-- Hardware Diagnostic Rings with Show More -->
         <div class="flex items-center justify-between mb-3 px-1">
             <h2 class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest">System Diagnostics</h2>
-            <button onclick="toggleSystemDetails()" id="toggleSystemBtn" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition flex items-center gap-1">
-                <i data-lucide="chevron-down" id="toggleSystemIcon" class="w-3 h-3 sm:w-4 sm:h-4"></i>
-                <span id="toggleSystemText">Show More</span>
+            <button onclick="toggleSystemDetails()" id="toggleSystemBtn" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition flex items-center gap-1 group">
+                <i data-lucide="chevron-down" id="toggleSystemIcon" class="w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-400 group-hover:scale-110"></i>
+                <span id="toggleSystemText" class="transition-all duration-300">Show More</span>
             </button>
         </div>
 
@@ -586,9 +609,9 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             </div>
         </div>
 
-        <!-- Expanded System Details (Hidden by default) -->
-        <div id="systemDetails" class="hidden">
-            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-3 sm:mb-4">
+        <!-- Expanded System Details with Slide Animation -->
+        <div id="systemDetailsWrapper" class="system-details-wrapper">
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 <!-- CPU Details -->
                 <div class="detail-card bg-slate-900/40 border border-slate-800/60 rounded-xl p-3 sm:p-4">
                     <div class="flex items-center gap-2 mb-2">
@@ -1293,26 +1316,27 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             }
         }
 
-        // ---- Toggle System Details ----
+        // ---- Toggle System Details with Slide Animation ----
         let systemDetailsVisible = false;
 
         function toggleSystemDetails() {
             systemDetailsVisible = !systemDetailsVisible;
-            const details = document.getElementById('systemDetails');
+            const wrapper = document.getElementById('systemDetailsWrapper');
             const icon = document.getElementById('toggleSystemIcon');
             const text = document.getElementById('toggleSystemText');
             
             if (systemDetailsVisible) {
-                details.classList.remove('hidden');
-                icon.setAttribute('data-lucide', 'chevron-up');
+                wrapper.classList.add('open');
+                icon.classList.add('rotated');
                 text.textContent = 'Show Less';
-                lucide.createIcons();
+                // Update details when opened
+                updateSystemDetails();
             } else {
-                details.classList.add('hidden');
-                icon.setAttribute('data-lucide', 'chevron-down');
+                wrapper.classList.remove('open');
+                icon.classList.remove('rotated');
                 text.textContent = 'Show More';
-                lucide.createIcons();
             }
+            lucide.createIcons();
         }
 
         // ---- Update System Details ----
@@ -1645,7 +1669,9 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 }).join('');
                 lucide.createIcons();
                 updateStats();
-                updateSystemDetails();
+                if (systemDetailsVisible) {
+                    updateSystemDetails();
+                }
             } catch (e) {
                 if (e.message.includes('Unauthorized')) location.href = '/login';
             }
@@ -1812,7 +1838,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
         // Initial load
         loadConfigs();
-        updateSystemDetails();
         setInterval(() => {
             updateStats();
             if (systemDetailsVisible) {
