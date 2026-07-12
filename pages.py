@@ -1047,71 +1047,85 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             </div>
         </div>
     </div>
-
     <!-- ===== MODAL: QR ===== -->
     <div id="qrModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 space-y-4 max-h-[95vh] overflow-y-auto transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-2 flex-wrap gap-2">
-                <div class="min-w-0">
-                    <h3 class="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2">
-                        <i data-lucide="qrcode" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-400"></i>
-                        QR Codes
-                    </h3>
-                    <p class="text-[10px] sm:text-xs text-slate-400 font-mono truncate" id="qrTargetLabel">Default Link</p>
-                </div>
-                <button onclick="toggleModal('qrModal', false)" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-all duration-300"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3 sm:p-4 text-center qr-code-container">
-                    <p class="text-[10px] sm:text-xs text-slate-400 mb-2 sm:mb-3 font-medium flex items-center justify-center gap-1">
-                        <i data-lucide="link" class="w-3 h-3"></i>
-                        Config Link QR
-                    </p>
-                    <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50">
-                        <img id="qrImage" src="" alt="Config QR Code" class="w-full h-full object-contain transition-all duration-300">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
+            <!-- Header -->
+            <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
+                <div class="flex items-center space-x-3 min-w-0">
+                    <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20 shrink-0">
+                        <i data-lucide="qrcode" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                     </div>
-                    <div class="mt-2 sm:mt-3">
-                        <button onclick="copyText(document.getElementById('qrTextPayload').textContent)" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center justify-center gap-1">
-                            <i data-lucide="copy" class="w-3 h-3"></i>
+                    <div class="min-w-0">
+                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">QR Codes</h3>
+                        <p class="text-[10px] sm:text-xs text-slate-400 truncate" id="qrTargetLabel">Default Link</p>
+                    </div>
+                </div>
+                <button onclick="toggleModal('qrModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all duration-300 shrink-0">
+                    <i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                </button>
+            </div>
+
+            <!-- QR Content -->
+            <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content">
+                <!-- QR Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4">
+                    <!-- Config QR -->
+                    <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-4 text-center qr-code-container transition-all duration-300 hover:border-blue-500/30">
+                        <p class="text-[10px] sm:text-xs text-slate-400 mb-3 font-medium flex items-center justify-center gap-2">
+                            <i data-lucide="link" class="w-3 h-3 sm:w-4 sm:h-4"></i>
+                            Config Link
+                        </p>
+                        <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50 transition-all duration-300 hover:border-blue-500/50">
+                            <img id="qrImage" src="" alt="Config QR Code" class="w-full h-full object-contain">
+                        </div>
+                        <button onclick="copyText(document.getElementById('qrTextPayload').textContent)" class="mt-3 text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center justify-center gap-1.5 mx-auto hover:scale-105">
+                            <i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                             Copy Config Link
                         </button>
                     </div>
-                </div>
-                <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3 sm:p-4 text-center qr-code-container">
-                    <p class="text-[10px] sm:text-xs text-slate-400 mb-2 sm:mb-3 font-medium flex items-center justify-center gap-1">
-                        <i data-lucide="folder-tree" class="w-3 h-3"></i>
-                        Subscription Link QR
-                    </p>
-                    <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50">
-                        <img id="qrSubImage" src="" alt="Subscription QR Code" class="w-full h-full object-contain transition-all duration-300">
-                    </div>
-                    <div class="mt-2 sm:mt-3">
-                        <button onclick="copyText(document.getElementById('qrSubPayload').textContent)" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center justify-center gap-1">
-                            <i data-lucide="copy" class="w-3 h-3"></i>
+
+                    <!-- Subscription QR -->
+                    <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-4 text-center qr-code-container transition-all duration-300 hover:border-blue-500/30">
+                        <p class="text-[10px] sm:text-xs text-slate-400 mb-3 font-medium flex items-center justify-center gap-2">
+                            <i data-lucide="folder-tree" class="w-3 h-3 sm:w-4 sm:h-4"></i>
+                            Subscription Link
+                        </p>
+                        <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50 transition-all duration-300 hover:border-blue-500/50">
+                            <img id="qrSubImage" src="" alt="Subscription QR Code" class="w-full h-full object-contain">
+                        </div>
+                        <button onclick="copyText(document.getElementById('qrSubPayload').textContent)" class="mt-3 text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center justify-center gap-1.5 mx-auto hover:scale-105">
+                            <i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                             Copy Sub Link
                         </button>
                     </div>
                 </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-2 sm:p-3">
-                    <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-0.5 sm:mb-1 flex items-center gap-1">
-                        <i data-lucide="link" class="w-3 h-3"></i>
-                        Config Link
-                    </span>
-                    <p id="qrTextPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate">https://example.com/config</p>
+
+                <!-- Links Display -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3">
+                        <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5">
+                            <i data-lucide="link" class="w-3 h-3"></i>
+                            Config Link
+                        </span>
+                        <p id="qrTextPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate bg-slate-950/50 p-1.5 rounded border border-slate-800/40">https://example.com/config</p>
+                    </div>
+                    <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3">
+                        <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5">
+                            <i data-lucide="folder-tree" class="w-3 h-3"></i>
+                            Subscription Link
+                        </span>
+                        <p id="qrSubPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate bg-slate-950/50 p-1.5 rounded border border-slate-800/40">https://example.com/sub</p>
+                    </div>
                 </div>
-                <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-2 sm:p-3">
-                    <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-0.5 sm:mb-1 flex items-center gap-1">
-                        <i data-lucide="folder-tree" class="w-3 h-3"></i>
-                        Subscription Link
-                    </span>
-                    <p id="qrSubPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate">https://example.com/sub</p>
-                </div>
             </div>
-            <button onclick="toggleModal('qrModal', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition-all duration-300">
-                Close
-            </button>
+
+            <!-- Footer -->
+            <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end shrink-0">
+                <button onclick="toggleModal('qrModal', false)" class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 hover:scale-105 active:scale-95">
+                    Close
+                </button>
+            </div>
         </div>
     </div>
 
