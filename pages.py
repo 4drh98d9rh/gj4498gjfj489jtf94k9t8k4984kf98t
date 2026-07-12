@@ -215,7 +215,7 @@ LOGIN_HTML = r"""<!DOCTYPE html>
 </body>
 </html>"""
 
-# ---------- DASHBOARD_HTML ----------
+# ---------- DASHBOARD_HTML (with Database Settings Modal) ----------
 DASHBOARD_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -378,6 +378,10 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         .input-focus-ring-purple:focus {
             box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
         }
+        .input-focus-ring-green:focus {
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+        }
+        /* Toggle Switch Styles */
         .toggle-switch {
             position: relative;
             display: inline-block;
@@ -531,6 +535,66 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         .config-row .toggle-label {
             transition: all 0.3s ease;
         }
+        
+        /* Database Modal Styles */
+        .db-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            border-radius: 12px;
+            padding: 12px 16px;
+            transition: all 0.2s ease;
+        }
+        .db-card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            background: rgba(15, 23, 42, 0.7);
+        }
+        .db-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+        }
+        .db-value {
+            font-size: 13px;
+            font-weight: 500;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+            word-break: break-all;
+        }
+        .db-value.highlight {
+            color: #60a5fa;
+        }
+        .db-value.green {
+            color: #34d399;
+        }
+        .db-value.amber {
+            color: #fbbf24;
+        }
+        .db-value.rose {
+            color: #f87171;
+        }
+        .file-drop-zone {
+            border: 2px dashed #334155;
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(15, 23, 42, 0.3);
+        }
+        .file-drop-zone:hover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+        }
+        .file-drop-zone.dragover {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.05);
+        }
+        .file-drop-zone.has-file {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.05);
+        }
     </style>
 </head>
 <body class="font-sans text-slate-200 min-h-screen flex flex-col relative antialiased tracking-tight">
@@ -554,6 +618,39 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                     Online
                 </span>
+                <!-- Database Settings Button -->
+                <button onclick="toggleModal('databaseModal', true)" class="text-slate-400 hover:text-emerald-400 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0 transition-all duration-300 hover:scale-105" title="Database Settings">
+                    <svg version="1.0" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet" fill="currentColor">
+                        <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" stroke="none">
+                            <path d="M2245 5113 c-230 -13 -393 -27 -525 -44 -757 -97 -1254 -301 -1378
+                            -566 l-27 -58 0 -1885 0 -1885 26 -55 c47 -101 179 -220 327 -294 761 -384
+                            2532 -437 3521 -106 311 103 516 243 590 400 l26 55 0 1885 0 1885 -26 55
+                            c-152 324 -843 553 -1843 610 -160 9 -563 11 -691 3z m680 -303 c570 -32 1104
+                            -139 1380 -278 118 -59 205 -134 205 -176 0 -9 -20 -36 -45 -60 -173 -169
+                            -706 -311 -1380 -368 -200 -16 -866 -16 -1055 0 -547 49 -966 142 -1240 275
+                            -96 47 -180 120 -180 157 0 41 87 113 202 169 443 214 1284 326 2113 281z
+                            m-2101 -950 c264 -105 720 -192 1211 -232 204 -16 860 -16 1060 0 567 47 1022 145 1313 282 l102 49 0 -411 0 -412 -48 -45 c-152 -146 -632 -284 -1202 -346
+                            -344 -37 -911 -44 -1245 -15 -646 56 -1192 201 -1357 360 l-48 46 0 111 0 112
+                            103 -49 c275 -129 745 -234 1227 -273 l155 -12 6 40 c3 22 9 88 12 147 8 126 30 111 -178 128
+                            -574 47 -1118 198 -1282 355 l-43 42 0 111 0 112 70 -35 c38 -19 103 -48 144 -65z
+                            m0 -1200 c264 -105 719 -192 1211 -232 202 -16 860 -16 1050 0 608 53 1033 144 1322 281 l103 50 0 -411 0 -412 -48 -45
+                            c-152 -146 -632 -284 -1202 -346 -344 -37 -911 -44 -1245 -15 -646 56 -1192 201 -1357
+                            360 l-48 46 0 111 0 112 103 -49 c275 -129 745 -234 1227 -273 l155 -12 6 40
+                            c3 22 9 88 12 147 8 126 30 111 -178 128 -574 47 -1118 198 -1282 355 l-43 42
+                            0 111 0 112 70 -35 c38 -19 103 -48 144 -65z m0 -1200 c265 -105 717 -192
+                            1211 -232 202 -16 860 -16 1050 0 608 53 1033 144 1322 281 l103 50 0 -406 c0
+                            -465 7 -431 -98 -502 -119 -80 -274 -142 -510 -202 -654 -167 -1584 -196
+                            -2332 -73 -423 69 -788 195 -910 313 l-50 47 0 111 0 112 103 -49 c275 -129
+                            745 -234 1227 -273 l155 -12 6 40 c3 22 9 88 12 147 8 126 30 111 -178 128
+                            -334 27 -679 92 -935 177 -128 42 -290 126 -342 178 l-48 47 0 109 0 109 70
+                            -35 c38 -19 103 -48 144 -65z"/>
+                            <path d="M2410 3160 l0 -150 150 0 150 0 0 150 0 150 -150 0 -150 0 0 -150z"/>
+                            <path d="M2410 1960 l0 -150 150 0 150 0 0 150 0 150 -150 0 -150 0 0 -150z"/>
+                            <path d="M2410 760 l0 -150 150 0 150 0 0 150 0 150 -150 0 -150 0 0 -150z"/>
+                        </g>
+                    </svg>
+                    <span class="hidden xs:inline">Database</span>
+                </button>
                 <button onclick="toggleModal('settingsModal', true)" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0 transition-all duration-300 hover:scale-105">
                     <i data-lucide="settings" class="w-4 h-4"></i>
                     <span class="hidden xs:inline">Settings</span>
@@ -861,6 +958,138 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         </div>
     </footer>
 
+    <!-- ===== MODAL: DATABASE SETTINGS ===== -->
+    <div id="databaseModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-4xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
+            <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
+                <div class="flex items-center space-x-3 min-w-0">
+                    <div class="p-2 bg-emerald-500/10 rounded-lg text-emerald-400 border border-emerald-500/20 shrink-0">
+                        <svg version="1.0" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet" fill="currentColor">
+                            <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" stroke="none">
+                                <path d="M2245 5113 c-230 -13 -393 -27 -525 -44 -757 -97 -1254 -301 -1378
+                                -566 l-27 -58 0 -1885 0 -1885 26 -55 c47 -101 179 -220 327 -294 761 -384
+                                2532 -437 3521 -106 311 103 516 243 590 400 l26 55 0 1885 0 1885 -26 55
+                                c-152 324 -843 553 -1843 610 -160 9 -563 11 -691 3z m680 -303 c570 -32 1104
+                                -139 1380 -278 118 -59 205 -134 205 -176 0 -9 -20 -36 -45 -60 -173 -169
+                                -706 -311 -1380 -368 -200 -16 -866 -16 -1055 0 -547 49 -966 142 -1240 275
+                                -96 47 -180 120 -180 157 0 41 87 113 202 169 443 214 1284 326 2113 281z
+                                m-2101 -950 c264 -105 720 -192 1211 -232 204 -16 860 -16 1060 0 567 47 1022 145 1313 282 l102 49 0 -411 0 -412 -48 -45 c-152 -146 -632 -284 -1202 -346
+                                -344 -37 -911 -44 -1245 -15 -646 56 -1192 201 -1357 360 l-48 46 0 111 0 112
+                                103 -49 c275 -129 745 -234 1227 -273 l155 -12 6 40 c3 22 9 88 12 147 8 126 30 111 -178 128
+                                -574 47 -1118 198 -1282 355 l-43 42 0 111 0 112 70 -35 c38 -19 103 -48 144 -65z
+                                m0 -1200 c264 -105 719 -192 1211 -232 202 -16 860 -16 1050 0 608 53 1033 144 1322 281 l103 50 0 -411 0 -412 -48 -45
+                                c-152 -146 -632 -284 -1202 -346 -344 -37 -911 -44 -1245 -15 -646 56 -1192 201 -1357
+                                360 l-48 46 0 111 0 112 103 -49 c275 -129 745 -234 1227 -273 l155 -12 6 40
+                                c3 22 9 88 12 147 8 126 30 111 -178 128 -574 47 -1118 198 -1282 355 l-43 42
+                                0 111 0 112 70 -35 c38 -19 103 -48 144 -65z m0 -1200 c265 -105 717 -192
+                                1211 -232 202 -16 860 -16 1050 0 608 53 1033 144 1322 281 l103 50 0 -406 c0
+                                -465 7 -431 -98 -502 -119 -80 -274 -142 -510 -202 -654 -167 -1584 -196
+                                -2332 -73 -423 69 -788 195 -910 313 l-50 47 0 111 0 112 103 -49 c275 -129
+                                745 -234 1227 -273 l155 -12 6 40 c3 22 9 88 12 147 8 126 30 111 -178 128
+                                -334 27 -679 92 -935 177 -128 42 -290 126 -342 178 l-48 47 0 109 0 109 70
+                                -35 c38 -19 103 -48 144 -65z"/>
+                                <path d="M2410 3160 l0 -150 150 0 150 0 0 150 0 150 -150 0 -150 0 0 -150z"/>
+                                <path d="M2410 1960 l0 -150 150 0 150 0 0 150 0 150 -150 0 -150 0 0 -150z"/>
+                                <path d="M2410 760 l0 -150 150 0 150 0 0 150 0 150 -150 0 -150 0 0 -150z"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">Database Management</h3>
+                        <p class="text-[10px] sm:text-xs text-slate-400 truncate">View all stored data, backup and restore your configuration</p>
+                    </div>
+                </div>
+                <button onclick="toggleModal('databaseModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all duration-300"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
+            </div>
+            
+            <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-6">
+                <!-- Database Stats Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="dbStats">
+                    <div class="db-card">
+                        <div class="db-label">Total Configs</div>
+                        <div class="db-value highlight" id="db-total-configs">0</div>
+                    </div>
+                    <div class="db-card">
+                        <div class="db-label">Active Configs</div>
+                        <div class="db-value green" id="db-active-configs">0</div>
+                    </div>
+                    <div class="db-card">
+                        <div class="db-label">Total Traffic</div>
+                        <div class="db-value amber" id="db-total-traffic">0 B</div>
+                    </div>
+                    <div class="db-card">
+                        <div class="db-label">Last Saved</div>
+                        <div class="db-value" id="db-last-saved">Never</div>
+                    </div>
+                </div>
+
+                <!-- Config Details Table -->
+                <div class="db-card">
+                    <div class="db-label mb-3">All Configurations Details</div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-[11px] sm:text-xs">
+                            <thead>
+                                <tr class="text-slate-500 border-b border-slate-700/50">
+                                    <th class="text-left py-2 px-2">Label</th>
+                                    <th class="text-left py-2 px-2">UUID</th>
+                                    <th class="text-right py-2 px-2">Used</th>
+                                    <th class="text-right py-2 px-2">Limit</th>
+                                    <th class="text-center py-2 px-2">Status</th>
+                                    <th class="text-right py-2 px-2">IPs</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dbConfigsBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Backup / Restore Section -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Download Backup -->
+                    <div class="db-card">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i data-lucide="download" class="w-4 h-4 text-blue-400"></i>
+                            <span class="db-label">Backup Database</span>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mb-3">Download complete database as JSON file</p>
+                        <button onclick="downloadDatabase()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25 flex items-center justify-center gap-2">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            Download mx-ui.json
+                        </button>
+                    </div>
+
+                    <!-- Restore Backup -->
+                    <div class="db-card">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i data-lucide="upload" class="w-4 h-4 text-emerald-400"></i>
+                            <span class="db-label">Restore Database</span>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mb-3">Upload a mx-ui.json backup file</p>
+                        <div class="file-drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                            <input type="file" id="fileInput" accept=".json" class="hidden" onchange="handleFileSelect(event)">
+                            <div id="dropZoneContent">
+                                <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-500 mx-auto mb-2"></i>
+                                <p class="text-xs text-slate-400">Drop your mx-ui.json here or click to browse</p>
+                                <p class="text-[10px] text-slate-500 mt-1" id="fileName">No file selected</p>
+                            </div>
+                        </div>
+                        <button onclick="restoreDatabase()" id="restoreBtn" class="w-full mt-3 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-emerald-600/10 hover:shadow-emerald-600/25 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            <i data-lucide="upload" class="w-4 h-4"></i>
+                            Restore Database
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end shrink-0">
+                <button onclick="toggleModal('databaseModal', false)" class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 hover:scale-105 active:scale-95">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== MODAL: CREATE CONFIG ===== -->
     <div id="inboundModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
@@ -1098,9 +1327,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
             <!-- QR Content -->
             <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content">
-                <!-- QR Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4">
-                    <!-- Config QR -->
                     <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-4 text-center qr-code-container transition-all duration-300 hover:border-blue-500/30">
                         <p class="text-[10px] sm:text-xs text-slate-400 mb-3 font-medium flex items-center justify-center gap-2">
                             <i data-lucide="link" class="w-3 h-3 sm:w-4 sm:h-4"></i>
@@ -1115,7 +1342,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         </button>
                     </div>
 
-                    <!-- Subscription QR -->
                     <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-4 text-center qr-code-container transition-all duration-300 hover:border-blue-500/30">
                         <p class="text-[10px] sm:text-xs text-slate-400 mb-3 font-medium flex items-center justify-center gap-2">
                             <i data-lucide="folder-tree" class="w-3 h-3 sm:w-4 sm:h-4"></i>
@@ -1131,7 +1357,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     </div>
                 </div>
 
-                <!-- Links Display -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3">
                         <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5">
@@ -1150,7 +1375,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 </div>
             </div>
 
-            <!-- Footer -->
             <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end shrink-0">
                 <button onclick="toggleModal('qrModal', false)" class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 hover:scale-105 active:scale-95">
                     Close
@@ -1306,6 +1530,9 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     modalContent.style.transform = 'scale(1)';
                     modalContent.style.opacity = '1';
                 }
+                if (modalId === 'databaseModal') {
+                    loadDatabaseInfo();
+                }
             } else {
                 target.classList.remove('active');
                 document.body.style.overflow = '';
@@ -1351,7 +1578,176 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             toggleModal('customAlert', true);
         }
 
-        // QR Modal - Using local API
+        // ===== DATABASE FUNCTIONS =====
+        let selectedFile = null;
+
+        function loadDatabaseInfo() {
+            fetch('/api/links')
+                .then(res => res.json())
+                .then(data => {
+                    const links = data.links || [];
+                    let totalTraffic = 0;
+                    let activeCount = 0;
+                    
+                    links.forEach(l => {
+                        totalTraffic += l.used_bytes || 0;
+                        if (l.active) activeCount++;
+                    });
+
+                    document.getElementById('db-total-configs').textContent = links.length;
+                    document.getElementById('db-active-configs').textContent = activeCount;
+                    document.getElementById('db-total-traffic').textContent = fmtBytes(totalTraffic);
+                    document.getElementById('db-last-saved').textContent = new Date().toLocaleString();
+
+                    const tbody = document.getElementById('dbConfigsBody');
+                    if (links.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-slate-500">No configurations found</td></tr>';
+                    } else {
+                        tbody.innerHTML = links.map(l => `
+                            <tr class="border-b border-slate-800/30 hover:bg-slate-800/20 transition-colors">
+                                <td class="py-2 px-2 text-slate-200 font-medium truncate max-w-[80px]">${l.label || 'Unnamed'}</td>
+                                <td class="py-2 px-2 text-slate-400 font-mono text-[10px] truncate max-w-[100px]">${l.uuid.substring(0, 12)}...</td>
+                                <td class="py-2 px-2 text-right text-blue-300 font-mono">${fmtBytes(l.used_bytes || 0)}</td>
+                                <td class="py-2 px-2 text-right text-amber-300 font-mono">${l.limit_bytes === 0 ? '∞' : fmtBytes(l.limit_bytes)}</td>
+                                <td class="py-2 px-2 text-center">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] ${l.active ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}">
+                                        <span class="w-1.5 h-1.5 rounded-full ${l.active ? 'bg-emerald-400' : 'bg-red-400'}"></span>
+                                        ${l.active ? 'Active' : 'Inactive'}
+                                    </span>
+                                </td>
+                                <td class="py-2 px-2 text-right text-slate-400 font-mono">${l.connected_ips || 0}</td>
+                            </tr>
+                        `).join('');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error loading database info:', err);
+                    toast('Failed to load database info', 'error');
+                });
+        }
+
+        function fmtBytes(b) {
+            if (b === 0) return '0 B';
+            if (b < 1024) return b + ' B';
+            if (b < 1024 ** 2) return (b / 1024).toFixed(1) + ' KB';
+            if (b < 1024 ** 3) return (b / 1024 ** 2).toFixed(2) + ' MB';
+            return (b / 1024 ** 3).toFixed(2) + ' GB';
+        }
+
+        // Download Database
+        function downloadDatabase() {
+            fetch('/api/database/export')
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed to export database');
+                    return res.json();
+                })
+                .then(data => {
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'mx-ui.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    toast('Database downloaded successfully!', 'success');
+                })
+                .catch(err => {
+                    console.error('Download error:', err);
+                    toast('Failed to download database: ' + err.message, 'error');
+                });
+        }
+
+        // File drop zone handlers
+        const dropZone = document.getElementById('dropZone');
+        if (dropZone) {
+            dropZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('dragover');
+            });
+            dropZone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+            });
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFile(files[0]);
+                }
+            });
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            if (file.name !== 'mx-ui.json') {
+                toast('Please select a valid mx-ui.json file', 'error');
+                return;
+            }
+            selectedFile = file;
+            document.getElementById('fileName').textContent = file.name + ' (' + (file.size / 1024).toFixed(2) + ' KB)';
+            document.getElementById('dropZone').classList.add('has-file');
+            document.getElementById('restoreBtn').disabled = false;
+            toast('File loaded: ' + file.name, 'info');
+        }
+
+        // Restore Database
+        function restoreDatabase() {
+            if (!selectedFile) {
+                toast('Please select a file first', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Validate the data structure
+                    if (!data.links && !data.password_hash) {
+                        toast('Invalid database file format', 'error');
+                        return;
+                    }
+
+                    fetch('/api/database/restore', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Restore failed');
+                        return res.json();
+                    })
+                    .then(result => {
+                        toast('Database restored successfully!', 'success');
+                        document.getElementById('restoreBtn').disabled = true;
+                        document.getElementById('dropZone').classList.remove('has-file');
+                        document.getElementById('fileName').textContent = 'No file selected';
+                        selectedFile = null;
+                        loadDatabaseInfo();
+                        loadConfigs();
+                        // Reload stats
+                        setTimeout(updateStats, 500);
+                    })
+                    .catch(err => {
+                        toast('Restore failed: ' + err.message, 'error');
+                    });
+                } catch (err) {
+                    toast('Invalid JSON file: ' + err.message, 'error');
+                }
+            };
+            reader.readAsText(selectedFile);
+        }
+
+        // QR Modal
         function openQrModal(label, uriPayload, subUrl) {
             document.getElementById('qrTargetLabel').textContent = label;
             document.getElementById('qrTextPayload').textContent = uriPayload;
@@ -1360,7 +1756,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             const qrImg = document.getElementById('qrImage');
             const qrSubImg = document.getElementById('qrSubImage');
             
-            // Generate QR via local API
             fetch(`/api/qr?data=${encodeURIComponent(uriPayload)}&size=300`)
                 .then(res => res.json())
                 .then(data => {
@@ -1457,7 +1852,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             }
         }
 
-        // ---- Toggle System Details with Slide Animation ----
+        // ---- Toggle System Details ----
         let systemDetailsVisible = false;
 
         function toggleSystemDetails() {
@@ -1781,7 +2176,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                                 </div>
                             </div>
                             <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 lg:justify-end">
-                                <!-- Toggle Switch -->
                                 <label class="relative inline-flex items-center cursor-pointer group shrink-0">
                                     <input type="checkbox" class="sr-only peer" ${active ? 'checked' : ''} onchange="toggleConfigStatus('${l.uuid}', this.checked)">
                                     <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600 peer-checked:border-emerald-600"></div>
@@ -1809,14 +2203,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             } catch (e) {
                 if (e.message.includes('Unauthorized')) location.href = '/login';
             }
-        }
-
-        function fmtBytes(b) {
-            if (b === 0) return '0 B';
-            if (b < 1024) return b + ' B';
-            if (b < 1024 ** 2) return (b / 1024).toFixed(1) + ' KB';
-            if (b < 1024 ** 3) return (b / 1024 ** 2).toFixed(2) + ' MB';
-            return (b / 1024 ** 3).toFixed(2) + ' GB';
         }
 
         async function updateStats() {

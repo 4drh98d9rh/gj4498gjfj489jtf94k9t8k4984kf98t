@@ -1187,7 +1187,46 @@ async def dynamic_path_handler(request: Request, path: str):
     
     # Default: redirect to dashboard
     return RedirectResponse(url=dashboard_path)
+@app.get("/api/database/export")
+async def export_database(_=Depends(require_auth)):
+    """Export complete database as JSON"""
+    async with LINKS_LOCK:
+        data = {
+            "links": dict(LINKS),
+            "password_hash": AUTH["password_hash"],
+            "exported_at": datetime.now().isoformat(),
+            "paths": {
+                "dashboard_path": CONFIG.get("dashboard_path", "/dashboard"),
+                "login_path": CONFIG.get("login_path", "/login"),
+                "sub_path": CONFIG.get("sub_path", "/sub"),
+            }
+        }
+    return data
 
+@app.post("/api/database/restore")
+async def restore_database(request: Request, _=Depends(require_auth)):
+    """Restore database from JSON backup"""
+    data = await request.json()
+    
+    # Validate data
+    if "links" not in data or "password_hash" not in data:
+        raise HTTPException(status_code=400, detail="Invalid database format")
+    
+    async with LINKS_LOCK:
+        # Clear existing links
+        LINKS.clear()
+        # Restore links
+        LINKS.update(data.get("links", {}))
+        # Restore password hash
+        AUTH["password_hash"] = data["password_hash"]
+        # Restore paths if present
+        if "paths" in data:
+            for key, value in data["paths"].items():
+                CONFIG[key] = value
+    
+    await save_state()
+    log_activity("database", "Database restored from backup", "ok")
+    return {"ok": True, "restored": len(LINKS)}
 async def render_dashboard(request: Request):
     """Render the dashboard page"""
     token = request.cookies.get(SESSION_COOKIE)
