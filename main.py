@@ -280,22 +280,33 @@ async def require_auth(request: Request):
         raise HTTPException(status_code=401, detail="unauthorized")
     return token
 
+# ── Helper to get client IP ──────────────────────────────────────────────────
+def get_client_ip(request: Request) -> str:
+    """Extract client IP from request"""
+    fwd = request.headers.get("x-forwarded-for")
+    if fwd:
+        return fwd.split(",")[0].strip()
+    real_ip = request.headers.get("x-real-ip")
+    if real_ip:
+        return real_ip.strip()
+    return request.client.host if request.client else "127.0.0.1"
+
 # ── Country Detection ────────────────────────────────────────────────────────
 async def get_client_country(request: Request) -> tuple[str, str]:
     """Get client country and flag emoji from IP using ip-api.com"""
-    client_ip = client_ip(request)
+    ip_address = get_client_ip(request)
     
     # Check cache first
     async with IP_CACHE_LOCK:
-        if client_ip in IP_CACHE:
-            cached_time, country, emoji = IP_CACHE[client_ip]
+        if ip_address in IP_CACHE:
+            cached_time, country, emoji = IP_CACHE[ip_address]
             if time.time() - cached_time < IP_CACHE_TTL:
                 return country, emoji
     
     try:
         # Use ip-api.com for geolocation (free, no API key needed)
         async with httpx.AsyncClient(timeout=5.0) as client:
-            response = await client.get(f"http://ip-api.com/json/{client_ip}")
+            response = await client.get(f"http://ip-api.com/json/{ip_address}")
             if response.status_code == 200:
                 data = response.json()
                 if data.get("status") == "success":
@@ -307,19 +318,19 @@ async def get_client_country(request: Request) -> tuple[str, str]:
                     
                     # Cache the result
                     async with IP_CACHE_LOCK:
-                        IP_CACHE[client_ip] = (time.time(), country, emoji)
+                        IP_CACHE[ip_address] = (time.time(), country, emoji)
                     
                     return country, emoji
     except Exception as e:
-        logger.warning(f"Failed to get country for IP {client_ip}: {e}")
+        logger.warning(f"Failed to get country for IP {ip_address}: {e}")
     
-    # Fallback: random country if detection fails
+    # Fallback: use random country if detection fails
     fallback_country = random.choice(list(COUNTRY_EMOJIS.keys()))
     fallback_emoji = COUNTRY_EMOJIS.get(fallback_country, "🌍")
     
     # Cache fallback
     async with IP_CACHE_LOCK:
-        IP_CACHE[client_ip] = (time.time(), "Unknown", "🌍")
+        IP_CACHE[ip_address] = (time.time(), "Unknown", "🌍")
     
     return "Unknown", "🌍"
 
@@ -1071,7 +1082,6 @@ async def make_link(
     alpn: str = "",
     ip_limit: int = 0,
     speed_limit_bytes: int = 0,
-    request: Request = None,
     country_emoji: str = "🌍",
 ) -> tuple[str, dict]:
     if protocol not in PROTOCOLS:
@@ -1163,7 +1173,6 @@ async def create_link(request: Request, _=Depends(require_auth)):
         alpn=body.get("alpn") or "",
         ip_limit=ip_limit,
         speed_limit_bytes=speed_limit_bytes,
-        request=request,
         country_emoji=country_emoji,
     )
 
