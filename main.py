@@ -844,6 +844,10 @@ async def subscription_all_handler(request: Request):
 # ── Auth endpoints ────────────────────────────────────────────────────────────
 @app.post("/api/login")
 async def api_login(request: Request):
+    # Check if setup is required
+    if not is_setup_complete():
+        raise HTTPException(status_code=403, detail="Setup required. Please visit /setup")
+    
     body = await request.json()
     ip = client_ip(request)
     if hash_password(str(body.get("password", ""))) != AUTH["password_hash"]:
@@ -877,7 +881,6 @@ async def api_logout(request: Request):
 @app.get("/api/me")
 async def api_me(request: Request):
     return {"authenticated": await is_valid_session(request.cookies.get(SESSION_COOKIE))}
-
 @app.post("/api/change-password")
 async def api_change_password(request: Request, token=Depends(require_auth)):
     body = await request.json()
@@ -888,6 +891,10 @@ async def api_change_password(request: Request, token=Depends(require_auth)):
         raise HTTPException(status_code=400, detail="New password must be at least 4 characters")
     
     AUTH["password_hash"] = hash_password(new)
+    
+    # Make sure setup is marked complete
+    await mark_setup_complete()
+    
     await clear_all_sessions()
     await save_state()
     log_activity("auth", "Panel password changed", "ok")
@@ -1481,8 +1488,74 @@ async def http_proxy(target_url: str, request: Request):
         raise HTTPException(status_code=502, detail=f"Proxy error: {exc}")
 
 # ── HTML Pages ─────────────────────────────────────────────────────────────────
-from pages import LOGIN_HTML, DASHBOARD_HTML
+from pages import LOGIN_HTML, DASHBOARD_HTML, SETUP_HTML
+# اضافه کردن به main.py بعد از imports
 
+# ── Setup Check ─────────────────────────────────────────────────────────────
+SETUP_COMPLETE_FILE = DATA_DIR / "setup_complete.lock"
+
+def is_setup_complete() -> bool:
+    """Check if setup has been completed (password has been set)"""
+    try:
+        # Check if setup file exists OR password is not default
+        if SETUP_COMPLETE_FILE.exists():
+            return True
+        # If password is not default (MUVIXO), consider setup complete
+        if AUTH["password_hash"] != hash_password("MUVIXO"):
+            return True
+        return False
+    except Exception:
+        return False
+
+async def mark_setup_complete():
+    """Mark setup as complete"""
+    try:
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        SETUP_COMPLETE_FILE.write_text("setup_complete", encoding="utf-8")
+    except Exception as e:
+        logger.warning(f"Could not mark setup complete: {e}")
+
+# ── Setup endpoint ────────────────────────────────────────────────────────────
+from pages import SETUP_HTML
+
+@app.get("/setup")
+async def setup_page(request: Request):
+    """Show setup page if not completed"""
+    # If setup is already complete, redirect to login
+    if is_setup_complete():
+        login_path = CONFIG.get("login_path", "/login")
+        return RedirectResponse(url=login_path, status_code=302)
+    return HTMLResponse(content=SETUP_HTML)
+
+@app.post("/api/setup")
+async def setup_admin(request: Request):
+    """Set admin password during setup"""
+    try:
+        body = await request.json()
+        password = str(body.get("password", ""))
+        
+        if len(password) < 4:
+            raise HTTPException(status_code=400, detail="Password must be at least 4 characters")
+        
+        # Set new password
+        AUTH["password_hash"] = hash_password(password)
+        
+        # Mark setup as complete
+        await mark_setup_complete()
+        
+        # Clear any existing sessions
+        await clear_all_sessions()
+        
+        await save_state()
+        log_activity("auth", "Initial admin password set during setup", "ok")
+        
+        return {"ok": True, "message": "Password set successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Setup error: {e}")
+        raise HTTPException(status_code=500, detail="Setup failed")
 # Dashboard and Login handlers
 @app.get("/dash")
 async def dash_redirect(request: Request):
@@ -1565,6 +1638,12 @@ async def dynamic_path_handler(request: Request, path: str):
     return RedirectResponse(url=dashboard_path, status_code=302)
 
 async def render_dashboard(request: Request):
+    """Render the dashboard page"""
+    # Check if setup is required
+    if not is_setup_complete():
+        setup_path = "/setup"
+        return RedirectResponse(url=setup_path, status_code=302)
+    
     token = request.cookies.get(SESSION_COOKIE)
     valid = await is_valid_session(token)
     if not valid:
@@ -1572,8 +1651,13 @@ async def render_dashboard(request: Request):
         return RedirectResponse(url=login_path, status_code=302)
     await ensure_default_link()
     return HTMLResponse(content=DASHBOARD_HTML)
-
 async def render_login(request: Request):
+    """Render the login page"""
+    # Check if setup is required
+    if not is_setup_complete():
+        setup_path = "/setup"
+        return RedirectResponse(url=setup_path, status_code=302)
+    
     if await is_valid_session(request.cookies.get(SESSION_COOKIE)):
         dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
         return RedirectResponse(url=dashboard_path, status_code=302)
@@ -1588,6 +1672,7 @@ async def render_login(request: Request):
         )
     
     return HTMLResponse(content=login_html)
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=CONFIG["port"], log_level="info", workers=1)
