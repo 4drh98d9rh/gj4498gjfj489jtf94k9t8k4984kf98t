@@ -1443,103 +1443,103 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
+        tailwind.config = {{
+            theme: {{
+                extend: {{
+                    fontFamily: {{
                         sans: ['Inter', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
-                    }
-                }
-            }
-        }
+                    }}
+                }}
+            }}
+        }}
     </script>
     <style>
-        body {
+        body {{
             background-color: #070a13;
-        }
-        .glow-effect {
+        }}
+        .glow-effect {{
             box-shadow: 0 0 25px rgba(59, 130, 246, 0.12);
-        }
-        .status-dot {
+        }}
+        .status-dot {{
             display: inline-block;
             width: 8px;
             height: 8px;
             border-radius: 50%;
             margin-right: 6px;
             flex-shrink: 0;
-        }
-        .status-dot.active {
+        }}
+        .status-dot.active {{
             background-color: #22c55e;
-        }
-        .status-dot.inactive {
+        }}
+        .status-dot.inactive {{
             background-color: #ef4444;
-        }
-        .copy-btn {
+        }}
+        .copy-btn {{
             transition: all 0.2s ease;
             min-height: 36px;
             min-width: 36px;
-        }
-        .copy-btn:active {
+        }}
+        .copy-btn:active {{
             transform: scale(0.95);
-        }
-        .progress-bar-fill {
+        }}
+        .progress-bar-fill {{
             transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .qr-container {
+        }}
+        .qr-container {{
             transition: all 0.3s ease;
-        }
-        .qr-container:active {
+        }}
+        .qr-container:active {{
             transform: scale(0.98);
-        }
-        .detail-row {
+        }}
+        .detail-row {{
             transition: background-color 0.15s ease;
-        }
-        .detail-row:hover {
+        }}
+        .detail-row:hover {{
             background-color: rgba(30, 41, 59, 0.3);
-        }
-        @media (max-width: 640px) {
-            .mobile-stack {
+        }}
+        @media (max-width: 640px) {{
+            .mobile-stack {{
                 flex-direction: column;
                 align-items: stretch;
-            }
-            .mobile-text-center {
+            }}
+            .mobile-text-center {{
                 text-align: center;
-            }
-            .mobile-padding {
+            }}
+            .mobile-padding {{
                 padding-left: 0.75rem;
                 padding-right: 0.75rem;
-            }
-            .mobile-gap {
+            }}
+            .mobile-gap {{
                 gap: 0.5rem;
-            }
-            .qr-image {
+            }}
+            .qr-image {{
                 width: 160px;
                 height: 160px;
-            }
-        }
-        @media (max-width: 480px) {
-            .xs-text-xs {
+            }}
+        }}
+        @media (max-width: 480px) {{
+            .xs-text-xs {{
                 font-size: 0.65rem;
-            }
-            .xs-padding {
+            }}
+            .xs-padding {{
                 padding: 0.5rem;
-            }
-            .qr-image {
+            }}
+            .qr-image {{
                 width: 140px;
                 height: 140px;
-            }
-            .detail-label {
+            }}
+            .detail-label {{
                 font-size: 0.6rem;
-            }
-            .detail-value {
+            }}
+            .detail-value {{
                 font-size: 0.65rem;
-            }
-        }
-        .input-focus-ring:focus {
+            }}
+        }}
+        .input-focus-ring:focus {{
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-        .toast {
+        }}
+        .toast {{
             position: fixed;
             bottom: 20px;
             left: 50%;
@@ -1558,20 +1558,20 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
             max-width: 90vw;
             text-align: center;
-        }
-        .toast.show {
+        }}
+        .toast.show {{
             opacity: 1;
             transform: translateX(-50%) translateY(0);
-        }
-        .toast.success {
+        }}
+        .toast.success {{
             border-color: #22c55e;
             color: #86efac;
-        }
-        .toast.error {
+        }}
+        .toast.error {{
             border-color: #ef4444;
             color: #fca5a5;
-        }
-        .status-badge {
+        }}
+        .status-badge {{
             display: inline-flex;
             align-items: center;
             padding: 0.25rem 0.75rem;
@@ -1579,17 +1579,17 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             font-size: 0.7rem;
             font-weight: 600;
             letter-spacing: 0.025em;
-        }
-        .status-badge.active {
+        }}
+        .status-badge.active {{
             background-color: rgba(34, 197, 94, 0.1);
             color: #4ade80;
             border: 1px solid rgba(34, 197, 94, 0.2);
-        }
-        .status-badge.inactive {
+        }}
+        .status-badge.inactive {{
             background-color: rgba(239, 68, 68, 0.1);
             color: #f87171;
             border: 1px solid rgba(239, 68, 68, 0.2);
-        }
+        }}
     </style>
 </head>
 <body class="font-sans text-slate-200 min-h-screen flex flex-col justify-between relative antialiased tracking-tight">
@@ -1747,30 +1747,30 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
 
     <script>
         // Toast notification system
-        function showToast(message, type) {
+        function showToast(message, type) {{
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.className = 'toast show' + (type ? ' ' + type : '');
             clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => {
+            toast._timeout = setTimeout(() => {{
                 toast.classList.remove('show');
-            }, 3000);
-        }
+            }}, 3000);
+        }}
 
         // Copy to clipboard with fallback
-        function copyToClipboard(text) {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
+        function copyToClipboard(text) {{
+            if (navigator.clipboard && navigator.clipboard.writeText) {{
+                navigator.clipboard.writeText(text).then(() => {{
                     showToast('Copied to clipboard!', 'success');
-                }).catch(() => {
+                }}).catch(() => {{
                     fallbackCopy(text);
-                });
-            } else {
+                }});
+            }} else {{
                 fallbackCopy(text);
-            }
-        }
+            }}
+        }}
 
-        function fallbackCopy(text) {
+        function fallbackCopy(text) {{
             const textarea = document.createElement('textarea');
             textarea.value = text;
             textarea.style.position = 'fixed';
@@ -1779,99 +1779,91 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             textarea.style.top = '-9999px';
             document.body.appendChild(textarea);
             textarea.select();
-            try {
+            try {{
                 document.execCommand('copy');
                 showToast('Copied to clipboard!', 'success');
-            } catch (e) {
+            }} catch (e) {{
                 showToast('Failed to copy', 'error');
-            }
+            }}
             document.body.removeChild(textarea);
-        }
+        }}
 
         // Auto-select input on click
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {{
             const input = document.getElementById('vless-link-input');
-            if (input) {
-                input.addEventListener('click', function() {
+            if (input) {{
+                input.addEventListener('click', function() {{
                     this.select();
-                });
-                input.addEventListener('focus', function() {
+                }});
+                input.addEventListener('focus', function() {{
                     this.select();
-                });
-            }
+                }});
+            }}
 
             // Update status badge based on status text
             const statusBadge = document.getElementById('status-badge');
-            const statusText = document.querySelector('.detail-value:has(+ .status-badge)');
-            
-            // Check if status contains "Active" or "Inactive"
             const statusValue = document.querySelector('.detail-row:nth-child(3) .detail-value');
-            if (statusValue) {
+            if (statusValue) {{
                 const isActive = statusValue.textContent.trim().toLowerCase().includes('active');
                 const dot = statusBadge.querySelector('.status-dot');
-                if (isActive) {
+                if (isActive) {{
                     statusBadge.className = 'status-badge active';
                     dot.className = 'status-dot active';
                     statusBadge.innerHTML = '<span class="status-dot active"></span> Active';
-                } else {
+                }} else {{
                     statusBadge.className = 'status-badge inactive';
                     dot.className = 'status-dot inactive';
                     statusBadge.innerHTML = '<span class="status-dot inactive"></span> Inactive';
-                }
-            }
-        });
+                }}
+            }}
+        }});
 
         // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            // Ctrl+C or Cmd+C on the input field
-            if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+        document.addEventListener('keydown', function(e) {{
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c') {{
                 const input = document.getElementById('vless-link-input');
-                if (document.activeElement === input) {
+                if (document.activeElement === input) {{
                     copyToClipboard(input.value);
-                }
-            }
-        });
+                }}
+            }}
+        }});
 
         // Handle page visibility change to refresh QR if needed
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden) {
-                // Page became visible again
+        document.addEventListener('visibilitychange', function() {{
+            if (!document.hidden) {{
                 const qrImg = document.querySelector('.qr-image');
-                if (qrImg && qrImg.src && qrImg.src.includes('qrserver')) {
-                    // Refresh QR with cache-buster
+                if (qrImg && qrImg.src && qrImg.src.includes('qrserver')) {{
                     const url = new URL(qrImg.src);
                     url.searchParams.set('t', Date.now());
                     qrImg.src = url.toString();
-                }
-            }
-        });
+                }}
+            }}
+        }});
 
         // Touch feedback for copy button
-        document.querySelector('.copy-btn')?.addEventListener('touchstart', function() {
+        document.querySelector('.copy-btn')?.addEventListener('touchstart', function() {{
             this.style.transform = 'scale(0.95)';
-        }, { passive: true });
+        }}, {{ passive: true }});
         
-        document.querySelector('.copy-btn')?.addEventListener('touchend', function() {
+        document.querySelector('.copy-btn')?.addEventListener('touchend', function() {{
             this.style.transform = 'scale(1)';
-        }, { passive: true });
+        }}, {{ passive: true }});
 
         // Handle responsive QR code loading
-        function handleQrLoading() {
+        function handleQrLoading() {{
             const qrImg = document.querySelector('.qr-image');
-            if (qrImg) {
-                qrImg.addEventListener('error', function() {
-                    // QR failed to load, try with a different service
+            if (qrImg) {{
+                qrImg.addEventListener('error', function() {{
                     const currentSrc = this.src;
-                    if (currentSrc.includes('api.qrserver.com')) {
-                        // Try alternative QR service
+                    if (currentSrc.includes('api.qrserver.com')) {{
                         const dataParam = new URL(currentSrc).searchParams.get('data');
-                        if (dataParam) {
+                        if (dataParam) {{
                             this.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + dataParam + '&t=' + Date.now();
-                        }
-                    }
-                });
-            }
-        }
+                        }}
+                    }}
+                }});
+            }}
+        }}
         document.addEventListener('DOMContentLoaded', handleQrLoading);
     </script>
 </body>
