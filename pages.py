@@ -1158,97 +1158,6 @@ setInterval(loadConfigs, 15000);
 </body>
 </html>"""
 # ---------- SUB_INFO_HTML (fixed) ----------
-SUB_INFO_HTML = r"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Subscription Info · MX-UI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {{
-    theme: {{
-        extend: {{
-            fontFamily: {{
-                sans: ['Inter', 'sans-serif'],
-                mono: ['JetBrains Mono', 'monospace'],
-            }}
-        }}
-    }}
-}}
-</script>
-<style>
-body {{ background-color: #070a13; }}
-.glow-effect {{ box-shadow: 0 0 25px rgba(59, 130, 246, 0.12); }}
-</style>
-</head>
-<body class="font-sans text-slate-200 min-h-screen flex flex-col justify-between relative antialiased tracking-tight">
-<div class="max-w-2xl w-full mx-auto px-4 py-10 flex-grow">
-    <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-8 backdrop-blur-xl glow-effect">
-        <div class="flex items-center gap-3 mb-6">
-            <div class="bg-blue-600 p-2 rounded-xl text-white glow-effect">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-            </div>
-            <div>
-                <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">MX-UI PANEL</span>
-                <span class="text-xs block text-slate-500 font-medium">v1.0.0</span>
-            </div>
-        </div>
-        <h2 class="text-xl font-bold text-slate-100 mb-1">Subscription Details</h2>
-        <p class="text-sm text-slate-400 mb-6">Information for your configuration</p>
-
-        <div class="space-y-4">
-            <div class="flex justify-between border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400">Label</span>
-                <span class="font-mono text-slate-200">{label}</span>
-            </div>
-            <div class="flex justify-between border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400">Subscription ID (UUID)</span>
-                <span class="font-mono text-slate-200 text-sm">{uuid}</span>
-            </div>
-            <div class="flex justify-between border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400">Used</span>
-                <span class="font-mono text-slate-200">{used_fmt}</span>
-            </div>
-            <div class="flex justify-between border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400">Limit</span>
-                <span class="font-mono text-slate-200">{limit_fmt}</span>
-            </div>
-            <div class="flex justify-between border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400">Expiry</span>
-                <span class="font-mono text-rose-300">{expires_at}</span>
-            </div>
-            <div class="flex justify-between border-b border-slate-800/60 pb-2">
-                <span class="text-slate-400">Status</span>
-                <span class="font-mono">{'Active' if active else 'Inactive'}</span>
-            </div>
-        </div>
-
-        <div class="mt-6 p-4 bg-slate-950/60 border border-slate-800/60 rounded-xl">
-            <p class="text-xs text-slate-400 mb-2">VLESS Link (copy to client):</p>
-            <div class="flex items-center gap-2">
-                <input type="text" readonly value="{vless_link}" class="flex-1 bg-slate-950 border border-slate-800/80 rounded-xl px-3 py-2 text-xs font-mono text-slate-400 focus:outline-none select-all truncate">
-                <button onclick="copyToClipboard('{vless_link}')" class="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-            </div>
-        </div>
-        <div class="mt-4 p-4 bg-slate-950/60 border border-slate-800/60 rounded-xl">
-            <p class="text-xs text-slate-400 mb-2">Subscription URL (for clients):</p>
-            <div class="flex items-center gap-2">
-                <input type="text" readonly value="{sub_url}" class="flex-1 bg-slate-950 border border-slate-800/80 rounded-xl px-3 py-2 text-xs font-mono text-slate-400 focus:outline-none select-all truncate">
-                <button onclick="copyToClipboard('{sub_url}')" class="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-            </div>
-        </div>
-        <div class="mt-8 text-center text-xs text-slate-500 border-t border-slate-800/60 pt-4">
-            {watermark}
-        </div>
-    </div>
-</div>
-</body>
-</html>"""
-
-# ---------- SUB_USER_HTML (for /sub/user) ----------
 # ---------- SUB_USER_HTML (for /sub/user) ----------
 SUB_USER_HTML = r"""<!DOCTYPE html>
 <html lang="en">
@@ -1400,7 +1309,6 @@ body {{ background-color: #070a13; }}
 </div>
 
 <script>
-// Copy to clipboard function
 function copyToClipboard(text) {{
     if (navigator.clipboard && navigator.clipboard.writeText) {{
         navigator.clipboard.writeText(text).then(() => {{
@@ -1430,14 +1338,12 @@ function fallbackCopy(text) {{
     document.body.removeChild(textarea);
 }}
 
-// Toast notification
-function showToast(message, type = 'info') {{
+function showToast(message, type) {{
     const toast = document.createElement('div');
-    toast.className = `fixed bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg text-sm font-medium z-50 transition-all duration-300 ${
-        type === 'success' ? 'bg-emerald-500/90 text-white' :
-        type === 'error' ? 'bg-red-500/90 text-white' :
-        'bg-slate-800/90 text-slate-200'
-    } shadow-lg backdrop-blur-sm`;
+    let bgColor = 'bg-slate-800/90';
+    if (type === 'success') bgColor = 'bg-emerald-500/90';
+    if (type === 'error') bgColor = 'bg-red-500/90';
+    toast.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg text-sm font-medium z-50 transition-all duration-300 ' + bgColor + ' text-white shadow-lg backdrop-blur-sm';
     toast.textContent = message;
     document.body.appendChild(toast);
     setTimeout(() => {{
@@ -1447,7 +1353,6 @@ function showToast(message, type = 'info') {{
     }}, 2500);
 }}
 
-// Auto-select input on click
 document.addEventListener('DOMContentLoaded', function() {{
     const input = document.getElementById('vless-link-input');
     if (input) {{
