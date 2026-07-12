@@ -350,18 +350,28 @@ def get_limit_emoji(limit_bytes: int) -> str:
         return "🚀"
     else:
         return "🌌"
-
 def format_limit(limit_bytes: int) -> str:
     """Format limit as readable string"""
     if limit_bytes == 0:
         return "∞"
     elif limit_bytes >= 1024 ** 3:
-        return f"{limit_bytes / 1024 ** 3:.1f}GB"
+        # Show in GB with 1 decimal
+        gb = limit_bytes / 1024 ** 3
+        if gb >= 100:
+            return f"{gb:.0f}GB"
+        else:
+            return f"{gb:.1f}GB"
     elif limit_bytes >= 1024 ** 2:
-        return f"{limit_bytes / 1024 ** 2:.0f}MB"
+        # Show in MB with 0 decimal
+        mb = limit_bytes / 1024 ** 2
+        if mb >= 100:
+            return f"{mb:.0f}MB"
+        else:
+            return f"{mb:.0f}MB"
     else:
-        return f"{limit_bytes / 1024:.0f}KB"
-
+        # Show in KB with 0 decimal
+        kb = limit_bytes / 1024
+        return f"{kb:.0f}KB"
 def generate_emoji_label(base_label: str, limit_bytes: int, speed_limit_bytes: int, country_emoji: str) -> str:
     """Generate a formatted label with emojis"""
     random_emoji = get_random_decorative_emoji()
@@ -369,8 +379,18 @@ def generate_emoji_label(base_label: str, limit_bytes: int, speed_limit_bytes: i
     limit_str = format_limit(limit_bytes)
     speed_emoji = "⚡" if speed_limit_bytes > 0 else "🐢"
     
-    return f"{country_emoji} {random_emoji} {base_label} {limit_emoji} {limit_str} {speed_emoji}"
-
+    # Clean up the base label - remove any existing emojis or weird characters
+    import re
+    # Remove all emojis and special characters from base label
+    emoji_pattern = re.compile(r'[🇦-🇿🌍-🌏🎌🏁🚩🇺🇸🇬🇧🇩🇪🇫🇷🇮🇹🇪🇸🇵🇹🇳🇱🇧🇪🇨🇭🇦🇹🇸🇪🇳🇴🇩🇰🇫🇮🇮🇪🇬🇷🇹🇷🇷🇺🇺🇦🇵🇱🇨🇿🇭🇺🇷🇴🇧🇬🇭🇷🇷🇸🇸🇰🇸🇮🇱🇹🇱🇻🇪🇪🇨🇦🇲🇽🇧🇷🇦🇷🇨🇱🇨🇴🇵🇪🇻🇪🇯🇵🇰🇷🇨🇳🇹🇼🇭🇰🇸🇬🇲🇾🇮🇩🇵🇭🇻🇳🇹🇭🇮🇳🇵🇰🇧🇩🇦🇪🇸🇦🇮🇱🇪🇬🇿🇦🇳🇬🇦🇺🇳🇿🌸🌺🌻🌹🌷🌿🍀🌴🌳🎋💎🌟✨🎯🏆🔥💨🚀⭐💫🌈⚡🎉🎊💝🌊🍃♾️📦🌌🐢]')
+    clean_label = emoji_pattern.sub('', base_label).strip()
+    
+    # If clean_label is empty, use a default name
+    if not clean_label:
+        clean_label = "Config"
+    
+    # Format: 🇺🇸 🌸 My Server 📦 50GB ⚡
+    return f"{country_emoji} {random_emoji} {clean_label} {limit_emoji} {limit_str} {speed_emoji}"
 # ── Startup / Shutdown ────────────────────────────────────────────────────────
 @app.on_event("startup")
 async def startup():
@@ -1070,8 +1090,6 @@ async def get_connections(_=Depends(require_auth)):
         "count": len(result),
         "raw_count": len(connections),
     }
-
-# ── Link Management ───────────────────────────────────────────────────────────
 async def make_link(
     label: str = "New Link",
     limit_bytes: int = 0,
@@ -1091,14 +1109,22 @@ async def make_link(
         fingerprint = DEFAULT_FINGERPRINT
     uid = generate_uuid()
     
+    # Clean the label - remove any existing emojis or weird formatting
+    import re
+    emoji_pattern = re.compile(r'[🇦-🇿🌍-🌏🎌🏁🚩🇺🇸🇬🇧🇩🇪🇫🇷🇮🇹🇪🇸🇵🇹🇳🇱🇧🇪🇨🇭🇦🇹🇸🇪🇳🇴🇩🇰🇫🇮🇮🇪🇬🇷🇹🇷🇷🇺🇺🇦🇵🇱🇨🇿🇭🇺🇷🇴🇧🇬🇭🇷🇷🇸🇸🇰🇸🇮🇱🇹🇱🇻🇪🇪🇨🇦🇲🇽🇧🇷🇦🇷🇨🇱🇨🇴🇵🇪🇻🇪🇯🇵🇰🇷🇨🇳🇹🇼🇭🇰🇸🇬🇲🇾🇮🇩🇵🇭🇻🇳🇹🇭🇮🇳🇵🇰🇧🇩🇦🇪🇸🇦🇮🇱🇪🇬🇿🇦🇳🇬🇦🇺🇳🇿🌸🌺🌻🌹🌷🌿🍀🌴🌳🎋💎🌟✨🎯🏆🔥💨🚀⭐💫🌈⚡🎉🎊💝🌊🍃♾️📦🌌🐢]')
+    clean_label = emoji_pattern.sub('', label).strip()
+    
+    # If label is empty after cleaning, use default
+    if not clean_label:
+        clean_label = "Config"
+    
     # Generate label with emojis
-    base_label = (label or "New Link").strip()[:60] or "New Link"
     random_emoji = get_random_decorative_emoji()
     limit_emoji = get_limit_emoji(limit_bytes)
     limit_str = format_limit(limit_bytes)
     speed_emoji = "⚡" if speed_limit_bytes > 0 else "🐢"
     
-    formatted_label = f"{country_emoji} {random_emoji} {base_label} {limit_emoji} {limit_str} {speed_emoji}"
+    formatted_label = f"{country_emoji} {random_emoji} {clean_label} {limit_emoji} {limit_str} {speed_emoji}"
     
     async with LINKS_LOCK:
         LINKS[uid] = {
