@@ -1,7 +1,6 @@
 # pages.py - MX-UI v1.0.0
 # All templates with escaped braces for Python .format()
 
-# ---------- LOGIN_HTML ----------
 # ---------- LOGIN_HTML (with Persian font support) ----------
 LOGIN_HTML = r"""<!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -2714,7 +2713,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                 <!-- Label -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
                     <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider font-english">Label</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-200 font-semibold truncate font-english" id="labelValue">{label}</span>
+                    <span class="detail-value text-xs sm:text-sm font-mixed text-slate-200 font-semibold truncate" id="labelValue">{label}</span>
                 </div>
                 
                 <!-- Subscription ID -->
@@ -2781,7 +2780,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             <!-- Progress Bar Section -->
             <div class="mt-5 sm:mt-6 p-4 sm:p-5 bg-slate-950/60 border border-slate-800/60 rounded-xl">
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 mb-2">
-                    <span class="text-xs sm:text-sm text-slate-300 font-medium truncate font-english" id="progressLabel">{label}</span>
+                    <span class="text-xs sm:text-sm text-slate-300 font-medium truncate font-mixed" id="progressLabel">{label}</span>
                     <span class="text-[10px] sm:text-xs text-slate-400 font-mono font-english" id="progressText">{used_fmt} / {limit_fmt}</span>
                 </div>
                 <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
