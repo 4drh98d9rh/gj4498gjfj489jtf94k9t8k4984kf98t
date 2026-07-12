@@ -1995,6 +1995,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 </body>
 </html>"""
 # ---------- SUB_USER_HTML (for /sub/user with auto-update every 30s - NO TAB RESET) ----------
+# ---------- SUB_USER_HTML (for /sub/user with auto-update every 30s - TIMER CONTINUES IN BACKGROUND) ----------
 SUB_USER_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2419,8 +2420,8 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
         let isPaused = false;
         let isFirstLoad = true;
         let lastUpdateTime = Date.now();
-        let tabHiddenTime = 0;
-        let totalHiddenTime = 0;
+        let timerStartTime = Date.now();
+        let timerLastTick = Date.now();
 
         // Toast notification system
         function showToast(message, type) {{
@@ -2497,6 +2498,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
         function manualUpdate() {{
             // Reset countdown
             countdown = 30;
+            timerStartTime = Date.now();
             updateTimer();
             // Force update
             updateSubscriptionData();
@@ -2591,6 +2593,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
 
                 // Reset countdown after successful update
                 countdown = 30;
+                timerStartTime = Date.now();
                 updateTimer();
 
             }} catch (error) {{
@@ -2608,29 +2611,40 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             }}
         }}
 
-        // Timer countdown function
+        // Timer countdown function - Uses REAL time, not interval ticks
         function startTimer() {{
             if (timerInterval) clearInterval(timerInterval);
+            
+            timerStartTime = Date.now();
+            timerLastTick = Date.now();
             
             timerInterval = setInterval(() => {{
                 if (isPaused) return;
                 
-                countdown--;
-                updateTimer();
+                // Calculate elapsed time since last tick
+                const now = Date.now();
+                const elapsedSeconds = (now - timerLastTick) / 1000;
+                timerLastTick = now;
                 
-                // When timer reaches 0, trigger update
+                // Decrease countdown by elapsed seconds (minimum 1)
+                countdown = Math.max(0, countdown - elapsedSeconds);
+                
+                // If countdown reached 0 or below, trigger update
                 if (countdown <= 0) {{
                     countdown = 30;
+                    timerStartTime = Date.now();
                     updateTimer();
                     updateSubscriptionData();
+                }} else {{
+                    updateTimer();
                 }}
-            }}, 1000);
+            }}, 200); // Check every 200ms for accuracy
         }}
 
         // Start auto-update
         function startAutoUpdate() {{
             isPaused = false;
-            // Start timer
+            timerLastTick = Date.now();
             startTimer();
         }}
 
@@ -2646,8 +2660,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
         // Resume auto-update
         function resumeAutoUpdate() {{
             isPaused = false;
-            // Calculate remaining time based on elapsed time
-            // Don't reset, just continue from where we left off
+            timerLastTick = Date.now();
             startTimer();
         }}
 
@@ -2708,35 +2721,19 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             }}
         }});
 
-        // Handle page visibility change - DO NOT reset timer
+        // Handle page visibility change - Timer continues in background
         document.addEventListener('visibilitychange', function() {{
             if (document.hidden) {{
-                // Tab is hidden - just pause
-                tabHiddenTime = Date.now();
-                stopAutoUpdate();
+                // Tab is hidden - just mark as paused but timer continues running
+                // We DON'T stop the timer, just prevent UI updates
+                isPaused = true;
             }} else {{
-                // Tab is visible again - resume from where we left off
-                // Calculate how long we were hidden
-                const hiddenDuration = Date.now() - tabHiddenTime;
-                
-                // Adjust countdown based on hidden time
-                // Subtract the hidden time from countdown
-                const hiddenSeconds = Math.floor(hiddenDuration / 1000);
-                countdown = Math.max(1, countdown - hiddenSeconds);
-                
-                // If countdown reached 0 or below, trigger immediate update
-                if (countdown <= 0) {{
-                    countdown = 30;
-                    updateTimer();
-                    updateSubscriptionData();
-                }} else {{
-                    updateTimer();
-                }}
-                
-                // Resume timer
-                if (isPaused) {{
-                    resumeAutoUpdate();
-                }}
+                // Tab is visible again - resume UI updates
+                // Countdown continues from where it was
+                isPaused = false;
+                timerLastTick = Date.now();
+                // Force update timer display
+                updateTimer();
             }}
         }});
 
