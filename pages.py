@@ -6,7 +6,7 @@ LOGO_B64 = "iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAABOq0lEQVR42q2dd7wldXn/
 # ---------- LOGIN_HTML (escaped braces) ----------
 # ---------- LOGIN_HTML (fixed) ----------
 LOGIN_HTML = r"""<!DOCTYPE html>
-<html lang="en" dir="ltr" class="h-full">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,16 +21,6 @@ LOGIN_HTML = r"""<!DOCTYPE html>
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
-                    },
-                    animation: {
-                        'shake': 'shake 0.4s ease-in-out',
-                    },
-                    keyframes: {
-                        shake: {
-                            '0%, 100%': { transform: 'translateX(0)' },
-                            '25%': { transform: 'translateX(-6px)' },
-                            '75%': { transform: 'translateX(6px)' },
-                        }
                     }
                 }
             }
@@ -38,89 +28,80 @@ LOGIN_HTML = r"""<!DOCTYPE html>
     </script>
     <style>
         body {
-            background-color: #030712;
+            background-color: #070a13;
+        }
+        .glow-effect {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.12);
+        }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .pulse-slow {
+            animation: pulse-slow 2s ease-in-out infinite;
+        }
+        .input-focus-ring:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        @media (max-width: 640px) {
+            .mobile-padding {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
         }
     </style>
 </head>
-<body class="font-sans text-slate-200 min-h-full flex flex-col items-center justify-center relative antialiased tracking-tight p-4 sm:p-6 selection:bg-blue-500/30 selection:text-blue-200">
+<body class="font-sans text-slate-200 min-h-screen flex items-center justify-center bg-[#070a13] relative antialiased tracking-tight p-4 mobile-padding">
     
-    <!-- Background Light Rays / Gradients -->
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(59,130,246,0.15),transparent_70%)] pointer-events-none"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(99,102,241,0.05),transparent_40%)] pointer-events-none"></div>
+    <!-- Background Effects -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(59,130,246,0.08),transparent_70%)] pointer-events-none"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_100%,rgba(99,102,241,0.05),transparent_70%)] pointer-events-none"></div>
     
-    <!-- Sophisticated Grid Overlay -->
-    <div class="absolute inset-0 opacity-[0.015] pointer-events-none" style="background-image: linear-gradient(#3b82f6 1px, transparent 1px), linear-gradient(90deg, #3b82f6 1px, transparent 1px); background-size: 32px 32px;"></div>
+    <!-- Grid Pattern Overlay -->
+    <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(circle at 1px 1px, #3b82f6 1px, transparent 0); background-size: 24px 24px;"></div>
     
-    <div class="w-full max-w-[420px] relative z-10 my-auto">
-        <!-- Main Card Wrapper -->
-        <div class="bg-zinc-900/60 border border-white/[0.06] rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl shadow-black/40 transition-all duration-300 hover:border-white/[0.12]">
+    <div class="w-full max-w-md relative z-10">
+        <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-6 sm:p-8 backdrop-blur-xl glow-effect transition-all duration-300 hover:border-slate-700/80">
             
-            <!-- Logo & Header Group -->
-            <div class="flex items-center justify-between gap-4 mb-8">
-                <div class="flex items-center gap-3">
-                    <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 p-2.5 rounded-xl text-white shadow-lg shadow-blue-500/20 flex-shrink-0 ring-1 ring-white/10">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                            <polyline points="9 12 11 14 15 10"/>
-                        </svg>
-                    </div>
-                    <div class="min-w-0">
-                        <span class="font-bold text-sm tracking-widest bg-gradient-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent block uppercase">MX-UI Panel</span>
-                        <span class="text-[10px] text-zinc-500 font-semibold tracking-wider uppercase font-mono bg-zinc-800/60 px-1.5 py-0.5 rounded border border-white/[0.04]">v1.0.0</span>
-                    </div>
+            <!-- Logo & Brand -->
+            <div class="flex items-center gap-3 mb-6">
+                <div class="bg-blue-600 p-2 rounded-xl text-white glow-effect flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <polyline points="9 12 11 14 15 10"/>
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent block truncate">MX-UI PANEL</span>
+                    <span class="text-xs text-slate-500 font-medium">v1.0.0</span>
                 </div>
             </div>
             
-            <!-- Form Core Identity -->
-            <div class="mb-6">
-                <h1 class="text-2xl font-semibold text-white tracking-tight">Welcome back</h1>
-                <p class="text-sm text-zinc-400 mt-1">Please enter your credentials to manage the panel.</p>
-            </div>
+            <!-- Title -->
+            <h1 class="text-xl font-bold text-slate-100 mb-1">Sign In</h1>
+            <p class="text-sm text-slate-400 mb-6">Enter your password to access the dashboard</p>
             
-            <!-- Interactive Default Password Tip Section -->
-            <div id="password-status-card" class="bg-blue-500/[0.03] border border-blue-500/20 rounded-xl p-3.5 mb-6 transition-all duration-300">
-                <div class="flex items-start justify-between gap-3">
-                    <div class="flex gap-2.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <div class="space-y-1">
-                            <p id="password-status-title" class="text-xs font-medium text-blue-300">Default Access Configuration</p>
-                            <p id="password-status-desc" class="text-[11px] text-zinc-400 leading-relaxed">Click the credential token to automatically populate the entry security field.</p>
-                        </div>
-                    </div>
-                    <button type="button" id="default-password-display" class="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded border border-blue-500/20 hover:bg-blue-500/20 active:scale-95 transition-all flex-shrink-0" onclick="fillDefaultPassword()">
+            <!-- Default Password Display -->
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-xl p-3 mb-5">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <span class="text-xs text-slate-400">Default password</span>
+                    <span id="default-password-display" class="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20 cursor-pointer hover:bg-blue-500/20 transition text-center sm:text-left" onclick="document.getElementById('pw').value='MUVIXO';document.getElementById('pw').focus();">
                         MUVIXO
-                    </button>
+                    </span>
+                </div>
+                <div id="password-status-message" class="hidden mt-2 text-xs text-amber-400 border-t border-amber-500/20 pt-2">
+                    <span class="font-medium">⚠️ Password changed</span>
+                    <span class="text-slate-400 ml-2">(your custom password)</span>
                 </div>
             </div>
             
             <!-- Login Form -->
-            <form id="loginForm" class="space-y-5">
-                <div>
-                    <label for="pw" class="block text-[11px] font-medium text-zinc-400 uppercase tracking-wider mb-2">Password Token</label>
-                    <div class="relative group">
-                        <input type="password" id="pw" class="w-full bg-zinc-950/80 border border-white/[0.08] rounded-xl pl-3.5 pr-10 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200" placeholder="••••••••••••" autofocus required>
-                        
-                        <!-- Toggle Visibility Feature -->
-                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 focus:outline-none transition-colors">
-                            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                        </button>
-                    </div>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password</label>
+                    <input type="password" id="pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="Enter your password" autofocus required>
                 </div>
-
-                <!-- Custom Error Alert Hook -->
-                <div id="errorMsg" class="text-xs text-red-400 bg-red-500/[0.06] border border-red-500/20 rounded-xl p-3 hidden items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <span id="errorText">Invalid password</span>
-                </div>
-
-                <button type="submit" id="loginButton" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium text-sm px-4 py-3 rounded-xl transition-all duration-200 shadow-xl shadow-blue-900/20 hover:shadow-blue-600/10 flex items-center justify-center gap-2 font-medium border border-white/10 active:scale-[0.99]">
+                <button type="submit" id="loginButton" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm px-4 py-2.5 rounded-xl transition duration-200 shadow-lg shadow-blue-600/10 flex items-center justify-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
                         <polyline points="10 17 15 12 10 7"/>
@@ -128,56 +109,31 @@ LOGIN_HTML = r"""<!DOCTYPE html>
                     </svg>
                     Sign In
                 </button>
+                <div id="errorMsg" class="mt-3 text-sm text-red-400 hidden"></div>
             </form>
             
             <!-- Footer -->
-            <div class="mt-8 pt-4 border-t border-white/[0.04] text-center text-xs text-zinc-500 tracking-wide">
-                Engineered by <span class="text-zinc-400 font-medium">Muvixo</span>
+            <div class="mt-6 pt-4 border-t border-slate-800/60 text-center text-xs text-slate-500">
+                Created by Muvixo
             </div>
         </div>
     </div>
 
     <script>
-        function fillDefaultPassword() {
-            const pwInput = document.getElementById('pw');
-            const targetBtn = document.getElementById('default-password-display');
-            if(targetBtn && targetBtn.onclick !== null) {
-                pwInput.value = 'MUVIXO';
-                pwInput.focus();
-            }
-        }
-
-        function togglePasswordVisibility() {
-            const pwInput = document.getElementById('pw');
-            const eyeIcon = document.getElementById('eye-icon');
-            if (pwInput.type === 'password') {
-                pwInput.type = 'text';
-                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />`;
-            } else {
-                pwInput.type = 'password';
-                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
-            }
-        }
-
+        // Check if default password is still used
         async function checkDefaultPassword() {
             try {
                 const res = await fetch('/api/is-default-password');
                 const data = await res.json();
                 if (!data.is_default) {
                     const display = document.getElementById('default-password-display');
-                    const card = document.getElementById('password-status-card');
-                    const title = document.getElementById('password-status-title');
-                    const desc = document.getElementById('password-status-desc');
-                    
-                    // Style structural block as alert warning instead
-                    card.className = "bg-amber-500/[0.02] border border-amber-500/20 rounded-xl p-3.5 mb-6";
-                    title.textContent = "Custom Token Active";
-                    title.className = "text-xs font-medium text-amber-400";
-                    desc.textContent = "The system is hardened with a modified custom security protocol key.";
-                    
-                    display.textContent = 'Modified';
-                    display.className = 'text-[11px] font-sans font-semibold tracking-wide text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded border border-amber-500/20';
+                    display.textContent = 'Password changed';
+                    display.className = 'text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20 text-center sm:text-left';
                     display.onclick = null;
+                    
+                    // Show status message
+                    const statusMsg = document.getElementById('password-status-message');
+                    statusMsg.classList.remove('hidden');
                 }
             } catch(e) {
                 console.error('Error checking password status:', e);
@@ -186,6 +142,8 @@ LOGIN_HTML = r"""<!DOCTYPE html>
         
         document.addEventListener('DOMContentLoaded', function() {
             checkDefaultPassword();
+            
+            // Auto-focus the password field
             const pwInput = document.getElementById('pw');
             if (pwInput) {
                 setTimeout(() => pwInput.focus(), 100);
@@ -196,55 +154,67 @@ LOGIN_HTML = r"""<!DOCTYPE html>
             e.preventDefault();
             const btn = document.getElementById('loginButton');
             const err = document.getElementById('errorMsg');
-            const errText = document.getElementById('errorText');
-            const pwInput = document.getElementById('pw');
-            
             err.classList.add('hidden');
-            err.classList.remove('flex');
             btn.disabled = true;
             
+            // Store original button content
             const originalContent = btn.innerHTML;
-            btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Authorizing...';
+            btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Signing in...';
             
             try {
                 const res = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: pwInput.value })
+                    body: JSON.stringify({ password: document.getElementById('pw').value })
                 });
                 
                 if (!res.ok) {
-                    let errorMsg = 'Access Denied: Invalid security password signature.';
+                    let errorMsg = 'Invalid password';
                     try {
                         const data = await res.json();
-                        if (data && data.detail) errorMsg = data.detail;
-                    } catch (pE) {
-                        if (res.statusText) errorMsg = res.statusText;
+                        if (data && data.detail) {
+                            errorMsg = data.detail;
+                        }
+                    } catch (parseError) {
+                        // If response is not JSON, use status text
+                        if (res.statusText) {
+                            errorMsg = res.statusText;
+                        }
                     }
                     throw new Error(errorMsg);
                 }
                 
+                // Redirect to dashboard on success
                 location.href = '/dashboard';
                 
             } catch (e) {
-                errText.textContent = e.message || 'Invalid password token';
+                err.textContent = e.message || 'Invalid password';
                 err.classList.remove('hidden');
-                err.classList.add('flex');
-                
                 btn.disabled = false;
                 btn.innerHTML = originalContent;
                 
-                // Native CSS Micro-shaking UX Failure Feedback
-                pwInput.classList.add('animate-shake', 'border-red-500/50', 'focus:ring-red-500/10');
+                // Shake the password input on error
+                const pwInput = document.getElementById('pw');
+                pwInput.classList.add('border-red-500');
                 setTimeout(() => {
-                    pwInput.classList.remove('animate-shake', 'border-red-500/50', 'focus:ring-red-500/10');
-                }, 400);
+                    pwInput.classList.remove('border-red-500');
+                }, 1000);
                 
+                // Clear password field
                 pwInput.value = '';
                 pwInput.focus();
             }
         });
 
+        // Add keyboard shortcut (Enter key on password field triggers submit)
+        document.getElementById('pw').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+        
+        // Also check when page loads from cache
         window.addEventListener('pageshow', function(event) {
             if (event.persisted) {
                 checkDefaultPassword();
@@ -1078,7 +1048,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         </div>
     </div>
        <!-- ===== MODAL: QR ===== -->
-    <!-- ===== MODAL: QR ===== -->
     <div id="qrModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
             <!-- Header -->
@@ -1086,53 +1055,25 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="flex items-center space-x-3 min-w-0">
                     <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20 shrink-0">
                         <!-- SVG QR Code Icon -->
-                        <svg version="1.0" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet" fill="currentColor">
-                            <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" stroke="none">
-                                <path d="M545 5104 c-38 -8 -113 -35 -165 -61 -78 -38 -109 -60 -176 -127 -67
-                                -67 -89 -98 -127 -176 -75 -154 -77 -172 -77 -767 0 -316 4 -532 10 -554 34
-                                -122 166 -186 303 -148 47 13 102 60 130 113 22 40 22 49 27 581 l5 540 25 43
-                                c15 27 42 54 70 70 l45 27 535 5 c515 5 537 6 580 26 188 87 169 379 -29 434
-                                -22 6 -238 10 -561 9 -416 0 -540 -4 -595 -15z"/>
-                                <path d="M3420 5111 c-103 -32 -160 -110 -160 -220 0 -98 42 -170 124 -214 40
-                                -22 49 -22 581 -27 l540 -5 43 -25 c27 -15 54 -42 70 -70 l27 -45 5 -540 c5
-                                -532 5 -541 27 -581 98 -182 379 -160 433 35 6 22 10 238 10 554 0 594 -2 613
-                                -76 765 -94 192 -263 322 -476 366 -65 14 -159 16 -600 15 -288 0 -534 -4
-                                -548 -8z"/>
-                                <path d="M1074 4174 c-23 -8 -58 -31 -77 -51 -67 -66 -67 -69 -67 -625 0 -327
-                                4 -514 11 -542 14 -55 59 -110 112 -139 42 -22 43 -22 577 -22 529 0 535 0
-                                575 22 46 24 75 54 101 103 18 33 19 67 19 570 0 534 0 535 -22 577 -29 53
-                                -84 98 -139 112 -28 7 -214 11 -546 10 -414 0 -510 -3 -544 -15z m786 -684 l0
-                                -230 -230 0 -230 0 0 230 0 230 230 0 230 0 0 -230z"/>
-                                <path d="M2941 4175 c-51 -16 -94 -54 -124 -110 -22 -40 -22 -46 -22 -575 0
-                                -529 0 -535 22 -575 24 -46 54 -75 103 -101 33 -18 67 -19 570 -19 534 0 535
-                                0 577 22 53 29 98 84 112 139 7 28 11 214 11 537 0 554 -1 561 -67 629 -66 67
-                                -72 68 -637 67 -394 0 -510 -3 -545 -14z m779 -685 l0 -230 -230 0 -230 0 0
-                                230 0 230 230 0 230 0 0 -230z"/>
-                                <path d="M1105 2321 c-43 -11 -76 -29 -113 -64 -60 -58 -62 -75 -62 -633 0
-                                -560 0 -557 68 -627 64 -66 73 -67 629 -67 323 0 509 4 537 11 55 14 110 59
-                                139 112 22 42 22 43 22 577 0 503 -1 537 -19 570 -26 49 -55 79 -101 103 -39
-                                22 -48 22 -555 24 -283 1 -528 -2 -545 -6z m755 -691 l0 -230 -230 0 -230 0 0
-                                230 0 230 230 0 230 0 0 -230z"/>
-                                <path d="M2965 2321 c-70 -18 -117 -56 -151 -121 -15 -28 -19 -65 -22 -186 -5
-                                -203 5 -254 67 -315 54 -55 109 -74 193 -66 103 9 174 69 198 168 7 29 10 107
-                                8 205 -3 168 -10 196 -62 252 -47 52 -158 82 -231 63z"/>
-                                <path d="M3665 2321 c-105 -27 -175 -117 -175 -226 0 -100 66 -194 154 -220
-                                61 -18 316 -20 383 -3 32 8 61 25 94 57 39 38 49 56 60 105 25 113 -17 212
-                                -112 266 -41 24 -53 25 -209 27 -91 1 -178 -2 -195 -6z"/>
-                                <path d="M119 1833 c-57 -30 -92 -71 -109 -132 -6 -22 -10 -238 -10 -554 0
-                                -595 2 -613 77 -767 38 -78 60 -109 127 -176 67 -67 98 -89 176 -127 154 -75
-                                172 -77 767 -77 316 0 532 4 554 10 122 34 186 166 148 303 -13 47 -60 102
-                                -113 130 -40 22 -49 22 -581 27 l-540 5 -43 25 c-27 15 -54 42 -70 70 l-27 45
-                                -5 540 c-5 532 -5 541 -27 581 -62 117 -202 158 -324 97z"/>
-                                <path d="M4796 1845 c-47 -17 -91 -57 -119 -110 -22 -39 -22 -51 -27 -580 l-5
-                                -540 -27 -45 c-16 -28 -43 -55 -70 -70 l-43 -25 -540 -5 c-532 -5 -541 -5
-                                -581 -27 -182 -98 -160 -379 35 -433 22 -6 238 -10 554 -10 434 0 530 3 595
-                                16 213 44 382 174 476 366 74 152 76 171 76 765 0 316 -4 532 -10 554 -17 61
-                                -52 102 -109 132 -62 31 -139 36 -205 12z"/>
-                                <path d="M3188 1386 c-104 -28 -158 -104 -158 -219 0 -106 33 -167 115 -210
-                                39 -21 53 -22 438 -25 463 -3 477 -1 545 72 102 111 73 291 -59 366 l-44 25
-                                -395 2 c-298 2 -407 -1 -442 -11z"/>
-                            </g>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="7" height="7" rx="1"></rect>
+                            <rect x="15" y="2" width="7" height="7" rx="1"></rect>
+                            <rect x="2" y="15" width="7" height="7" rx="1"></rect>
+                            <line x1="22" y1="11" x2="22" y2="13"></line>
+                            <line x1="2" y1="11" x2="2" y2="13"></line>
+                            <line x1="11" y1="2" x2="13" y2="2"></line>
+                            <line x1="11" y1="22" x2="13" y2="22"></line>
+                            <line x1="15" y1="15" x2="22" y2="22"></line>
+                            <line x1="22" y1="15" x2="15" y2="22"></line>
+                            <rect x="15" y="15" width="2" height="2"></rect>
+                            <rect x="19" y="15" width="2" height="2"></rect>
+                            <rect x="15" y="19" width="2" height="2"></rect>
+                            <rect x="19" y="19" width="2" height="2"></rect>
+                            <rect x="11" y="11" width="2" height="2"></rect>
+                            <rect x="11" y="15" width="2" height="2"></rect>
+                            <rect x="11" y="19" width="2" height="2"></rect>
+                            <rect x="15" y="11" width="2" height="2"></rect>
+                            <rect x="19" y="11" width="2" height="2"></rect>
                         </svg>
                     </div>
                     <div class="min-w-0">
@@ -2061,257 +2002,415 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
     </script>
     <style>
         body {{
-            background-color: #030712;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.05) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.03) 0px, transparent 50%);
+            background-color: #070a13;
         }}
-        .glass-card {{
-            background: rgba(17, 24, 39, 0.7);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .glow-effect {{
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.12);
         }}
-        .glass-subcard {{
-            background: rgba(3, 7, 18, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.03);
+        .status-dot {{
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+            flex-shrink: 0;
         }}
-        .glow-cyan {{
-            box-shadow: 0 0 30px rgba(6, 182, 212, 0.15);
+        .status-dot.active {{
+            background-color: #22c55e;
+        }}
+        .status-dot.inactive {{
+            background-color: #ef4444;
+        }}
+        .copy-btn {{
+            transition: all 0.2s ease;
+            min-height: 36px;
+            min-width: 36px;
+        }}
+        .copy-btn:active {{
+            transform: scale(0.95);
         }}
         .progress-bar-fill {{
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-            background: linear-gradient(90deg, #06b6d4 0%, #3b82f6 100%);
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }}
+        .qr-container {{
+            transition: all 0.3s ease;
+        }}
+        .qr-container:active {{
+            transform: scale(0.98);
+        }}
+        .detail-row {{
+            transition: background-color 0.15s ease;
+        }}
+        .detail-row:hover {{
+            background-color: rgba(30, 41, 59, 0.3);
+        }}
+        @media (max-width: 640px) {{
+            .mobile-stack {{
+                flex-direction: column;
+                align-items: stretch;
+            }}
+            .mobile-text-center {{
+                text-align: center;
+            }}
+            .mobile-padding {{
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }}
+            .mobile-gap {{
+                gap: 0.5rem;
+            }}
+            .qr-image {{
+                width: 160px;
+                height: 160px;
+            }}
+        }}
+        @media (max-width: 480px) {{
+            .xs-text-xs {{
+                font-size: 0.65rem;
+            }}
+            .xs-padding {{
+                padding: 0.5rem;
+            }}
+            .qr-image {{
+                width: 140px;
+                height: 140px;
+            }}
+            .detail-label {{
+                font-size: 0.6rem;
+            }}
+            .detail-value {{
+                font-size: 0.65rem;
+            }}
+        }}
+        .input-focus-ring:focus {{
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }}
         .toast {{
             position: fixed;
-            bottom: 24px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%) translateY(20px);
-            background: rgba(17, 24, 39, 0.9);
-            border: 1px solid rgba(6, 182, 212, 0.3);
+            background: #0f172a;
+            border: 1px solid #1e293b;
             color: #e2e8f0;
-            padding: 10px 20px;
+            padding: 8px 18px;
             border-radius: 12px;
             font-size: 13px;
-            backdrop-filter: blur(8px);
+            font-family: Inter, sans-serif;
             opacity: 0;
-            transition: opacity 0.3s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: opacity 0.25s, transform 0.25s;
             z-index: 9999;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            max-width: 90vw;
+            text-align: center;
         }}
         .toast.show {{
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }}
-        .status-dot {{
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            display: inline-block;
+        .toast.success {{
+            border-color: #22c55e;
+            color: #86efac;
         }}
-        .status-dot.active {{
-            background-color: #06b6d4;
-            box-shadow: 0 0 10px #06b6d4;
+        .toast.error {{
+            border-color: #ef4444;
+            color: #fca5a5;
         }}
-        .status-dot.inactive {{
-            background-color: #ef4444;
-            box-shadow: 0 0 10px #ef4444;
+        .status-badge {{
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
         }}
-        @media (max-width: 640px) {{
-            .mobile-column {{
-                flex-direction: column;
-                align-items: stretch;
-            }}
+        .status-badge.active {{
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }}
+        .status-badge.inactive {{
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }}
     </style>
 </head>
-<body class="font-sans text-slate-300 min-h-screen flex flex-col justify-between antialiased tracking-tight">
+<body class="font-sans text-slate-200 min-h-screen flex flex-col justify-between relative antialiased tracking-tight">
     
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
     
-    <div class="max-w-xl w-full mx-auto px-4 py-8 sm:py-14 flex-grow flex flex-col justify-center">
-        <div class="glass-card rounded-2xl p-6 sm:p-8 glow-cyan transition-all duration-300">
+    <div class="max-w-2xl w-full mx-auto px-3 sm:px-4 py-6 sm:py-10 flex-grow mobile-padding">
+        <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5 sm:p-8 backdrop-blur-xl glow-effect transition-all duration-300 hover:border-slate-700/80">
             
-            <!-- Top Header & Brand -->
-            <div class="flex items-center justify-between mb-8 border-b border-slate-800/80 pb-5">
-                <div class="flex items-center gap-3">
-                    <div class="h-9 w-9 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h1 class="text-sm font-bold tracking-wider text-slate-200 font-mono">MX-UI // CORE</h1>
-                        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-medium">Node Security Dashboard</p>
-                    </div>
+            <!-- Header -->
+            <div class="flex items-center gap-3 mb-6">
+                <div class="bg-blue-600 p-2 rounded-xl text-white glow-effect flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <polyline points="9 12 11 14 15 10"/>
+                    </svg>
                 </div>
-                
-                <span id="status-badge" class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-slate-950 border border-slate-800 text-[10px] font-mono tracking-wider uppercase">
+                <div class="flex-1 min-w-0">
+                    <span class="font-bold text-base sm:text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent block truncate">MX-UI PANEL</span>
+                    <span class="text-[10px] sm:text-xs text-slate-500 font-medium block truncate">v1.0.0</span>
+                </div>
+            </div>
+
+            <!-- Title Section -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 sm:mb-6">
+                <div class="min-w-0">
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-100 truncate">Subscription Info</h2>
+                    <p class="text-xs sm:text-sm text-slate-400 truncate">Details for your configuration</p>
+                </div>
+                <span id="status-badge" class="status-badge active shrink-0 self-start sm:self-center">
                     <span class="status-dot active"></span>
-                    <span class="text-slate-400">Loading</span>
+                    Loading...
                 </span>
             </div>
 
-            <!-- Profile Title Summary -->
-            <div class="mb-6 flex items-center justify-between">
-                <div>
-                    <h2 class="text-lg font-semibold text-slate-100">{label}</h2>
-                    <p class="text-xs text-slate-500 font-mono mt-0.5 max-w-[240px] sm:max-w-xs truncate">{uuid}</p>
-                </div>
-                <div class="text-right">
-                    <span class="text-[10px] font-mono uppercase tracking-wider text-slate-500 block">Current Status</span>
-                    <span class="text-sm font-medium text-cyan-400 font-mono block mt-0.5">{status}</span>
+            <!-- QR Code -->
+            <div class="mb-5 sm:mb-6 flex justify-center">
+                <div class="bg-white p-2 sm:p-3 rounded-xl shadow-lg border-2 border-slate-700/50 qr-container">
+                    <img src="{qr_url}" alt="QR Code" class="qr-image w-36 h-36 sm:w-48 sm:h-48 object-contain">
                 </div>
             </div>
 
-            <!-- Enhanced QR Visualization -->
-            <div class="mb-8 flex justify-center">
-                <div class="relative group p-3 bg-white rounded-xl shadow-2xl transition-transform duration-300 hover:scale-[1.01]">
-                    <img src="{qr_url}" alt="Configuration QR" class="w-40 h-40 sm:w-44 sm:h-44 object-contain mix-blend-multiply opacity-95">
-                    <div class="absolute inset-0 border border-slate-950/5 rounded-xl pointer-events-none"></div>
-                </div>
-            </div>
-
-            <!-- Live Usage Metrics Framework -->
-            <div class="mb-6 p-4 bg-slate-950/80 border border-slate-800/80 rounded-xl">
-                <div class="flex justify-between items-end mb-2">
-                    <div>
-                        <span class="text-[10px] font-mono uppercase tracking-widest text-slate-500 block">Bandwidth Allocation</span>
-                        <span class="text-xs font-semibold text-slate-300 mt-0.5 block">{usage} used</span>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-xs font-mono font-medium text-slate-400">{total_quota} Limit</span>
-                    </div>
+            <!-- Details Grid -->
+            <div class="space-y-1.5 sm:space-y-2 mb-5 sm:mb-6">
+                <!-- Label -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Label</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-200 font-semibold truncate">{label}</span>
                 </div>
                 
-                <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden p-[1px] border border-slate-800/50">
-                    <div class="h-full rounded-full progress-bar-fill" style="width: {usage_pct}%;"></div>
+                <!-- Subscription ID -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Subscription ID</span>
+                    <span class="detail-value text-[10px] sm:text-xs font-mono text-slate-200 truncate">{uuid}</span>
                 </div>
                 
-                <div class="flex justify-between items-center mt-2 font-mono text-[10px] text-slate-500">
-                    <span>{usage_pct}% Consumed</span>
-                    <span class="text-emerald-400/90">{remained} Remained</span>
+                <!-- Status -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Status</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono font-semibold">{status}</span>
+                </div>
+                
+                <!-- Downloaded -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Downloaded</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-blue-300 font-semibold">{downloaded}</span>
+                </div>
+                
+                <!-- Uploaded -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Uploaded</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-purple-300 font-semibold">{uploaded}</span>
+                </div>
+                
+                <!-- Usage -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Usage</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-amber-300 font-semibold">{usage} / {total_quota}</span>
+                </div>
+                
+                <!-- Total Quota -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Total Quota</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-200 font-semibold">{total_quota}</span>
+                </div>
+                
+                <!-- Remained -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Remained</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-emerald-300 font-semibold">{remained}</span>
+                </div>
+                
+                <!-- Last Online -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Last Online</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-300">{last_online}</span>
+                </div>
+                
+                <!-- Expiry -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Expiry</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-rose-300 font-semibold">{expiry}</span>
+                </div>
+                
+                <!-- IPs Connected -->
+                <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">IP(s) Connected</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-cyan-300">{ips}</span>
                 </div>
             </div>
 
-            <!-- Core Metrics Data Grid Split -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-                <!-- Segment Left: Traffic Metrics -->
-                <div class="glass-subcard rounded-xl p-3.5 space-y-2.5">
-                    <div class="flex justify-between items-center text-xs border-b border-slate-900 pb-2">
-                        <span class="text-slate-500 font-medium">Downlink Traffic</span>
-                        <span class="font-mono font-medium text-blue-400">{downloaded}</span>
-                    </div>
-                    <div class="flex justify-between items-center text-xs border-b border-slate-900 pb-2">
-                        <span class="text-slate-500 font-medium">Uplink Traffic</span>
-                        <span class="font-mono font-medium text-purple-400">{uploaded}</span>
-                    </div>
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="text-slate-500 font-medium">Active IP Access</span>
-                        <span class="font-mono font-medium text-cyan-400">{ips} Devices</span>
-                    </div>
+            <!-- Progress Bar Section -->
+            <div class="mt-5 sm:mt-6 p-4 sm:p-5 bg-slate-950/60 border border-slate-800/60 rounded-xl">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 mb-2">
+                    <span class="text-xs sm:text-sm text-slate-300 font-medium truncate">{label}</span>
+                    <span class="text-[10px] sm:text-xs text-slate-400 font-mono">{used_fmt} / {limit_fmt}</span>
                 </div>
-
-                <!-- Segment Right: Dynamic Expirations -->
-                <div class="glass-subcard rounded-xl p-3.5 space-y-2.5">
-                    <div class="flex justify-between items-center text-xs border-b border-slate-900 pb-2">
-                        <span class="text-slate-500 font-medium">Expiration Boundary</span>
-                        <span class="font-mono font-medium text-rose-400">{expiry}</span>
-                    </div>
-                    <div class="flex justify-between items-center text-xs border-b border-slate-900 pb-2">
-                        <span class="text-slate-500 font-medium">Network Limit</span>
-                        <span class="font-mono font-medium text-slate-300">{limit_fmt}</span>
-                    </div>
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="text-slate-500 font-medium">Last Node Echo</span>
-                        <span class="font-mono font-medium text-slate-400 truncate max-w-[90px]">{last_online}</span>
-                    </div>
+                <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full progress-bar-fill" style="width: {usage_pct}%;"></div>
+                </div>
+                <div class="flex flex-col xs:flex-row xs:justify-between gap-0.5 xs:gap-0 mt-1.5">
+                    <span class="text-[10px] sm:text-xs text-slate-500">{usage_pct}% used</span>
+                    <span class="text-[10px] sm:text-xs text-slate-500">{remained} remaining</span>
                 </div>
             </div>
 
-            <!-- Refactored Clean Proxy Copy Strip -->
-            <div class="glass-subcard rounded-xl p-3 border border-slate-800/60 flex items-center justify-between gap-3 group hover:border-slate-700/60 transition-colors cursor-pointer" onclick="copyToClipboard('{vless_link}')">
-                <div class="min-w-0 flex-1 pl-1">
-                    <span class="text-[9px] font-mono uppercase tracking-widest text-slate-500 block mb-0.5">VLESS Node Configuration String</span>
-                    <div class="text-[11px] font-mono text-slate-400 truncate pr-2 select-all">{vless_link}</div>
-                </div>
-                <button class="h-9 w-9 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            <!-- VLESS Link -->
+            <div class="mt-5 sm:mt-6 p-3 sm:p-4 bg-slate-950/60 border border-slate-800/60 rounded-xl">
+                <p class="text-[10px] sm:text-xs text-slate-400 mb-2 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
                     </svg>
-                </button>
+                    <span class="truncate">VLESS Link (copy to client):</span>
+                </p>
+                <div class="flex items-center gap-2 mobile-stack">
+                    <input type="text" readonly value="{vless_link}" id="vless-link-input" class="flex-1 min-w-0 bg-slate-950 border border-slate-800/80 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 text-[8px] sm:text-[10px] font-mono text-slate-400 focus:outline-none select-all truncate input-focus-ring">
+                    <button onclick="copyToClipboard('{vless_link}')" class="copy-btn px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition shadow-lg shadow-blue-600/20 flex items-center justify-center gap-1.5 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        <span class="hidden xs:inline text-[10px] sm:text-xs">Copy</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- Clean Embedded Footnote Watermark -->
-            <div class="mt-8 text-center text-[10px] font-mono text-slate-600 tracking-wider">
+            <!-- Footer -->
+            <div class="mt-6 sm:mt-8 text-center text-[10px] sm:text-xs text-slate-500 border-t border-slate-800/60 pt-4">
                 {watermark}
             </div>
         </div>
     </div>
 
     <script>
-        // Precision Toast Pipeline
-        function showToast(message, isSuccess = true) {{
+        // Toast notification system
+        function showToast(message, type) {{
             const toast = document.getElementById('toast');
             toast.textContent = message;
-            toast.style.borderColor = isSuccess ? 'rgba(6, 182, 212, 0.4)' : 'rgba(239, 68, 68, 0.4)';
-            toast.className = 'toast show';
+            toast.className = 'toast show' + (type ? ' ' + type : '');
             clearTimeout(toast._timeout);
             toast._timeout = setTimeout(() => {{
                 toast.classList.remove('show');
-            }}, 2500);
+            }}, 3000);
         }}
 
-        // Dynamic System Clipboard API Hook with Textarea Redundancy
+        // Copy to clipboard with fallback
         function copyToClipboard(text) {{
             if (navigator.clipboard && navigator.clipboard.writeText) {{
                 navigator.clipboard.writeText(text).then(() => {{
-                    showToast('Configuration securely copied');
+                    showToast('Copied to clipboard!', 'success');
                 }}).catch(() => {{
-                    fallbackClipboardCopy(text);
+                    fallbackCopy(text);
                 }});
             }} else {{
-                fallbackClipboardCopy(text);
+                fallbackCopy(text);
             }}
         }}
 
-        function fallbackClipboardCopy(text) {{
-            const area = document.createElement('textarea');
-            area.value = text;
-            area.style.position = 'fixed';
-            area.style.opacity = '0';
-            document.body.appendChild(area);
-            area.select();
+        function fallbackCopy(text) {{
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            textarea.style.left = '-9999px';
+            textarea.style.top = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
             try {{
                 document.execCommand('copy');
-                showToast('Configuration securely copied');
-            }} catch (err) {{
-                showToast('Copy execution failed', false);
+                showToast('Copied to clipboard!', 'success');
+            }} catch (e) {{
+                showToast('Failed to copy', 'error');
             }}
-            document.body.removeChild(area);
+            document.body.removeChild(textarea);
         }}
 
-        // Lifecycle Events Execution
+        // Auto-select input on click
         document.addEventListener('DOMContentLoaded', function() {{
-            const badge = document.getElementById('status-badge');
-            const targetText = '{status}'.trim().toLowerCase();
-            
-            if (badge) {{
-                const isLive = targetText.includes('active') || targetText.includes('true') || targetText.includes('online');
-                const dot = badge.querySelector('.status-dot');
-                if (isLive) {{
-                    badge.className = 'inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-cyan-950/30 border border-cyan-800/30 text-[10px] font-mono tracking-wider uppercase';
+            const input = document.getElementById('vless-link-input');
+            if (input) {{
+                input.addEventListener('click', function() {{
+                    this.select();
+                }});
+                input.addEventListener('focus', function() {{
+                    this.select();
+                }});
+            }}
+
+            // Update status badge based on status text
+            const statusBadge = document.getElementById('status-badge');
+            const statusValue = document.querySelector('.detail-row:nth-child(3) .detail-value');
+            if (statusValue) {{
+                const isActive = statusValue.textContent.trim().toLowerCase().includes('active');
+                const dot = statusBadge.querySelector('.status-dot');
+                if (isActive) {{
+                    statusBadge.className = 'status-badge active';
                     dot.className = 'status-dot active';
-                    badge.innerHTML = '<span class="status-dot active"></span> <span class="text-cyan-400">Active</span>';
+                    statusBadge.innerHTML = '<span class="status-dot active"></span> Active';
                 }} else {{
-                    badge.className = 'inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-rose-950/30 border border-rose-800/30 text-[10px] font-mono tracking-wider uppercase';
+                    statusBadge.className = 'status-badge inactive';
                     dot.className = 'status-dot inactive';
-                    badge.innerHTML = '<span class="status-dot inactive"></span> <span class="text-rose-400">Suspended</span>';
+                    statusBadge.innerHTML = '<span class="status-dot inactive"></span> Inactive';
                 }}
             }}
         }});
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {{
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c') {{
+                const input = document.getElementById('vless-link-input');
+                if (document.activeElement === input) {{
+                    copyToClipboard(input.value);
+                }}
+            }}
+        }});
+
+        // Handle page visibility change to refresh QR if needed
+        document.addEventListener('visibilitychange', function() {{
+            if (!document.hidden) {{
+                const qrImg = document.querySelector('.qr-image');
+                if (qrImg && qrImg.src && qrImg.src.includes('qrserver')) {{
+                    const url = new URL(qrImg.src);
+                    url.searchParams.set('t', Date.now());
+                    qrImg.src = url.toString();
+                }}
+            }}
+        }});
+
+        // Touch feedback for copy button
+        document.querySelector('.copy-btn')?.addEventListener('touchstart', function() {{
+            this.style.transform = 'scale(0.95)';
+        }}, {{ passive: true }});
+        
+        document.querySelector('.copy-btn')?.addEventListener('touchend', function() {{
+            this.style.transform = 'scale(1)';
+        }}, {{ passive: true }});
+
+        // Handle responsive QR code loading
+        function handleQrLoading() {{
+            const qrImg = document.querySelector('.qr-image');
+            if (qrImg) {{
+                qrImg.addEventListener('error', function() {{
+                    const currentSrc = this.src;
+                    if (currentSrc.includes('api.qrserver.com')) {{
+                        const dataParam = new URL(currentSrc).searchParams.get('data');
+                        if (dataParam) {{
+                            this.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + dataParam + '&t=' + Date.now();
+                        }}
+                    }}
+                }});
+            }}
+        }}
+        document.addEventListener('DOMContentLoaded', handleQrLoading);
     </script>
 </body>
 </html>"""
