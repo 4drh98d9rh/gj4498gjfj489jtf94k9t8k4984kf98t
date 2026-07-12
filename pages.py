@@ -529,9 +529,11 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     </div>
 </div>
 <!-- ===== MODAL: QR with 4 items ===== -->
-<div id="qrModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75" style="display: none;">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow p-6 space-y-3 relative">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+<!-- ===== MODAL: QR with 4 items ===== -->
+<!-- ===== MODAL: QR with 4 items ===== -->
+<div id="qrModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm" style="display: none;">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow p-6 space-y-3 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2 flex-shrink-0">
             <div>
                 <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
                     <i data-lucide="qrcode" class="w-5 h-5 text-blue-400"></i>
@@ -539,7 +541,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 </h3>
                 <p class="text-xs text-slate-400 font-mono pl-7" id="qrTargetLabel">Default Link</p>
             </div>
-            <button onclick="toggleModal('qrModal', false)" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition">
+            <button onclick="toggleModal('qrModal', false)" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition flex-shrink-0">
                 <i data-lucide="x" class="w-4 h-4"></i>
             </button>
         </div>
@@ -583,23 +585,23 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
         <!-- Links display -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3">
+            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3 min-w-0">
                 <span class="text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1 flex items-center gap-1">
-                    <i data-lucide="link" class="w-3 h-3"></i>
+                    <i data-lucide="link" class="w-3 h-3 flex-shrink-0"></i>
                     Config Link
                 </span>
                 <p id="qrTextPayload" class="text-[10px] font-mono text-slate-400 break-all select-all truncate"></p>
             </div>
-            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3">
+            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3 min-w-0">
                 <span class="text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1 flex items-center gap-1">
-                    <i data-lucide="folder-tree" class="w-3 h-3"></i>
+                    <i data-lucide="folder-tree" class="w-3 h-3 flex-shrink-0"></i>
                     Subscription Link
                 </span>
                 <p id="qrSubPayload" class="text-[10px] font-mono text-slate-400 break-all select-all truncate"></p>
             </div>
         </div>
 
-        <button onclick="toggleModal('qrModal', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition">
+        <button onclick="toggleModal('qrModal', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition flex-shrink-0">
             Close
         </button>
     </div>
