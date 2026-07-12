@@ -6,7 +6,7 @@ LOGO_B64 = "iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAABOq0lEQVR42q2dd7wldXn/
 # ---------- LOGIN_HTML (escaped braces) ----------
 # ---------- LOGIN_HTML (fixed) ----------
 LOGIN_HTML = r"""<!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,6 +21,16 @@ LOGIN_HTML = r"""<!DOCTYPE html>
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'shake': 'shake 0.4s ease-in-out',
+                    },
+                    keyframes: {
+                        shake: {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '25%': { transform: 'translateX(-6px)' },
+                            '75%': { transform: 'translateX(6px)' },
+                        }
                     }
                 }
             }
@@ -28,80 +38,89 @@ LOGIN_HTML = r"""<!DOCTYPE html>
     </script>
     <style>
         body {
-            background-color: #070a13;
-        }
-        .glow-effect {
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.12);
-        }
-        @keyframes pulse-slow {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .pulse-slow {
-            animation: pulse-slow 2s ease-in-out infinite;
-        }
-        .input-focus-ring:focus {
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-        }
-        @media (max-width: 640px) {
-            .mobile-padding {
-                padding-left: 1rem;
-                padding-right: 1rem;
-            }
+            background-color: #030712;
         }
     </style>
 </head>
-<body class="font-sans text-slate-200 min-h-screen flex items-center justify-center bg-[#070a13] relative antialiased tracking-tight p-4 mobile-padding">
+<body class="font-sans text-slate-200 min-h-full flex flex-col items-center justify-center relative antialiased tracking-tight p-4 sm:p-6 selection:bg-blue-500/30 selection:text-blue-200">
     
-    <!-- Background Effects -->
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(59,130,246,0.08),transparent_70%)] pointer-events-none"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_100%,rgba(99,102,241,0.05),transparent_70%)] pointer-events-none"></div>
+    <!-- Background Light Rays / Gradients -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(59,130,246,0.15),transparent_70%)] pointer-events-none"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(99,102,241,0.05),transparent_40%)] pointer-events-none"></div>
     
-    <!-- Grid Pattern Overlay -->
-    <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(circle at 1px 1px, #3b82f6 1px, transparent 0); background-size: 24px 24px;"></div>
+    <!-- Sophisticated Grid Overlay -->
+    <div class="absolute inset-0 opacity-[0.015] pointer-events-none" style="background-image: linear-gradient(#3b82f6 1px, transparent 1px), linear-gradient(90deg, #3b82f6 1px, transparent 1px); background-size: 32px 32px;"></div>
     
-    <div class="w-full max-w-md relative z-10">
-        <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-6 sm:p-8 backdrop-blur-xl glow-effect transition-all duration-300 hover:border-slate-700/80">
+    <div class="w-full max-w-[420px] relative z-10 my-auto">
+        <!-- Main Card Wrapper -->
+        <div class="bg-zinc-900/60 border border-white/[0.06] rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl shadow-black/40 transition-all duration-300 hover:border-white/[0.12]">
             
-            <!-- Logo & Brand -->
-            <div class="flex items-center gap-3 mb-6">
-                <div class="bg-blue-600 p-2 rounded-xl text-white glow-effect flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                        <polyline points="9 12 11 14 15 10"/>
-                    </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent block truncate">MX-UI PANEL</span>
-                    <span class="text-xs text-slate-500 font-medium">v1.0.0</span>
+            <!-- Logo & Header Group -->
+            <div class="flex items-center justify-between gap-4 mb-8">
+                <div class="flex items-center gap-3">
+                    <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 p-2.5 rounded-xl text-white shadow-lg shadow-blue-500/20 flex-shrink-0 ring-1 ring-white/10">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <polyline points="9 12 11 14 15 10"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="font-bold text-sm tracking-widest bg-gradient-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent block uppercase">MX-UI Panel</span>
+                        <span class="text-[10px] text-zinc-500 font-semibold tracking-wider uppercase font-mono bg-zinc-800/60 px-1.5 py-0.5 rounded border border-white/[0.04]">v1.0.0</span>
+                    </div>
                 </div>
             </div>
             
-            <!-- Title -->
-            <h1 class="text-xl font-bold text-slate-100 mb-1">Sign In</h1>
-            <p class="text-sm text-slate-400 mb-6">Enter your password to access the dashboard</p>
+            <!-- Form Core Identity -->
+            <div class="mb-6">
+                <h1 class="text-2xl font-semibold text-white tracking-tight">Welcome back</h1>
+                <p class="text-sm text-zinc-400 mt-1">Please enter your credentials to manage the panel.</p>
+            </div>
             
-            <!-- Default Password Display -->
-            <div class="bg-slate-800/40 border border-slate-700/50 rounded-xl p-3 mb-5">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    <span class="text-xs text-slate-400">Default password</span>
-                    <span id="default-password-display" class="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20 cursor-pointer hover:bg-blue-500/20 transition text-center sm:text-left" onclick="document.getElementById('pw').value='MUVIXO';document.getElementById('pw').focus();">
+            <!-- Interactive Default Password Tip Section -->
+            <div id="password-status-card" class="bg-blue-500/[0.03] border border-blue-500/20 rounded-xl p-3.5 mb-6 transition-all duration-300">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex gap-2.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div class="space-y-1">
+                            <p id="password-status-title" class="text-xs font-medium text-blue-300">Default Access Configuration</p>
+                            <p id="password-status-desc" class="text-[11px] text-zinc-400 leading-relaxed">Click the credential token to automatically populate the entry security field.</p>
+                        </div>
+                    </div>
+                    <button type="button" id="default-password-display" class="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded border border-blue-500/20 hover:bg-blue-500/20 active:scale-95 transition-all flex-shrink-0" onclick="fillDefaultPassword()">
                         MUVIXO
-                    </span>
-                </div>
-                <div id="password-status-message" class="hidden mt-2 text-xs text-amber-400 border-t border-amber-500/20 pt-2">
-                    <span class="font-medium">⚠️ Password changed</span>
-                    <span class="text-slate-400 ml-2">(your custom password)</span>
+                    </button>
                 </div>
             </div>
             
             <!-- Login Form -->
-            <form id="loginForm">
-                <div class="mb-4">
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password</label>
-                    <input type="password" id="pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="Enter your password" autofocus required>
+            <form id="loginForm" class="space-y-5">
+                <div>
+                    <label for="pw" class="block text-[11px] font-medium text-zinc-400 uppercase tracking-wider mb-2">Password Token</label>
+                    <div class="relative group">
+                        <input type="password" id="pw" class="w-full bg-zinc-950/80 border border-white/[0.08] rounded-xl pl-3.5 pr-10 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200" placeholder="••••••••••••" autofocus required>
+                        
+                        <!-- Toggle Visibility Feature -->
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 focus:outline-none transition-colors">
+                            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                <button type="submit" id="loginButton" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm px-4 py-2.5 rounded-xl transition duration-200 shadow-lg shadow-blue-600/10 flex items-center justify-center gap-2">
+
+                <!-- Custom Error Alert Hook -->
+                <div id="errorMsg" class="text-xs text-red-400 bg-red-500/[0.06] border border-red-500/20 rounded-xl p-3 hidden items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span id="errorText">Invalid password</span>
+                </div>
+
+                <button type="submit" id="loginButton" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium text-sm px-4 py-3 rounded-xl transition-all duration-200 shadow-xl shadow-blue-900/20 hover:shadow-blue-600/10 flex items-center justify-center gap-2 font-medium border border-white/10 active:scale-[0.99]">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
                         <polyline points="10 17 15 12 10 7"/>
@@ -109,31 +128,56 @@ LOGIN_HTML = r"""<!DOCTYPE html>
                     </svg>
                     Sign In
                 </button>
-                <div id="errorMsg" class="mt-3 text-sm text-red-400 hidden"></div>
             </form>
             
             <!-- Footer -->
-            <div class="mt-6 pt-4 border-t border-slate-800/60 text-center text-xs text-slate-500">
-                Created by Muvixo
+            <div class="mt-8 pt-4 border-t border-white/[0.04] text-center text-xs text-zinc-500 tracking-wide">
+                Engineered by <span class="text-zinc-400 font-medium">Muvixo</span>
             </div>
         </div>
     </div>
 
     <script>
-        // Check if default password is still used
+        function fillDefaultPassword() {
+            const pwInput = document.getElementById('pw');
+            const targetBtn = document.getElementById('default-password-display');
+            if(targetBtn && targetBtn.onclick !== null) {
+                pwInput.value = 'MUVIXO';
+                pwInput.focus();
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const pwInput = document.getElementById('pw');
+            const eyeIcon = document.getElementById('eye-icon');
+            if (pwInput.type === 'password') {
+                pwInput.type = 'text';
+                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />`;
+            } else {
+                pwInput.type = 'password';
+                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
+            }
+        }
+
         async function checkDefaultPassword() {
             try {
                 const res = await fetch('/api/is-default-password');
                 const data = await res.json();
                 if (!data.is_default) {
                     const display = document.getElementById('default-password-display');
-                    display.textContent = 'Password changed';
-                    display.className = 'text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20 text-center sm:text-left';
-                    display.onclick = null;
+                    const card = document.getElementById('password-status-card');
+                    const title = document.getElementById('password-status-title');
+                    const desc = document.getElementById('password-status-desc');
                     
-                    // Show status message
-                    const statusMsg = document.getElementById('password-status-message');
-                    statusMsg.classList.remove('hidden');
+                    // Style structural block as alert warning instead
+                    card.className = "bg-amber-500/[0.02] border border-amber-500/20 rounded-xl p-3.5 mb-6";
+                    title.textContent = "Custom Token Active";
+                    title.className = "text-xs font-medium text-amber-400";
+                    desc.textContent = "The system is hardened with a modified custom security protocol key.";
+                    
+                    display.textContent = 'Modified';
+                    display.className = 'text-[11px] font-sans font-semibold tracking-wide text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded border border-amber-500/20';
+                    display.onclick = null;
                 }
             } catch(e) {
                 console.error('Error checking password status:', e);
@@ -142,8 +186,6 @@ LOGIN_HTML = r"""<!DOCTYPE html>
         
         document.addEventListener('DOMContentLoaded', function() {
             checkDefaultPassword();
-            
-            // Auto-focus the password field
             const pwInput = document.getElementById('pw');
             if (pwInput) {
                 setTimeout(() => pwInput.focus(), 100);
@@ -154,67 +196,55 @@ LOGIN_HTML = r"""<!DOCTYPE html>
             e.preventDefault();
             const btn = document.getElementById('loginButton');
             const err = document.getElementById('errorMsg');
+            const errText = document.getElementById('errorText');
+            const pwInput = document.getElementById('pw');
+            
             err.classList.add('hidden');
+            err.classList.remove('flex');
             btn.disabled = true;
             
-            // Store original button content
             const originalContent = btn.innerHTML;
-            btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Signing in...';
+            btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Authorizing...';
             
             try {
                 const res = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: document.getElementById('pw').value })
+                    body: JSON.stringify({ password: pwInput.value })
                 });
                 
                 if (!res.ok) {
-                    let errorMsg = 'Invalid password';
+                    let errorMsg = 'Access Denied: Invalid security password signature.';
                     try {
                         const data = await res.json();
-                        if (data && data.detail) {
-                            errorMsg = data.detail;
-                        }
-                    } catch (parseError) {
-                        // If response is not JSON, use status text
-                        if (res.statusText) {
-                            errorMsg = res.statusText;
-                        }
+                        if (data && data.detail) errorMsg = data.detail;
+                    } catch (pE) {
+                        if (res.statusText) errorMsg = res.statusText;
                     }
                     throw new Error(errorMsg);
                 }
                 
-                // Redirect to dashboard on success
                 location.href = '/dashboard';
                 
             } catch (e) {
-                err.textContent = e.message || 'Invalid password';
+                errText.textContent = e.message || 'Invalid password token';
                 err.classList.remove('hidden');
+                err.classList.add('flex');
+                
                 btn.disabled = false;
                 btn.innerHTML = originalContent;
                 
-                // Shake the password input on error
-                const pwInput = document.getElementById('pw');
-                pwInput.classList.add('border-red-500');
+                // Native CSS Micro-shaking UX Failure Feedback
+                pwInput.classList.add('animate-shake', 'border-red-500/50', 'focus:ring-red-500/10');
                 setTimeout(() => {
-                    pwInput.classList.remove('border-red-500');
-                }, 1000);
+                    pwInput.classList.remove('animate-shake', 'border-red-500/50', 'focus:ring-red-500/10');
+                }, 400);
                 
-                // Clear password field
                 pwInput.value = '';
                 pwInput.focus();
             }
         });
 
-        // Add keyboard shortcut (Enter key on password field triggers submit)
-        document.getElementById('pw').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-            }
-        });
-        
-        // Also check when page loads from cache
         window.addEventListener('pageshow', function(event) {
             if (event.persisted) {
                 checkDefaultPassword();
