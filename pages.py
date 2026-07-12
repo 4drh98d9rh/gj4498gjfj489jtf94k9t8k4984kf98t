@@ -610,7 +610,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 </div>
                 <div class="min-w-0">
                     <span class="font-bold text-sm sm:text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent font-sans truncate block">MX-UI PANEL</span>
-                    <span class="text-[10px] sm:text-xs text-slate-500 font-medium tracking-normal block truncate">v1.0.0 • Core Matrix</span>
+                    <span class="text-[10px] sm:text-xs text-slate-500 font-medium tracking-normal block truncate">v1.0.0</span>
                 </div>
             </div>
             <div class="flex items-center space-x-1 sm:space-x-3 flex-shrink-0">
