@@ -334,6 +334,7 @@ async def get_client_country(request: Request) -> tuple[str, str]:
 def get_random_decorative_emoji() -> str:
     """Get a random decorative emoji"""
     return random.choice(DECORATIVE_EMOJIS)
+
 def format_limit(limit_bytes: int) -> tuple[str, str]:
     """Format limit as readable string and return emoji + display text"""
     if limit_bytes == 0:
@@ -364,6 +365,7 @@ def format_limit(limit_bytes: int) -> tuple[str, str]:
         kb = limit_bytes / 1024
         display = f"{kb:.0f} KB"
         return "📦", display
+
 def generate_emoji_label(base_label: str, limit_bytes: int, speed_limit_bytes: int, country_emoji: str) -> str:
     """Generate a formatted label with emojis - clean and proper format"""
     import re
@@ -383,38 +385,14 @@ def generate_emoji_label(base_label: str, limit_bytes: int, speed_limit_bytes: i
     random_emoji = get_random_decorative_emoji()
     
     # Format limit
-    if limit_bytes == 0:
-        limit_display = "∞"
-        limit_emoji = "♾️"
-    elif limit_bytes >= 1024 ** 3:
-        gb = limit_bytes / 1024 ** 3
-        if gb >= 100:
-            limit_display = f"{gb:.0f} GB"
-        else:
-            limit_display = f"{gb:.1f} GB"
-        if gb < 10:
-            limit_emoji = "📦"
-        elif gb < 100:
-            limit_emoji = "🚀"
-        else:
-            limit_emoji = "🌌"
-    elif limit_bytes >= 1024 ** 2:
-        mb = limit_bytes / 1024 ** 2
-        if mb >= 100:
-            limit_display = f"{mb:.0f} MB"
-        else:
-            limit_display = f"{mb:.0f} MB"
-        limit_emoji = "📦"
-    else:
-        kb = limit_bytes / 1024
-        limit_display = f"{kb:.0f} KB"
-        limit_emoji = "📦"
+    limit_emoji, limit_display = format_limit(limit_bytes)
     
     # Speed emoji
     speed_emoji = "⚡" if speed_limit_bytes > 0 else "🐢"
     
     # Format: 🇺🇸 🌸 My Server 📦 50 GB ⚡
     return f"{country_emoji} {random_emoji} {clean_label} {limit_emoji} {limit_display} {speed_emoji}"
+
 # ── Startup / Shutdown ────────────────────────────────────────────────────────
 @app.on_event("startup")
 async def startup():
@@ -1156,7 +1134,7 @@ async def make_link(
     # Speed emoji
     speed_emoji = "⚡" if speed_limit_bytes > 0 else "🐢"
     
-    # Format: 🇺🇸 🌸 My Server 📦 50GB ⚡
+    # Format: 🇺🇸 🌸 My Server 📦 50 GB ⚡
     formatted_label = f"{country_emoji} {random_emoji} {clean_label} {limit_emoji} {limit_display} {speed_emoji}"
     
     async with LINKS_LOCK:
@@ -1289,6 +1267,7 @@ async def list_links(request: Request, _=Depends(require_auth)):
         })
     result.sort(key=lambda x: x["created_at"], reverse=True)
     return {"links": result}
+
 @app.patch("/api/links/{uid}")
 async def update_link(uid: str, request: Request, _=Depends(require_auth)):
     body = await request.json()
@@ -1308,7 +1287,7 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
             link["active"] = bool(body["active"])
             log_activity("link", f"Config «{label}» {'activated' if link['active'] else 'deactivated'}", "ok" if link["active"] else "warn")
         
-        # ===== FIX: Handle label update properly =====
+        # Handle label update
         if "label" in body:
             import re
             # Get the new label from user input
@@ -1342,7 +1321,7 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
                 link["active"] = True
             log_activity("link", f"Usage reset for «{label}»", "info")
         
-        # ===== FIX: Handle limit update =====
+        # Handle limit update
         if "limit_value" in body:
             lv = float(body.get("limit_value") or 0)
             lu = body.get("limit_unit") or "GB"
@@ -1381,7 +1360,7 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
                 il = 0
             link["ip_limit"] = max(0, il)
         
-        # ===== FIX: Handle speed limit update =====
+        # Handle speed limit update
         if "speed_limit_value" in body:
             sv = float(body.get("speed_limit_value") or 0)
             su = body.get("speed_limit_unit") or "MBIT"
@@ -1410,6 +1389,7 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
     
     asyncio.create_task(save_state())
     return {"ok": True}
+
 # --- Toggle link active status ---
 @app.patch("/api/links/{uid}/toggle")
 async def toggle_link_status(uid: str, request: Request, _=Depends(require_auth)):
