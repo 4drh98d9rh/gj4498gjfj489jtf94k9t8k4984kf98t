@@ -1997,6 +1997,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
 # ---------- SUB_USER_HTML (for /sub/user with clean QR) ----------
 # ---------- SUB_USER_HTML (for /sub/user with auto-update) ----------
+# ---------- SUB_USER_HTML (for /sub/user with auto-update and timer) ----------
 SUB_USER_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2164,6 +2165,34 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
         @keyframes spin {{
             to {{ transform: rotate(360deg); }}
         }}
+        .timer-ring {{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid #1e293b;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+            background: rgba(15, 23, 42, 0.5);
+        }}
+        .timer-ring.warning {{
+            border-color: #f59e0b;
+            color: #fbbf24;
+        }}
+        .timer-ring.critical {{
+            border-color: #ef4444;
+            color: #f87171;
+            animation: pulse-timer 1s ease-in-out infinite;
+        }}
+        @keyframes pulse-timer {{
+            0%, 100% {{ transform: scale(1); }}
+            50% {{ transform: scale(1.05); }}
+        }}
         @media (max-width: 640px) {{
             .mobile-stack {{
                 flex-direction: column;
@@ -2182,6 +2211,11 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             .qr-image {{
                 width: 160px;
                 height: 160px;
+            }}
+            .timer-ring {{
+                width: 24px;
+                height: 24px;
+                font-size: 9px;
             }}
         }}
         @media (max-width: 480px) {{
@@ -2226,10 +2260,13 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                     <span class="font-bold text-base sm:text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent block truncate">MX-UI PANEL</span>
                     <span class="text-[10px] sm:text-xs text-slate-500 font-medium block truncate">v1.0.0</span>
                 </div>
-                <!-- Auto-Update Indicator -->
-                <div class="update-indicator" id="updateIndicator">
-                    <span class="update-spinner" id="updateSpinner"></span>
-                    <span id="updateText">Updating...</span>
+                <!-- Auto-Update Indicator with Timer -->
+                <div class="flex items-center gap-2">
+                    <div class="update-indicator" id="updateIndicator">
+                        <span class="update-spinner" id="updateSpinner"></span>
+                        <span id="updateText">Auto</span>
+                    </div>
+                    <div class="timer-ring" id="timerRing">30</div>
                 </div>
             </div>
 
@@ -2357,10 +2394,15 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                 </div>
             </div>
 
-            <!-- Auto-Update Status Footer -->
-            <div class="mt-4 flex items-center justify-between text-[9px] sm:text-[10px] text-slate-500 border-t border-slate-800/60 pt-3">
+            <!-- Auto-Update Status Footer with Timer -->
+            <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[9px] sm:text-[10px] text-slate-500 border-t border-slate-800/60 pt-3">
                 <span>Last updated: <span id="lastUpdateTime">just now</span></span>
-                <span>Auto-update every 30s</span>
+                <div class="flex items-center gap-3">
+                    <span>Next update in: <span id="timerDisplay" class="font-mono text-blue-400">30</span>s</span>
+                    <button onclick="manualUpdate()" class="text-blue-400 hover:text-blue-300 transition-colors px-2 py-0.5 rounded border border-blue-500/20 hover:border-blue-500/40 text-[9px]">
+                        ↻ Refresh
+                    </button>
+                </div>
             </div>
 
             <!-- Footer -->
@@ -2374,7 +2416,10 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
         // Store current UUID for updates
         const CURRENT_UUID = '{uuid}';
         let updateInterval = null;
+        let timerInterval = null;
         let isUpdating = false;
+        let countdown = 30;
+        let isPaused = false;
 
         // Toast notification system
         function showToast(message, type) {{
@@ -2427,6 +2472,37 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             return (b / 1024 ** 3).toFixed(2) + ' GB';
         }}
 
+        // Update timer display
+        function updateTimer() {{
+            const timerDisplay = document.getElementById('timerDisplay');
+            const timerRing = document.getElementById('timerRing');
+            
+            if (timerDisplay) {{
+                timerDisplay.textContent = countdown;
+            }}
+            
+            if (timerRing) {{
+                timerRing.textContent = countdown;
+                // Change color based on remaining time
+                timerRing.classList.remove('warning', 'critical');
+                if (countdown <= 5) {{
+                    timerRing.classList.add('critical');
+                }} else if (countdown <= 10) {{
+                    timerRing.classList.add('warning');
+                }}
+            }}
+        }}
+
+        // Manual update trigger
+        function manualUpdate() {{
+            // Reset countdown
+            countdown = 30;
+            updateTimer();
+            // Force update
+            updateSubscriptionData();
+            showToast('Refreshing...', 'info');
+        }}
+
         // Update the subscription page data
         async function updateSubscriptionData() {{
             if (isUpdating) return;
@@ -2441,7 +2517,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             indicator.classList.add('updating');
             spinner.style.display = 'inline-block';
             text.textContent = 'Updating...';
-            qrImage.classList.add('loading');
+            if (qrImage) qrImage.classList.add('loading');
 
             try {{
                 // Fetch fresh data from the same endpoint with a cache-busting parameter
@@ -2515,7 +2591,11 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                 // Update last update time
                 document.getElementById('lastUpdateTime').textContent = new Date().toLocaleTimeString();
 
-                showToast('Page updated successfully', 'info');
+                // Reset countdown after successful update
+                countdown = 30;
+                updateTimer();
+
+                showToast('Page updated', 'info');
 
             }} catch (error) {{
                 console.error('Update error:', error);
@@ -2524,26 +2604,55 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                 isUpdating = false;
                 indicator.classList.remove('updating');
                 spinner.style.display = 'none';
-                text.textContent = 'Auto-update';
-                qrImage.classList.remove('loading');
+                text.textContent = 'Auto';
+                if (qrImage) qrImage.classList.remove('loading');
             }}
+        }}
+
+        // Timer countdown function
+        function startTimer() {{
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {{
+                if (isPaused) return;
+                
+                countdown--;
+                updateTimer();
+                
+                // When timer reaches 0, trigger update
+                if (countdown <= 0) {{
+                    countdown = 30;
+                    updateTimer();
+                    updateSubscriptionData();
+                }}
+            }}, 1000);
         }}
 
         // Start auto-update
         function startAutoUpdate() {{
+            isPaused = false;
             // Update immediately on load
             setTimeout(updateSubscriptionData, 1000);
             
-            // Then every 30 seconds
-            updateInterval = setInterval(updateSubscriptionData, 30000);
+            // Start timer
+            startTimer();
         }}
 
         // Stop auto-update
         function stopAutoUpdate() {{
-            if (updateInterval) {{
-                clearInterval(updateInterval);
-                updateInterval = null;
+            isPaused = true;
+            if (timerInterval) {{
+                clearInterval(timerInterval);
+                timerInterval = null;
             }}
+        }}
+
+        // Resume auto-update
+        function resumeAutoUpdate() {{
+            isPaused = false;
+            countdown = 30;
+            updateTimer();
+            startTimer();
         }}
 
         // Auto-select input on click
@@ -2584,7 +2693,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             // Ctrl+U or Cmd+U to manually update
             if ((e.ctrlKey || e.metaKey) && e.key === 'u') {{
                 e.preventDefault();
-                updateSubscriptionData();
+                manualUpdate();
             }}
             // Ctrl+C or Cmd+C to copy VLESS link
             if ((e.ctrlKey || e.metaKey) && e.key === 'c') {{
@@ -2593,11 +2702,16 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                     copyToClipboard(input.value);
                 }}
             }}
-            // Escape to stop auto-update (temporary)
-            if (e.key === 'Escape') {{
-                stopAutoUpdate();
-                showToast('Auto-update paused', 'info');
-                setTimeout(startAutoUpdate, 60000); // Restart after 60s
+            // Space to pause/resume
+            if (e.key === ' ' && !e.target.matches('input, textarea, button')) {{
+                e.preventDefault();
+                if (isPaused) {{
+                    resumeAutoUpdate();
+                    showToast('Auto-update resumed', 'info');
+                }} else {{
+                    stopAutoUpdate();
+                    showToast('Auto-update paused', 'info');
+                }}
             }}
         }});
 
@@ -2606,7 +2720,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             if (document.hidden) {{
                 stopAutoUpdate();
             }} else {{
-                startAutoUpdate();
+                resumeAutoUpdate();
                 // Force immediate update when tab becomes visible
                 setTimeout(updateSubscriptionData, 500);
             }}
@@ -2614,7 +2728,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
 
         // Clean up on page unload
         window.addEventListener('beforeunload', function() {{
-            stopAutoUpdate();
+            if (timerInterval) clearInterval(timerInterval);
         }});
 
         // Touch feedback for copy button
