@@ -2,6 +2,7 @@
 # All templates with escaped braces for Python .format()
 
 # ---------- LOGIN_HTML ----------
+# ---------- LOGIN_HTML (with Persian font support) ----------
 LOGIN_HTML = r"""<!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -9,14 +10,15 @@ LOGIN_HTML = r"""<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login · MX-UI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Inter', 'Vazirmatn', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
                     }
                 }
@@ -46,6 +48,18 @@ LOGIN_HTML = r"""<!DOCTYPE html>
                 padding-right: 1rem;
             }
         }
+        /* Persian font support - Vazirmatn for Persian characters */
+        .font-persian {
+            font-family: 'Vazirmatn', 'Inter', sans-serif;
+        }
+        /* Ensure English text still looks good */
+        .font-english {
+            font-family: 'Inter', 'Vazirmatn', sans-serif;
+        }
+        /* Mixed content support */
+        .font-mixed {
+            font-family: 'Inter', 'Vazirmatn', sans-serif;
+        }
     </style>
 </head>
 <body class="font-sans text-slate-200 min-h-screen flex items-center justify-center bg-[#070a13] relative antialiased tracking-tight p-4 mobile-padding">
@@ -69,36 +83,36 @@ LOGIN_HTML = r"""<!DOCTYPE html>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent block truncate">MX-UI PANEL</span>
-                    <span class="text-xs text-slate-500 font-medium">v1.0.0</span>
+                    <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent block truncate font-english">MX-UI PANEL</span>
+                    <span class="text-xs text-slate-500 font-medium font-english">v1.0.0</span>
                 </div>
             </div>
             
             <!-- Title -->
-            <h1 class="text-xl font-bold text-slate-100 mb-1">Sign In</h1>
-            <p class="text-sm text-slate-400 mb-6">Enter your password to access the dashboard</p>
+            <h1 class="text-xl font-bold text-slate-100 mb-1 font-english">Sign In</h1>
+            <p class="text-sm text-slate-400 mb-6 font-english">Enter your password to access the dashboard</p>
             
             <!-- Default Password Display -->
             <div class="bg-slate-800/40 border border-slate-700/50 rounded-xl p-3 mb-5">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    <span class="text-xs text-slate-400">Default password</span>
-                    <span id="default-password-display" class="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20 cursor-pointer hover:bg-blue-500/20 transition text-center sm:text-left" onclick="document.getElementById('pw').value='MUVIXO';document.getElementById('pw').focus();">
+                    <span class="text-xs text-slate-400 font-english">Default password</span>
+                    <span id="default-password-display" class="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20 cursor-pointer hover:bg-blue-500/20 transition text-center sm:text-left font-english" onclick="document.getElementById('pw').value='MUVIXO';document.getElementById('pw').focus();">
                         MUVIXO
                     </span>
                 </div>
                 <div id="password-status-message" class="hidden mt-2 text-xs text-amber-400 border-t border-amber-500/20 pt-2">
-                    <span class="font-medium">⚠️ Password changed</span>
-                    <span class="text-slate-400 ml-2">(your custom password)</span>
+                    <span class="font-medium font-english">⚠️ Password changed</span>
+                    <span class="text-slate-400 ml-2 font-english">(your custom password)</span>
                 </div>
             </div>
             
             <!-- Login Form -->
             <form id="loginForm">
                 <div class="mb-4">
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password</label>
-                    <input type="password" id="pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="Enter your password" autofocus required>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 font-english">Password</label>
+                    <input type="password" id="pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring font-english" placeholder="Enter your password" autofocus required>
                 </div>
-                <button type="submit" id="loginButton" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm px-4 py-2.5 rounded-xl transition duration-200 shadow-lg shadow-blue-600/10 flex items-center justify-center gap-2">
+                <button type="submit" id="loginButton" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm px-4 py-2.5 rounded-xl transition duration-200 shadow-lg shadow-blue-600/10 flex items-center justify-center gap-2 font-english">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
                         <polyline points="10 17 15 12 10 7"/>
@@ -106,11 +120,11 @@ LOGIN_HTML = r"""<!DOCTYPE html>
                     </svg>
                     Sign In
                 </button>
-                <div id="errorMsg" class="mt-3 text-sm text-red-400 hidden"></div>
+                <div id="errorMsg" class="mt-3 text-sm text-red-400 hidden font-english"></div>
             </form>
             
             <!-- Footer -->
-            <div class="mt-6 pt-4 border-t border-slate-800/60 text-center text-xs text-slate-500">
+            <div class="mt-6 pt-4 border-t border-slate-800/60 text-center text-xs text-slate-500 font-english">
                 Created by Muvixo
             </div>
         </div>
@@ -125,7 +139,7 @@ LOGIN_HTML = r"""<!DOCTYPE html>
                 if (!data.is_default) {
                     const display = document.getElementById('default-password-display');
                     display.textContent = 'Password changed';
-                    display.className = 'text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20 text-center sm:text-left';
+                    display.className = 'text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20 text-center sm:text-left font-english';
                     display.onclick = null;
                     
                     // Show status message
@@ -215,9 +229,11 @@ LOGIN_HTML = r"""<!DOCTYPE html>
 </body>
 </html>"""
 
+
 # ---------- DASHBOARD_HTML (with Database Settings Modal) ----------
+# ---------- DASHBOARD_HTML (with Persian font support) ----------
 DASHBOARD_HTML = r"""<!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
@@ -228,13 +244,13 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Inter', 'Vazirmatn', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
                     }
                 }
@@ -281,7 +297,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             padding: 8px 18px;
             border-radius: 12px;
             font-size: 13px;
-            font-family: Inter, sans-serif;
+            font-family: 'Inter', 'Vazirmatn', sans-serif;
             opacity: 0;
             transition: opacity 0.25s, transform 0.25s;
             z-index: 9999;
@@ -380,6 +396,16 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         }
         .input-focus-ring-green:focus {
             box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+        }
+        /* Persian font support */
+        .font-persian {
+            font-family: 'Vazirmatn', 'Inter', sans-serif;
+        }
+        .font-english {
+            font-family: 'Inter', 'Vazirmatn', sans-serif;
+        }
+        .font-mixed {
+            font-family: 'Inter', 'Vazirmatn', sans-serif;
         }
         /* Toggle Switch Styles */
         .toggle-switch {
@@ -554,6 +580,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: #64748b;
+            font-family: 'Inter', 'Vazirmatn', sans-serif;
         }
         .db-value {
             font-size: 13px;
@@ -609,37 +636,34 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     <i data-lucide="shield-check" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 </div>
                 <div class="min-w-0">
-                    <span class="font-bold text-sm sm:text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent font-sans truncate block">MX-UI PANEL</span>
-                    <span class="text-[10px] sm:text-xs text-slate-500 font-medium tracking-normal block truncate">v1.0.0</span>
+                    <span class="font-bold text-sm sm:text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent font-sans truncate block font-english">MX-UI PANEL</span>
+                    <span class="text-[10px] sm:text-xs text-slate-500 font-medium tracking-normal block truncate font-english">v1.0.0</span>
                 </div>
             </div>
             <div class="flex items-center space-x-1 sm:space-x-3 flex-shrink-0">
-                <span class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap transition-all duration-300 hover:bg-emerald-500/20">
+                <span class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap transition-all duration-300 hover:bg-emerald-500/20 font-english">
                     <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                     Online
                 </span>
                 <!-- Database Settings Button -->
-                <button onclick="toggleModal('databaseModal', true)" class="text-slate-400 hover:text-emerald-400 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0 transition-all duration-300 hover:scale-105" title="Database Settings">
+                <button onclick="toggleModal('databaseModal', true)" class="text-slate-400 hover:text-emerald-400 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0 transition-all duration-300 hover:scale-105 font-english" title="Database Settings">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 sm:w-5 sm:h-5">
-  <!-- Top Cylinder -->
-  <ellipse cx="12" cy="5" rx="9" ry="3" />
-  
-  <!-- Middle Cylinder -->
-  <path d="M3 5v6c0 1.66 4 3 9 3s9-1.34 9-3V5" />
-  
-  <!-- Bottom Cylinder -->
-  <path d="M3 11v6c0 1.66 4 3 9 3s9-1.34 9-3v-6" />
-</svg>
-
-                    <span class="hidden xs:inline">Database</span>
+                        <!-- Top Cylinder -->
+                        <ellipse cx="12" cy="5" rx="9" ry="3" />
+                        <!-- Middle Cylinder -->
+                        <path d="M3 5v6c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                        <!-- Bottom Cylinder -->
+                        <path d="M3 11v6c0 1.66 4 3 9 3s9-1.34 9-3v-6" />
+                    </svg>
+                    <span class="hidden xs:inline font-english">Database</span>
                 </button>
-                <button onclick="toggleModal('settingsModal', true)" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0 transition-all duration-300 hover:scale-105">
+                <button onclick="toggleModal('settingsModal', true)" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0 transition-all duration-300 hover:scale-105 font-english">
                     <i data-lucide="settings" class="w-4 h-4"></i>
-                    <span class="hidden xs:inline">Settings</span>
+                    <span class="hidden xs:inline font-english">Settings</span>
                 </button>
-                <button onclick="logout()" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0 transition-all duration-300 hover:scale-105">
+                <button onclick="logout()" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0 transition-all duration-300 hover:scale-105 font-english">
                     <i data-lucide="log-out" class="w-4 h-4"></i>
-                    <span class="hidden xs:inline">Logout</span>
+                    <span class="hidden xs:inline font-english">Logout</span>
                 </button>
             </div>
         </div>
@@ -651,29 +675,29 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         <!-- Stats Summary -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
             <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center transition-all duration-300 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5">
-                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Traffic</p>
-                <p class="text-sm sm:text-lg font-bold text-blue-400 font-mono truncate stat-value" id="total-traffic">0 MB</p>
+                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider font-english">Traffic</p>
+                <p class="text-sm sm:text-lg font-bold text-blue-400 font-mono truncate stat-value font-english" id="total-traffic">0 MB</p>
             </div>
             <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center transition-all duration-300 hover:border-amber-500/30 hover:shadow-lg hover:shadow-amber-500/5">
-                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Usage</p>
-                <p class="text-sm sm:text-lg font-bold text-amber-400 font-mono truncate stat-value" id="total-usage">0 GB</p>
+                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider font-english">Usage</p>
+                <p class="text-sm sm:text-lg font-bold text-amber-400 font-mono truncate stat-value font-english" id="total-usage">0 GB</p>
             </div>
             <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5">
-                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Inbounds</p>
-                <p class="text-sm sm:text-lg font-bold text-emerald-400 font-mono truncate stat-value" id="total-inbounds">0</p>
+                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider font-english">Inbounds</p>
+                <p class="text-sm sm:text-lg font-bold text-emerald-400 font-mono truncate stat-value font-english" id="total-inbounds">0</p>
             </div>
             <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5">
-                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Connections</p>
-                <p class="text-sm sm:text-lg font-bold text-purple-400 font-mono truncate stat-value" id="active-connections">0</p>
+                <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider font-english">Connections</p>
+                <p class="text-sm sm:text-lg font-bold text-purple-400 font-mono truncate stat-value font-english" id="active-connections">0</p>
             </div>
         </div>
 
         <!-- Hardware Diagnostic Rings with Show More -->
         <div class="flex items-center justify-between mb-3 px-1">
-            <h2 class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest">System Diagnostics</h2>
-            <button onclick="toggleSystemDetails()" id="toggleSystemBtn" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center gap-1 group cursor-pointer select-none">
+            <h2 class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest font-english">System Diagnostics</h2>
+            <button onclick="toggleSystemDetails()" id="toggleSystemBtn" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center gap-1 group cursor-pointer select-none font-english">
                 <i data-lucide="chevron-down" id="toggleSystemIcon" class="w-3 h-3 sm:w-4 sm:h-4"></i>
-                <span id="toggleSystemText" class="transition-all duration-300">Show More</span>
+                <span id="toggleSystemText" class="transition-all duration-300 font-english">Show More</span>
             </button>
         </div>
 
@@ -686,11 +710,11 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         <path class="text-blue-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     </svg>
-                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-blue-400 transition-all duration-300" id="ring-cpu-pct">0%</div>
+                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-blue-400 transition-all duration-300 font-english" id="ring-cpu-pct">0%</div>
                 </div>
                 <div class="text-right flex-1 min-w-0">
-                    <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">CPU</p>
-                    <p class="text-xs sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate transition-all duration-300" id="ring-cpu-val">0 Cores</p>
+                    <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider font-english">CPU</p>
+                    <p class="text-xs sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate transition-all duration-300 font-english" id="ring-cpu-val">0 Cores</p>
                 </div>
             </div>
             <!-- RAM -->
@@ -700,11 +724,11 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         <path class="text-indigo-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     </svg>
-                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-indigo-400 transition-all duration-300" id="ring-ram-pct">0%</div>
+                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-indigo-400 transition-all duration-300 font-english" id="ring-ram-pct">0%</div>
                 </div>
                 <div class="text-right flex-1 min-w-0">
-                    <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">RAM</p>
-                    <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate transition-all duration-300" id="ring-ram-val">0 GB</p>
+                    <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider font-english">RAM</p>
+                    <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate transition-all duration-300 font-english" id="ring-ram-val">0 GB</p>
                 </div>
             </div>
             <!-- Swap -->
@@ -714,11 +738,11 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         <path class="text-amber-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     </svg>
-                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-amber-400 transition-all duration-300" id="ring-swap-pct">0%</div>
+                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-amber-400 transition-all duration-300 font-english" id="ring-swap-pct">0%</div>
                 </div>
                 <div class="text-right flex-1 min-w-0">
-                    <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Swap</p>
-                    <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate transition-all duration-300" id="ring-swap-val">0 GB</p>
+                    <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider font-english">Swap</p>
+                    <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate transition-all duration-300 font-english" id="ring-swap-val">0 GB</p>
                 </div>
             </div>
             <!-- Storage -->
@@ -728,11 +752,11 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         <path class="text-rose-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     </svg>
-                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-rose-400 transition-all duration-300" id="ring-disk-pct">0%</div>
+                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-rose-400 transition-all duration-300 font-english" id="ring-disk-pct">0%</div>
                 </div>
                 <div class="text-right flex-1 min-w-0">
-                    <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Storage</p>
-                    <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate transition-all duration-300" id="ring-disk-val">0 GB</p>
+                    <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider font-english">Storage</p>
+                    <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate transition-all duration-300 font-english" id="ring-disk-val">0 GB</p>
                 </div>
             </div>
         </div>
@@ -744,28 +768,28 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="detail-card bg-slate-900/40 border border-slate-800/60 rounded-xl p-3 sm:p-4">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="cpu" class="w-4 h-4 text-blue-400"></i>
-                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">CPU Details</span>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider font-english">CPU Details</span>
                     </div>
                     <div class="space-y-1.5 text-[10px] sm:text-xs">
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Load Average</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="cpu-load-avg">--</span>
+                            <span class="text-slate-400 font-english">Load Average</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="cpu-load-avg">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Cores / Threads</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="cpu-cores-detail">--</span>
+                            <span class="text-slate-400 font-english">Cores / Threads</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="cpu-cores-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Usage (User)</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="cpu-user">--</span>
+                            <span class="text-slate-400 font-english">Usage (User)</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="cpu-user">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Usage (System)</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="cpu-system">--</span>
+                            <span class="text-slate-400 font-english">Usage (System)</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="cpu-system">--</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Usage (Idle)</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="cpu-idle">--</span>
+                            <span class="text-slate-400 font-english">Usage (Idle)</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="cpu-idle">--</span>
                         </div>
                     </div>
                 </div>
@@ -774,28 +798,28 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="detail-card bg-slate-900/40 border border-slate-800/60 rounded-xl p-3 sm:p-4">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="memory-stick" class="w-4 h-4 text-indigo-400"></i>
-                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">RAM Details</span>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider font-english">RAM Details</span>
                     </div>
                     <div class="space-y-1.5 text-[10px] sm:text-xs">
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Total</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="ram-total-detail">--</span>
+                            <span class="text-slate-400 font-english">Total</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="ram-total-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Used</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="ram-used-detail">--</span>
+                            <span class="text-slate-400 font-english">Used</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="ram-used-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Free</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="ram-free-detail">--</span>
+                            <span class="text-slate-400 font-english">Free</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="ram-free-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Available</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="ram-available-detail">--</span>
+                            <span class="text-slate-400 font-english">Available</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="ram-available-detail">--</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Cached</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="ram-cached-detail">--</span>
+                            <span class="text-slate-400 font-english">Cached</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="ram-cached-detail">--</span>
                         </div>
                     </div>
                 </div>
@@ -804,24 +828,24 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="detail-card bg-slate-900/40 border border-slate-800/60 rounded-xl p-3 sm:p-4">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="hard-drive" class="w-4 h-4 text-amber-400"></i>
-                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Swap Details</span>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider font-english">Swap Details</span>
                     </div>
                     <div class="space-y-1.5 text-[10px] sm:text-xs">
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Total</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="swap-total-detail">--</span>
+                            <span class="text-slate-400 font-english">Total</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="swap-total-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Used</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="swap-used-detail">--</span>
+                            <span class="text-slate-400 font-english">Used</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="swap-used-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Free</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="swap-free-detail">--</span>
+                            <span class="text-slate-400 font-english">Free</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="swap-free-detail">--</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Usage</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="swap-usage-detail">--</span>
+                            <span class="text-slate-400 font-english">Usage</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="swap-usage-detail">--</span>
                         </div>
                     </div>
                 </div>
@@ -830,24 +854,24 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="detail-card bg-slate-900/40 border border-slate-800/60 rounded-xl p-3 sm:p-4">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="database" class="w-4 h-4 text-rose-400"></i>
-                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Storage Details</span>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider font-english">Storage Details</span>
                     </div>
                     <div class="space-y-1.5 text-[10px] sm:text-xs">
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Total</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="disk-total-detail">--</span>
+                            <span class="text-slate-400 font-english">Total</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="disk-total-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Used</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="disk-used-detail">--</span>
+                            <span class="text-slate-400 font-english">Used</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="disk-used-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Free</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="disk-free-detail">--</span>
+                            <span class="text-slate-400 font-english">Free</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="disk-free-detail">--</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Usage</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="disk-usage-detail">--</span>
+                            <span class="text-slate-400 font-english">Usage</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="disk-usage-detail">--</span>
                         </div>
                     </div>
                 </div>
@@ -856,24 +880,24 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="detail-card bg-slate-900/40 border border-slate-800/60 rounded-xl p-3 sm:p-4">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="network" class="w-4 h-4 text-cyan-400"></i>
-                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Network Stats</span>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider font-english">Network Stats</span>
                     </div>
                     <div class="space-y-1.5 text-[10px] sm:text-xs">
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Total Traffic</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="network-total">--</span>
+                            <span class="text-slate-400 font-english">Total Traffic</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="network-total">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Total Requests</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="network-requests">--</span>
+                            <span class="text-slate-400 font-english">Total Requests</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="network-requests">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Active Connections</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="network-connections">--</span>
+                            <span class="text-slate-400 font-english">Active Connections</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="network-connections">--</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Errors</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="network-errors">--</span>
+                            <span class="text-slate-400 font-english">Errors</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="network-errors">--</span>
                         </div>
                     </div>
                 </div>
@@ -882,24 +906,24 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="detail-card bg-slate-900/40 border border-slate-800/60 rounded-xl p-3 sm:p-4">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="info" class="w-4 h-4 text-green-400"></i>
-                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">System Info</span>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider font-english">System Info</span>
                     </div>
                     <div class="space-y-1.5 text-[10px] sm:text-xs">
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Uptime</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="sys-uptime">--</span>
+                            <span class="text-slate-400 font-english">Uptime</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="sys-uptime">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Active Configs</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="sys-active-configs">--</span>
+                            <span class="text-slate-400 font-english">Active Configs</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="sys-active-configs">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
-                            <span class="text-slate-400">Total Configs</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="sys-total-configs">--</span>
+                            <span class="text-slate-400 font-english">Total Configs</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="sys-total-configs">--</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Expired Configs</span>
-                            <span class="text-slate-200 font-mono transition-all duration-300" id="sys-expired-configs">--</span>
+                            <span class="text-slate-400 font-english">Expired Configs</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300 font-english" id="sys-expired-configs">--</span>
                         </div>
                     </div>
                 </div>
@@ -910,10 +934,10 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         <div class="bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden glow-effect transition-all duration-300">
             <div class="p-4 sm:p-6 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-900/40">
                 <div class="min-w-0">
-                    <h2 class="text-lg sm:text-xl font-bold text-slate-100 truncate">Configs</h2>
-                    <p class="text-xs sm:text-sm text-slate-400 mt-0.5 truncate">All V2Ray configurations:</p>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-100 truncate font-english">Configs</h2>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-0.5 truncate font-english">All V2Ray configurations:</p>
                 </div>
-                <button onclick="toggleModal('inboundModal', true)" class="flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25 hover:scale-105 active:scale-95 shrink-0">
+                <button onclick="toggleModal('inboundModal', true)" class="flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25 hover:scale-105 active:scale-95 shrink-0 font-english">
                     <i data-lucide="plus" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                     <span>Add Config</span>
                 </button>
@@ -928,14 +952,14 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     <footer class="border-t border-slate-800/60 bg-slate-950 py-3 sm:py-4 text-[10px] sm:text-xs text-slate-500">
         <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 mobile-padding">
             <div class="flex items-center space-x-2 sm:space-x-3 flex-wrap justify-center sm:justify-start">
-                <p>MX-UI v1.0.0</p>
-                <span class="text-[8px] sm:text-[9px] font-mono font-bold tracking-widest text-slate-400 border border-slate-800 px-1.5 py-0.5 rounded bg-slate-900/60 select-none transition-all duration-300 hover:border-slate-600">
+                <p class="font-english">MX-UI v1.0.0</p>
+                <span class="text-[8px] sm:text-[9px] font-mono font-bold tracking-widest text-slate-400 border border-slate-800 px-1.5 py-0.5 rounded bg-slate-900/60 select-none transition-all duration-300 hover:border-slate-600 font-english">
                     Created by Muvixo
                 </span>
             </div>
             <div class="flex items-center space-x-3 sm:space-x-4 flex-wrap justify-center">
-                <span>Core: <strong class="text-slate-400 font-mono text-[10px] sm:text-[11px] transition-all duration-300" id="uptime-display">00:00:00</strong></span>
-                <span>API: <strong class="text-emerald-400 transition-all duration-300">Connected</strong></span>
+                <span class="font-english">Core: <strong class="text-slate-400 font-mono text-[10px] sm:text-[11px] transition-all duration-300 font-english" id="uptime-display">00:00:00</strong></span>
+                <span class="font-english">API: <strong class="text-emerald-400 transition-all duration-300 font-english">Connected</strong></span>
             </div>
         </div>
     </footer>
@@ -977,8 +1001,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         </svg>
                     </div>
                     <div class="min-w-0">
-                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">Database Management</h3>
-                        <p class="text-[10px] sm:text-xs text-slate-400 truncate">View all stored data, backup and restore your configuration</p>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate font-english">Database Management</h3>
+                        <p class="text-[10px] sm:text-xs text-slate-400 truncate font-english">View all stored data, backup and restore your configuration</p>
                     </div>
                 </div>
                 <button onclick="toggleModal('databaseModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all duration-300"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
@@ -988,36 +1012,36 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <!-- Database Stats Cards -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="dbStats">
                     <div class="db-card">
-                        <div class="db-label">Total Configs</div>
-                        <div class="db-value highlight" id="db-total-configs">0</div>
+                        <div class="db-label font-english">Total Configs</div>
+                        <div class="db-value highlight font-english" id="db-total-configs">0</div>
                     </div>
                     <div class="db-card">
-                        <div class="db-label">Active Configs</div>
-                        <div class="db-value green" id="db-active-configs">0</div>
+                        <div class="db-label font-english">Active Configs</div>
+                        <div class="db-value green font-english" id="db-active-configs">0</div>
                     </div>
                     <div class="db-card">
-                        <div class="db-label">Total Traffic</div>
-                        <div class="db-value amber" id="db-total-traffic">0 B</div>
+                        <div class="db-label font-english">Total Traffic</div>
+                        <div class="db-value amber font-english" id="db-total-traffic">0 B</div>
                     </div>
                     <div class="db-card">
-                        <div class="db-label">Last Saved</div>
-                        <div class="db-value" id="db-last-saved">Never</div>
+                        <div class="db-label font-english">Last Saved</div>
+                        <div class="db-value font-english" id="db-last-saved">Never</div>
                     </div>
                 </div>
 
                 <!-- Config Details Table -->
                 <div class="db-card">
-                    <div class="db-label mb-3">All Configurations Details</div>
+                    <div class="db-label mb-3 font-english">All Configurations Details</div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-[11px] sm:text-xs">
                             <thead>
                                 <tr class="text-slate-500 border-b border-slate-700/50">
-                                    <th class="text-left py-2 px-2">Label</th>
-                                    <th class="text-left py-2 px-2">UUID</th>
-                                    <th class="text-right py-2 px-2">Used</th>
-                                    <th class="text-right py-2 px-2">Limit</th>
-                                    <th class="text-center py-2 px-2">Status</th>
-                                    <th class="text-right py-2 px-2">IPs</th>
+                                    <th class="text-left py-2 px-2 font-english">Label</th>
+                                    <th class="text-left py-2 px-2 font-english">UUID</th>
+                                    <th class="text-right py-2 px-2 font-english">Used</th>
+                                    <th class="text-right py-2 px-2 font-english">Limit</th>
+                                    <th class="text-center py-2 px-2 font-english">Status</th>
+                                    <th class="text-right py-2 px-2 font-english">IPs</th>
                                 </tr>
                             </thead>
                             <tbody id="dbConfigsBody">
@@ -1032,10 +1056,10 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     <div class="db-card">
                         <div class="flex items-center gap-2 mb-3">
                             <i data-lucide="download" class="w-4 h-4 text-blue-400"></i>
-                            <span class="db-label">Backup Database</span>
+                            <span class="db-label font-english">Backup Database</span>
                         </div>
-                        <p class="text-[10px] text-slate-400 mb-3">Download complete database as JSON file</p>
-                        <button onclick="downloadDatabase()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25 flex items-center justify-center gap-2">
+                        <p class="text-[10px] text-slate-400 mb-3 font-english">Download complete database as JSON file</p>
+                        <button onclick="downloadDatabase()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25 flex items-center justify-center gap-2 font-english">
                             <i data-lucide="download" class="w-4 h-4"></i>
                             Download mx-ui.json
                         </button>
@@ -1045,18 +1069,18 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     <div class="db-card">
                         <div class="flex items-center gap-2 mb-3">
                             <i data-lucide="upload" class="w-4 h-4 text-emerald-400"></i>
-                            <span class="db-label">Restore Database</span>
+                            <span class="db-label font-english">Restore Database</span>
                         </div>
-                        <p class="text-[10px] text-slate-400 mb-3">Upload a mx-ui.json backup file</p>
+                        <p class="text-[10px] text-slate-400 mb-3 font-english">Upload a mx-ui.json backup file</p>
                         <div class="file-drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
                             <input type="file" id="fileInput" accept=".json" class="hidden" onchange="handleFileSelect(event)">
                             <div id="dropZoneContent">
                                 <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-500 mx-auto mb-2"></i>
-                                <p class="text-xs text-slate-400">Drop your mx-ui.json here or click to browse</p>
-                                <p class="text-[10px] text-slate-500 mt-1" id="fileName">No file selected</p>
+                                <p class="text-xs text-slate-400 font-english">Drop your mx-ui.json here or click to browse</p>
+                                <p class="text-[10px] text-slate-500 mt-1 font-english" id="fileName">No file selected</p>
                             </div>
                         </div>
-                        <button onclick="restoreDatabase()" id="restoreBtn" class="w-full mt-3 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-emerald-600/10 hover:shadow-emerald-600/25 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <button onclick="restoreDatabase()" id="restoreBtn" class="w-full mt-3 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-emerald-600/10 hover:shadow-emerald-600/25 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed font-english">
                             <i data-lucide="upload" class="w-4 h-4"></i>
                             Restore Database
                         </button>
@@ -1065,7 +1089,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             </div>
 
             <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end shrink-0">
-                <button onclick="toggleModal('databaseModal', false)" class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 hover:scale-105 active:scale-95">
+                <button onclick="toggleModal('databaseModal', false)" class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 font-english">
                     Close
                 </button>
             </div>
@@ -1079,8 +1103,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="flex items-center space-x-3 min-w-0">
                     <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20 shrink-0"><i data-lucide="plus-circle" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
                     <div class="min-w-0">
-                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">Add New Config</h3>
-                        <p class="text-[10px] sm:text-xs text-slate-400 truncate">Deploy a new VLESS or XHTTP configuration.</p>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate font-english">Add New Config</h3>
+                        <p class="text-[10px] sm:text-xs text-slate-400 truncate font-english">Deploy a new VLESS or XHTTP configuration.</p>
                     </div>
                 </div>
                 <button onclick="toggleModal('inboundModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all duration-300"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
@@ -1088,12 +1112,12 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-5">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Remark / Label</label>
-                        <input type="text" id="new-label" placeholder="e.g., US-Reality" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Remark / Label</label>
+                        <input type="text" id="new-label" placeholder="e.g., US-Reality" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english">
                     </div>
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Protocol</label>
-                        <select id="new-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 font-mono text-xs">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Protocol</label>
+                        <select id="new-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 font-mono text-xs font-english">
                             <option value="vless-ws">VLESS + WS</option>
                             <option value="xhttp-packet-up">XHTTP (packet-up)</option>
                             <option value="xhttp-stream-up">XHTTP (stream-up)</option>
@@ -1102,8 +1126,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Fingerprint (uTLS)</label>
-                        <select id="new-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 font-mono text-xs">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Fingerprint (uTLS)</label>
+                        <select id="new-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 font-mono text-xs font-english">
                             <option value="chrome">chrome</option>
                             <option value="firefox">firefox</option>
                             <option value="safari">safari</option>
@@ -1117,30 +1141,30 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">ALPN (optional)</label>
-                        <input type="text" id="new-alpn" placeholder="e.g., h2,http/1.1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">ALPN (optional)</label>
+                        <input type="text" id="new-alpn" placeholder="e.g., h2,http/1.1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Traffic Limit (MB)</label>
-                        <input type="number" id="new-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Traffic Limit (MB)</label>
+                        <input type="number" id="new-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english">
                     </div>
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Expiry (days, 0 = unlimited)</label>
-                        <input type="number" id="new-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Expiry (days, 0 = unlimited)</label>
+                        <input type="number" id="new-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">IP Limit (0 = unlimited)</label>
-                        <input type="number" id="new-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">IP Limit (0 = unlimited)</label>
+                        <input type="number" id="new-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english">
                     </div>
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Speed Limit (0 = unlimited)</label>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Speed Limit (0 = unlimited)</label>
                         <div class="flex gap-2">
-                            <input type="number" id="new-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring">
-                            <select id="new-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 font-mono">
+                            <input type="number" id="new-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english">
+                            <select id="new-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 font-mono font-english">
                                 <option value="MBIT">Mbps</option>
                                 <option value="KB">KB/s</option>
                                 <option value="MB">MB/s</option>
@@ -1150,8 +1174,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 </div>
             </div>
             <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex flex-col sm:flex-row items-center justify-end space-y-2 sm:space-y-0 sm:space-x-3 shrink-0">
-                <button onclick="toggleModal('inboundModal', false)" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300">Cancel</button>
-                <button onclick="createConfig()" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25">Deploy Config</button>
+                <button onclick="toggleModal('inboundModal', false)" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 font-english">Cancel</button>
+                <button onclick="createConfig()" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25 font-english">Deploy Config</button>
             </div>
         </div>
     </div>
@@ -1163,8 +1187,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="flex items-center space-x-3 min-w-0">
                     <div class="p-2 bg-amber-500/10 rounded-lg text-amber-400 border border-amber-500/20 shrink-0"><i data-lucide="edit" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
                     <div class="min-w-0">
-                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">Modify Config: <span id="editNodeTitle" class="text-amber-400">Node</span></h3>
-                        <p class="text-[10px] sm:text-xs text-slate-400 truncate">Altering production values resets live connection pipelines.</p>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate font-english">Modify Config: <span id="editNodeTitle" class="text-amber-400 font-english">Node</span></h3>
+                        <p class="text-[10px] sm:text-xs text-slate-400 truncate font-english">Altering production values resets live connection pipelines.</p>
                     </div>
                 </div>
                 <button onclick="toggleModal('editModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all duration-300"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
@@ -1173,12 +1197,12 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <input type="hidden" id="edit-uuid">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Remark Label</label>
-                        <input type="text" id="edit-label" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 font-mono input-focus-ring-amber">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Remark Label</label>
+                        <input type="text" id="edit-label" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 font-mono input-focus-ring-amber font-english">
                     </div>
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Protocol</label>
-                        <select id="edit-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 font-mono text-xs">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Protocol</label>
+                        <select id="edit-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 font-mono text-xs font-english">
                             <option value="vless-ws">VLESS + WS</option>
                             <option value="xhttp-packet-up">XHTTP (packet-up)</option>
                             <option value="xhttp-stream-up">XHTTP (stream-up)</option>
@@ -1187,8 +1211,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Fingerprint</label>
-                        <select id="edit-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 font-mono text-xs">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Fingerprint</label>
+                        <select id="edit-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 font-mono text-xs font-english">
                             <option value="chrome">chrome</option>
                             <option value="firefox">firefox</option>
                             <option value="safari">safari</option>
@@ -1202,30 +1226,30 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">ALPN (optional)</label>
-                        <input type="text" id="edit-alpn" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">ALPN (optional)</label>
+                        <input type="text" id="edit-alpn" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber font-english">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Traffic Limit (MB)</label>
-                        <input type="number" id="edit-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Traffic Limit (MB)</label>
+                        <input type="number" id="edit-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber font-english">
                     </div>
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Expiry (days from now)</label>
-                        <input type="number" id="edit-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Expiry (days from now)</label>
+                        <input type="number" id="edit-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber font-english">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">IP Limit</label>
-                        <input type="number" id="edit-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber">
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">IP Limit</label>
+                        <input type="number" id="edit-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber font-english">
                     </div>
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Speed Limit</label>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Speed Limit</label>
                         <div class="flex gap-2">
-                            <input type="number" id="edit-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber">
-                            <select id="edit-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 font-mono">
+                            <input type="number" id="edit-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber font-english">
+                            <select id="edit-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 font-mono font-english">
                                 <option value="MBIT">Mbps</option>
                                 <option value="KB">KB/s</option>
                                 <option value="MB">MB/s</option>
@@ -1235,8 +1259,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 </div>
             </div>
             <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex flex-col sm:flex-row items-center justify-end space-y-2 sm:space-y-0 sm:space-x-3 shrink-0">
-                <button onclick="toggleModal('editModal', false)" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300">Discard</button>
-                <button onclick="saveEdit()" class="w-full sm:w-auto px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-amber-600/10 hover:shadow-amber-600/25">Commit Changes</button>
+                <button onclick="toggleModal('editModal', false)" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 font-english">Discard</button>
+                <button onclick="saveEdit()" class="w-full sm:w-auto px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-amber-600/10 hover:shadow-amber-600/25 font-english">Commit Changes</button>
             </div>
         </div>
     </div>
@@ -1298,8 +1322,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         </svg>
                     </div>
                     <div class="min-w-0">
-                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">QR Codes</h3>
-                        <p class="text-[10px] sm:text-xs text-slate-400 truncate" id="qrTargetLabel">Default Link</p>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate font-english">QR Codes</h3>
+                        <p class="text-[10px] sm:text-xs text-slate-400 truncate font-english" id="qrTargetLabel">Default Link</p>
                     </div>
                 </div>
                 <button onclick="toggleModal('qrModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all duration-300 shrink-0">
@@ -1311,28 +1335,28 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4">
                     <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-4 text-center qr-code-container transition-all duration-300 hover:border-blue-500/30">
-                        <p class="text-[10px] sm:text-xs text-slate-400 mb-3 font-medium flex items-center justify-center gap-2">
+                        <p class="text-[10px] sm:text-xs text-slate-400 mb-3 font-medium flex items-center justify-center gap-2 font-english">
                             <i data-lucide="link" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                             Config Link
                         </p>
                         <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50 transition-all duration-300 hover:border-blue-500/50">
                             <img id="qrImage" src="" alt="Config QR Code" class="w-full h-full object-contain">
                         </div>
-                        <button onclick="copyText(document.getElementById('qrTextPayload').textContent)" class="mt-3 text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center justify-center gap-1.5 mx-auto hover:scale-105">
+                        <button onclick="copyText(document.getElementById('qrTextPayload').textContent)" class="mt-3 text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center justify-center gap-1.5 mx-auto hover:scale-105 font-english">
                             <i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                             Copy Config Link
                         </button>
                     </div>
 
                     <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-4 text-center qr-code-container transition-all duration-300 hover:border-blue-500/30">
-                        <p class="text-[10px] sm:text-xs text-slate-400 mb-3 font-medium flex items-center justify-center gap-2">
+                        <p class="text-[10px] sm:text-xs text-slate-400 mb-3 font-medium flex items-center justify-center gap-2 font-english">
                             <i data-lucide="folder-tree" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                             Subscription Link
                         </p>
                         <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50 transition-all duration-300 hover:border-blue-500/50">
                             <img id="qrSubImage" src="" alt="Subscription QR Code" class="w-full h-full object-contain">
                         </div>
-                        <button onclick="copyText(document.getElementById('qrSubPayload').textContent)" class="mt-3 text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center justify-center gap-1.5 mx-auto hover:scale-105">
+                        <button onclick="copyText(document.getElementById('qrSubPayload').textContent)" class="mt-3 text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center justify-center gap-1.5 mx-auto hover:scale-105 font-english">
                             <i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                             Copy Sub Link
                         </button>
@@ -1341,24 +1365,24 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3">
-                        <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5">
+                        <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5 font-english">
                             <i data-lucide="link" class="w-3 h-3"></i>
                             Config Link
                         </span>
-                        <p id="qrTextPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate bg-slate-950/50 p-1.5 rounded border border-slate-800/40">https://example.com/config</p>
+                        <p id="qrTextPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate bg-slate-950/50 p-1.5 rounded border border-slate-800/40 font-english">https://example.com/config</p>
                     </div>
                     <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3">
-                        <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5">
+                        <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5 font-english">
                             <i data-lucide="folder-tree" class="w-3 h-3"></i>
                             Subscription Link
                         </span>
-                        <p id="qrSubPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate bg-slate-950/50 p-1.5 rounded border border-slate-800/40">https://example.com/sub</p>
+                        <p id="qrSubPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate bg-slate-950/50 p-1.5 rounded border border-slate-800/40 font-english">https://example.com/sub</p>
                     </div>
                 </div>
             </div>
 
             <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end shrink-0">
-                <button onclick="toggleModal('qrModal', false)" class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 hover:scale-105 active:scale-95">
+                <button onclick="toggleModal('qrModal', false)" class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 font-english">
                     Close
                 </button>
             </div>
@@ -1372,12 +1396,12 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <i data-lucide="alert-triangle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
             </div>
             <div class="space-y-1">
-                <h3 class="text-sm sm:text-base font-bold text-slate-100">Confirm Action</h3>
-                <p id="confirmMessage" class="text-[11px] sm:text-xs text-slate-400 leading-relaxed px-2">Are you sure?</p>
+                <h3 class="text-sm sm:text-base font-bold text-slate-100 font-english">Confirm Action</h3>
+                <p id="confirmMessage" class="text-[11px] sm:text-xs text-slate-400 leading-relaxed px-2 font-english">Are you sure?</p>
             </div>
             <div class="flex gap-3">
-                <button onclick="_confirmNo()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition-all duration-300">Cancel</button>
-                <button onclick="_confirmYes()" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-[10px] sm:text-xs font-semibold rounded-xl transition-all duration-300">Delete</button>
+                <button onclick="_confirmNo()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition-all duration-300 font-english">Cancel</button>
+                <button onclick="_confirmYes()" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-[10px] sm:text-xs font-semibold rounded-xl transition-all duration-300 font-english">Delete</button>
             </div>
         </div>
     </div>
@@ -1389,8 +1413,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="flex items-center space-x-3 min-w-0">
                     <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20 shrink-0"><i data-lucide="settings" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
                     <div class="min-w-0">
-                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">Settings</h3>
-                        <p class="text-[10px] sm:text-xs text-slate-400 truncate">Manage dashboard paths and security</p>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate font-english">Settings</h3>
+                        <p class="text-[10px] sm:text-xs text-slate-400 truncate font-english">Manage dashboard paths and security</p>
                     </div>
                 </div>
                 <button onclick="toggleModal('settingsModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all duration-300"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
@@ -1398,25 +1422,25 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-6">
                 <!-- Change Password Section -->
                 <div>
-                    <h4 class="text-xs sm:text-sm font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2">
+                    <h4 class="text-xs sm:text-sm font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2 font-english">
                         <i data-lucide="key" class="w-3 h-3 sm:w-4 sm:h-4 text-blue-400"></i>
                         Change Password
                     </h4>
                     <div class="space-y-3 sm:space-y-4">
                         <div>
-                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Current Password</label>
-                            <input type="password" id="settings-current-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring" placeholder="Enter current password">
+                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Current Password</label>
+                            <input type="password" id="settings-current-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english" placeholder="Enter current password">
                         </div>
                         <div>
-                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">New Password</label>
-                            <input type="password" id="settings-new-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring" placeholder="At least 4 characters">
+                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">New Password</label>
+                            <input type="password" id="settings-new-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english" placeholder="At least 4 characters">
                         </div>
                         <div>
-                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Confirm New Password</label>
-                            <input type="password" id="settings-confirm-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring" placeholder="Repeat new password">
+                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Confirm New Password</label>
+                            <input type="password" id="settings-confirm-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english" placeholder="Repeat new password">
                         </div>
-                        <div id="settingsError" class="text-[10px] sm:text-xs text-red-400 hidden"></div>
-                        <button onclick="changePassword()" class="w-full py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25">
+                        <div id="settingsError" class="text-[10px] sm:text-xs text-red-400 hidden font-english"></div>
+                        <button onclick="changePassword()" class="w-full py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25 font-english">
                             Update Password
                         </button>
                     </div>
@@ -1424,41 +1448,41 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="border-t border-slate-800/60"></div>
                 <!-- Path Settings Section -->
                 <div>
-                    <h4 class="text-xs sm:text-sm font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2">
+                    <h4 class="text-xs sm:text-sm font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2 font-english">
                         <i data-lucide="folder-tree" class="w-3 h-3 sm:w-4 sm:h-4 text-purple-400"></i>
                         Dashboard Paths
                     </h4>
                     <div class="space-y-3 sm:space-y-4">
                         <div>
-                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Dashboard Path</label>
+                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Dashboard Path</label>
                             <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="settings-dashboard-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple" placeholder="/dashboard">
-                                <button onclick="updatePath('dashboard')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25">Update</button>
+                                <input type="text" id="settings-dashboard-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple font-english" placeholder="/dashboard">
+                                <button onclick="updatePath('dashboard')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25 font-english">Update</button>
                             </div>
-                            <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-dashboard-path" class="text-slate-400 font-mono">/dashboard</span></p>
+                            <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1 font-english">Current: <span id="current-dashboard-path" class="text-slate-400 font-mono font-english">/dashboard</span></p>
                         </div>
                         <div>
-                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Login Path</label>
+                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Login Path</label>
                             <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="settings-login-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple" placeholder="/login">
-                                <button onclick="updatePath('login')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25">Update</button>
+                                <input type="text" id="settings-login-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple font-english" placeholder="/login">
+                                <button onclick="updatePath('login')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25 font-english">Update</button>
                             </div>
-                            <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-login-path" class="text-slate-400 font-mono">/login</span></p>
+                            <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1 font-english">Current: <span id="current-login-path" class="text-slate-400 font-mono font-english">/login</span></p>
                         </div>
                         <div>
-                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Subscription Path</label>
+                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Subscription Path</label>
                             <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="settings-sub-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple" placeholder="/sub">
-                                <button onclick="updatePath('sub')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25">Update</button>
+                                <input type="text" id="settings-sub-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple font-english" placeholder="/sub">
+                                <button onclick="updatePath('sub')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25 font-english">Update</button>
                             </div>
-                            <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-sub-path" class="text-slate-400 font-mono">/sub</span></p>
+                            <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1 font-english">Current: <span id="current-sub-path" class="text-slate-400 font-mono font-english">/sub</span></p>
                         </div>
-                        <div id="pathSettingsError" class="text-[10px] sm:text-xs text-red-400 hidden"></div>
+                        <div id="pathSettingsError" class="text-[10px] sm:text-xs text-red-400 hidden font-english"></div>
                     </div>
                 </div>
             </div>
             <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end shrink-0">
-                <button onclick="toggleModal('settingsModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300">Close</button>
+                <button onclick="toggleModal('settingsModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 font-english">Close</button>
             </div>
         </div>
     </div>
@@ -1470,10 +1494,10 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <i id="alertIcon" data-lucide="info" class="w-5 h-5 sm:w-6 sm:h-6"></i>
             </div>
             <div class="space-y-1">
-                <h3 id="alertTitle" class="text-sm sm:text-base font-bold text-slate-100">Notification</h3>
-                <p id="alertMessage" class="text-[11px] sm:text-xs text-slate-400 leading-relaxed px-2">Pipeline structural modifications updated successfully.</p>
+                <h3 id="alertTitle" class="text-sm sm:text-base font-bold text-slate-100 font-english">Notification</h3>
+                <p id="alertMessage" class="text-[11px] sm:text-xs text-slate-400 leading-relaxed px-2 font-english">Pipeline structural modifications updated successfully.</p>
             </div>
-            <button onclick="toggleModal('customAlert', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition-all duration-300">Acknowledge</button>
+            <button onclick="toggleModal('customAlert', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition-all duration-300 font-english">Acknowledge</button>
         </div>
     </div>
 
@@ -1583,21 +1607,21 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
                     const tbody = document.getElementById('dbConfigsBody');
                     if (links.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-slate-500">No configurations found</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-slate-500 font-english">No configurations found</td></tr>';
                     } else {
                         tbody.innerHTML = links.map(l => `
                             <tr class="border-b border-slate-800/30 hover:bg-slate-800/20 transition-colors">
-                                <td class="py-2 px-2 text-slate-200 font-medium truncate max-w-[80px]">${l.label || 'Unnamed'}</td>
-                                <td class="py-2 px-2 text-slate-400 font-mono text-[10px] truncate max-w-[100px]">${l.uuid.substring(0, 12)}...</td>
-                                <td class="py-2 px-2 text-right text-blue-300 font-mono">${fmtBytes(l.used_bytes || 0)}</td>
-                                <td class="py-2 px-2 text-right text-amber-300 font-mono">${l.limit_bytes === 0 ? '∞' : fmtBytes(l.limit_bytes)}</td>
+                                <td class="py-2 px-2 text-slate-200 font-medium truncate max-w-[80px] font-english">${l.label || 'Unnamed'}</td>
+                                <td class="py-2 px-2 text-slate-400 font-mono text-[10px] truncate max-w-[100px] font-english">${l.uuid.substring(0, 12)}...</td>
+                                <td class="py-2 px-2 text-right text-blue-300 font-mono font-english">${fmtBytes(l.used_bytes || 0)}</td>
+                                <td class="py-2 px-2 text-right text-amber-300 font-mono font-english">${l.limit_bytes === 0 ? '∞' : fmtBytes(l.limit_bytes)}</td>
                                 <td class="py-2 px-2 text-center">
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] ${l.active ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] ${l.active ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'} font-english">
                                         <span class="w-1.5 h-1.5 rounded-full ${l.active ? 'bg-emerald-400' : 'bg-red-400'}"></span>
                                         ${l.active ? 'Active' : 'Inactive'}
                                     </span>
                                 </td>
-                                <td class="py-2 px-2 text-right text-slate-400 font-mono">${l.connected_ips || 0}</td>
+                                <td class="py-2 px-2 text-right text-slate-400 font-mono font-english">${l.connected_ips || 0}</td>
                             </tr>
                         `).join('');
                     }
@@ -1683,66 +1707,66 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
         // Restore Database
         function restoreDatabase() {
-    if (!selectedFile) {
-        toast('Please select a file first', 'error');
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            
-            if (!data.links) {
-                toast('Invalid database file format', 'error');
+            if (!selectedFile) {
+                toast('Please select a file first', 'error');
                 return;
             }
 
-            fetch('/api/database/restore', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-            .then(res => {
-                if (!res.ok) throw new Error('Restore failed');
-                return res.json();
-            })
-            .then(result => {
-                if (result.password_reset) {
-                    toast('✅ Database restored! Password reset to: MUVIXO', 'success');
-                } else {
-                    toast('✅ Database restored successfully!', 'success');
-                }
-                
-                document.getElementById('restoreBtn').disabled = true;
-                document.getElementById('dropZone').classList.remove('has-file');
-                document.getElementById('fileName').textContent = 'No file selected';
-                selectedFile = null;
-                loadDatabaseInfo();
-                loadConfigs();
-                setTimeout(updateStats, 500);
-                
-                if (result.requires_login) {
-                    setTimeout(async () => {
-                        try {
-                            await fetch('/api/logout', { method: 'POST' });
-                            const paths = await getCurrentPaths();
-                            location.href = paths.login;
-                        } catch (e) {
-                            location.href = '/login';
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (!data.links) {
+                        toast('Invalid database file format', 'error');
+                        return;
+                    }
+
+                    fetch('/api/database/restore', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Restore failed');
+                        return res.json();
+                    })
+                    .then(result => {
+                        if (result.password_reset) {
+                            toast('✅ Database restored! Password reset to: MUVIXO', 'success');
+                        } else {
+                            toast('✅ Database restored successfully!', 'success');
                         }
-                    }, 3000);
+                        
+                        document.getElementById('restoreBtn').disabled = true;
+                        document.getElementById('dropZone').classList.remove('has-file');
+                        document.getElementById('fileName').textContent = 'No file selected';
+                        selectedFile = null;
+                        loadDatabaseInfo();
+                        loadConfigs();
+                        setTimeout(updateStats, 500);
+                        
+                        if (result.requires_login) {
+                            setTimeout(async () => {
+                                try {
+                                    await fetch('/api/logout', { method: 'POST' });
+                                    const paths = await getCurrentPaths();
+                                    location.href = paths.login;
+                                } catch (e) {
+                                    location.href = '/login';
+                                }
+                            }, 3000);
+                        }
+                    })
+                    .catch(err => {
+                        toast('❌ Restore failed: ' + err.message, 'error');
+                    });
+                } catch (err) {
+                    toast('❌ Invalid JSON file: ' + err.message, 'error');
                 }
-            })
-            .catch(err => {
-                toast('❌ Restore failed: ' + err.message, 'error');
-            });
-        } catch (err) {
-            toast('❌ Invalid JSON file: ' + err.message, 'error');
+            };
+            reader.readAsText(selectedFile);
         }
-    };
-    reader.readAsText(selectedFile);
-}
 
         // QR Modal
         function openQrModal(label, uriPayload, subUrl) {
@@ -1926,58 +1950,57 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             }
         }
 
-        
-// Change Password - Updated
-async function changePassword() {
-    const cur = document.getElementById('settings-current-pw').value;
-    const nw = document.getElementById('settings-new-pw').value;
-    const confirmPw = document.getElementById('settings-confirm-pw').value;
-    const errEl = document.getElementById('settingsError');
-    errEl.classList.add('hidden');
+        // Change Password - Updated
+        async function changePassword() {
+            const cur = document.getElementById('settings-current-pw').value;
+            const nw = document.getElementById('settings-new-pw').value;
+            const confirmPw = document.getElementById('settings-confirm-pw').value;
+            const errEl = document.getElementById('settingsError');
+            errEl.classList.add('hidden');
 
-    if (!cur || !nw || !confirmPw) {
-        errEl.textContent = 'All fields are required.';
-        errEl.classList.remove('hidden');
-        return;
-    }
-    if (nw.length < 4) {
-        errEl.textContent = 'New password must be at least 4 characters.';
-        errEl.classList.remove('hidden');
-        return;
-    }
-    if (nw !== confirmPw) {
-        errEl.textContent = 'New password and confirmation do not match.';
-        errEl.classList.remove('hidden');
-        return;
-    }
-
-    try {
-        const res = await fetch('/api/change-password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ current_password: cur, new_password: nw })
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.detail || 'Failed to update password');
-
-        toggleModal('settingsModal', false);
-        triggerAlert('Password Updated', 'Your password has been changed successfully. You will be logged out.', 'check-circle');
-
-        setTimeout(async () => {
-            try {
-                await fetch('/api/logout', { method: 'POST' });
-                const paths = await getCurrentPaths();
-                location.href = paths.login;
-            } catch (e) {
-                location.href = '/login';
+            if (!cur || !nw || !confirmPw) {
+                errEl.textContent = 'All fields are required.';
+                errEl.classList.remove('hidden');
+                return;
             }
-        }, 2000);
+            if (nw.length < 4) {
+                errEl.textContent = 'New password must be at least 4 characters.';
+                errEl.classList.remove('hidden');
+                return;
+            }
+            if (nw !== confirmPw) {
+                errEl.textContent = 'New password and confirmation do not match.';
+                errEl.classList.remove('hidden');
+                return;
+            }
 
-    } catch (e) {
-        errEl.textContent = e.message;
-        errEl.classList.remove('hidden');
-    }
-}
+            try {
+                const res = await fetch('/api/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ current_password: cur, new_password: nw })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.detail || 'Failed to update password');
+
+                toggleModal('settingsModal', false);
+                triggerAlert('Password Updated', 'Your password has been changed successfully. You will be logged out.', 'check-circle');
+
+                setTimeout(async () => {
+                    try {
+                        await fetch('/api/logout', { method: 'POST' });
+                        const paths = await getCurrentPaths();
+                        location.href = paths.login;
+                    } catch (e) {
+                        location.href = '/login';
+                    }
+                }, 2000);
+
+            } catch (e) {
+                errEl.textContent = e.message;
+                errEl.classList.remove('hidden');
+            }
+        }
 
         // ---- Settings: update paths ----
         async function updatePath(type) {
@@ -2086,11 +2109,11 @@ async function changePassword() {
                     
                     if (statusSpan && statusDot) {
                         if (enabled) {
-                            statusSpan.className = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20 text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0';
+                            statusSpan.className = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20 text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0 font-english';
                             statusSpan.innerHTML = `<span class="status-dot active"></span>Active`;
                             statusDot.className = 'status-dot active';
                         } else {
-                            statusSpan.className = 'text-red-400 bg-red-500/10 border-red-500/20 text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0';
+                            statusSpan.className = 'text-red-400 bg-red-500/10 border-red-500/20 text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0 font-english';
                             statusSpan.innerHTML = `<span class="status-dot inactive"></span>Inactive`;
                             statusDot.className = 'status-dot inactive';
                         }
@@ -2121,7 +2144,7 @@ async function changePassword() {
                 const links = data.links || [];
                 const container = document.getElementById('config-list');
                 if (!links.length) {
-                    container.innerHTML = '<div class="p-6 text-center text-slate-400 text-sm">No configurations yet. Click "Add Config" to create one.</div>';
+                    container.innerHTML = '<div class="p-6 text-center text-slate-400 text-sm font-english">No configurations yet. Click "Add Config" to create one.</div>';
                     return;
                 }
                 container.innerHTML = links.map(l => {
@@ -2150,23 +2173,23 @@ async function changePassword() {
                     <div class="p-4 sm:p-6 config-row transition-all duration-200 hover:bg-slate-800/20" data-uuid="${l.uuid}">
                         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-6">
                             <div class="flex items-start space-x-3 sm:space-x-4 min-w-0">
-                                <span class="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-[9px] sm:text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wide mt-0.5 font-mono shrink-0">${protoLabels[proto] || proto}</span>
+                                <span class="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-[9px] sm:text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wide mt-0.5 font-mono shrink-0 font-english">${protoLabels[proto] || proto}</span>
                                 <div class="min-w-0 flex-1">
                                     <div class="flex flex-wrap items-center gap-2">
-                                        <h3 class="text-sm sm:text-base font-semibold text-slate-200 truncate">${label}</h3>
-                                        <span class="text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium ${statusClass} shrink-0 transition-all duration-300">
+                                        <h3 class="text-sm sm:text-base font-semibold text-slate-200 truncate font-english">${label}</h3>
+                                        <span class="text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium ${statusClass} shrink-0 transition-all duration-300 font-english">
                                             <span class="${statusDot}"></span>${statusText}
                                         </span>
                                     </div>
                                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-0.5 mt-1 text-[10px] sm:text-xs text-slate-400">
-                                        <div>Network: <span class="text-slate-300 font-mono">${proto.includes('ws') ? 'ws' : 'tcp'}</span></div>
-                                        <div>Security: <span class="text-slate-300 font-mono">tls</span></div>
-                                        <div class="col-span-2 sm:col-span-1">Expiry: <span class="text-slate-300 font-mono">${l.expires_at ? new Date(l.expires_at).toISOString().slice(0,10) : 'Unlimited'}</span></div>
+                                        <div class="font-english">Network: <span class="text-slate-300 font-mono font-english">${proto.includes('ws') ? 'ws' : 'tcp'}</span></div>
+                                        <div class="font-english">Security: <span class="text-slate-300 font-mono font-english">tls</span></div>
+                                        <div class="col-span-2 sm:col-span-1 font-english">Expiry: <span class="text-slate-300 font-mono font-english">${l.expires_at ? new Date(l.expires_at).toISOString().slice(0,10) : 'Unlimited'}</span></div>
                                     </div>
                                     <div class="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-slate-400">
-                                        <span>Usage: <span class="text-slate-300 font-mono">${used} / ${limit}</span></span>
-                                        <span>IP: <span class="text-slate-300 font-mono">${l.ip_limit || '∞'}</span></span>
-                                        <span>Speed: <span class="text-slate-300 font-mono">${speedDisplay}</span></span>
+                                        <span class="font-english">Usage: <span class="text-slate-300 font-mono font-english">${used} / ${limit}</span></span>
+                                        <span class="font-english">IP: <span class="text-slate-300 font-mono font-english">${l.ip_limit || '∞'}</span></span>
+                                        <span class="font-english">Speed: <span class="text-slate-300 font-mono font-english">${speedDisplay}</span></span>
                                     </div>
                                     <div class="w-full max-w-xs mt-1.5 h-1.5 bg-slate-800/60 rounded-full overflow-hidden">
                                         <div class="h-full rounded-full transition-all duration-500" style="width: ${pct}%; background: ${color};"></div>
@@ -2177,11 +2200,11 @@ async function changePassword() {
                                 <label class="relative inline-flex items-center cursor-pointer group shrink-0">
                                     <input type="checkbox" class="sr-only peer" ${active ? 'checked' : ''} onchange="toggleConfigStatus('${l.uuid}', this.checked)">
                                     <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600 peer-checked:border-emerald-600"></div>
-                                    <span class="toggle-label transition-all duration-300 group-hover:text-slate-200">${active ? 'Enabled' : 'Disabled'}</span>
+                                    <span class="toggle-label transition-all duration-300 group-hover:text-slate-200 font-english">${active ? 'Enabled' : 'Disabled'}</span>
                                 </label>
                                 
                                 <div class="relative flex-grow sm:flex-grow-0 min-w-[180px] sm:min-w-[220px] max-w-full sm:max-w-xs">
-                                    <input type="text" id="uri-${l.uuid}" readonly value="${l.vless_link}" class="w-full bg-slate-950 border border-slate-800/80 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 pr-7 sm:pr-10 text-[8px] sm:text-[10px] font-mono text-slate-400 focus:outline-none select-all truncate">
+                                    <input type="text" id="uri-${l.uuid}" readonly value="${l.vless_link}" class="w-full bg-slate-950 border border-slate-800/80 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 pr-7 sm:pr-10 text-[8px] sm:text-[10px] font-mono text-slate-400 focus:outline-none select-all truncate font-english">
                                     <button onclick="copyLink('uri-${l.uuid}')" class="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 p-0.5 sm:p-1 text-slate-500 hover:text-slate-300 transition-all duration-300"><i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
                                 </div>
                                 <button onclick="openQrModal('${label}', '${l.vless_link}', '${l.sub_url}')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition-all duration-300" title="QR"><i data-lucide="qr-code" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
@@ -2378,22 +2401,23 @@ async function changePassword() {
     </script>
 </body>
 </html>"""
-# ---------- SUB_USER_HTML (for /sub/user with fixed timer - rounded numbers, continues in background) ----------
+# ---------- SUB_USER_HTML (for /sub/user with Persian font support) ----------
 SUB_USER_HTML = r"""<!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>Subscription · MX-UI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {{
             theme: {{
                 extend: {{
                     fontFamily: {{
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Inter', 'Vazirmatn', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
                     }}
                 }}
@@ -2464,7 +2488,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             padding: 8px 18px;
             border-radius: 12px;
             font-size: 13px;
-            font-family: Inter, sans-serif;
+            font-family: 'Inter', 'Vazirmatn', sans-serif;
             opacity: 0;
             transition: opacity 0.25s, transform 0.25s;
             z-index: 9999;
@@ -2620,6 +2644,16 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
         .input-focus-ring:focus {{
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }}
+        /* Persian font support - Vazirmatn for Persian characters */
+        .font-persian {{
+            font-family: 'Vazirmatn', 'Inter', sans-serif;
+        }}
+        .font-english {{
+            font-family: 'Inter', 'Vazirmatn', sans-serif;
+        }}
+        .font-mixed {{
+            font-family: 'Inter', 'Vazirmatn', sans-serif;
+        }}
     </style>
 </head>
 <body class="font-sans text-slate-200 min-h-screen flex flex-col justify-between relative antialiased tracking-tight">
@@ -2638,14 +2672,14 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <span class="font-bold text-base sm:text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent block truncate">MX-UI PANEL</span>
-                    <span class="text-[10px] sm:text-xs text-slate-500 font-medium block truncate">v1.0.0</span>
+                    <span class="font-bold text-base sm:text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent block truncate font-english">MX-UI PANEL</span>
+                    <span class="text-[10px] sm:text-xs text-slate-500 font-medium block truncate font-english">v1.0.0</span>
                 </div>
                 <!-- Auto-Update Indicator with Timer -->
                 <div class="flex items-center gap-2">
                     <div class="update-indicator" id="updateIndicator">
                         <span class="update-spinner" id="updateSpinner"></span>
-                        <span id="updateText">Auto</span>
+                        <span id="updateText" class="font-english">Auto</span>
                     </div>
                     <div class="timer-ring" id="timerRing">30</div>
                 </div>
@@ -2654,10 +2688,10 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             <!-- Title Section -->
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 sm:mb-6">
                 <div class="min-w-0">
-                    <h2 class="text-xl sm:text-2xl font-bold text-slate-100 truncate">Subscription Info</h2>
-                    <p class="text-xs sm:text-sm text-slate-400 truncate">Live updates every 30 seconds</p>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-100 truncate font-english">Subscription Info</h2>
+                    <p class="text-xs sm:text-sm text-slate-400 truncate font-english">Live updates every 30 seconds</p>
                 </div>
-                <span id="status-badge" class="status-badge loading shrink-0 self-start sm:self-center">
+                <span id="status-badge" class="status-badge loading shrink-0 self-start sm:self-center font-english">
                     <span class="status-dot" style="background-color: #60a5fa;"></span>
                     Loading...
                 </span>
@@ -2674,120 +2708,120 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             <div class="space-y-1.5 sm:space-y-2 mb-5 sm:mb-6" id="detailsGrid">
                 <!-- Label -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Label</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-200 font-semibold truncate" id="labelValue">{label}</span>
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider font-english">Label</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-200 font-semibold truncate font-english" id="labelValue">{label}</span>
                 </div>
                 
                 <!-- Subscription ID -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Subscription ID</span>
-                    <span class="detail-value text-[10px] sm:text-xs font-mono text-slate-200 truncate" id="uuidValue">{uuid}</span>
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider font-english">Subscription ID</span>
+                    <span class="detail-value text-[10px] sm:text-xs font-mono text-slate-200 truncate font-english" id="uuidValue">{uuid}</span>
                 </div>
                 
                 <!-- Status -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Status</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono font-semibold" id="statusValue">{status}</span>
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider font-english">Status</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono font-semibold font-english" id="statusValue">{status}</span>
                 </div>
                 
                 <!-- Downloaded -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Downloaded</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-blue-300 font-semibold" id="downloadedValue">{downloaded}</span>
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider font-english">Downloaded</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-blue-300 font-semibold font-english" id="downloadedValue">{downloaded}</span>
                 </div>
                 
                 <!-- Uploaded -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Uploaded</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-purple-300 font-semibold" id="uploadedValue">{uploaded}</span>
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider font-english">Uploaded</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-purple-300 font-semibold font-english" id="uploadedValue">{uploaded}</span>
                 </div>
                 
                 <!-- Usage -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Usage</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-amber-300 font-semibold" id="usageValue">{usage} / {total_quota}</span>
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider font-english">Usage</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-amber-300 font-semibold font-english" id="usageValue">{usage} / {total_quota}</span>
                 </div>
                 
                 <!-- Total Quota -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Total Quota</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-200 font-semibold" id="totalQuotaValue">{total_quota}</span>
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider font-english">Total Quota</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-200 font-semibold font-english" id="totalQuotaValue">{total_quota}</span>
                 </div>
                 
                 <!-- Remained -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Remained</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-emerald-300 font-semibold" id="remainedValue">{remained}</span>
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider font-english">Remained</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-emerald-300 font-semibold font-english" id="remainedValue">{remained}</span>
                 </div>
                 
                 <!-- Last Online -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Last Online</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-300" id="lastOnlineValue">{last_online}</span>
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider font-english">Last Online</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-300 font-english" id="lastOnlineValue">{last_online}</span>
                 </div>
                 
                 <!-- Expiry -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Expiry</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-rose-300 font-semibold" id="expiryValue">{expiry}</span>
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider font-english">Expiry</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-rose-300 font-semibold font-english" id="expiryValue">{expiry}</span>
                 </div>
                 
                 <!-- IPs Connected -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
-                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">IP(s) Connected</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-cyan-300" id="ipsValue">{ips}</span>
+                    <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider font-english">IP(s) Connected</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-cyan-300 font-english" id="ipsValue">{ips}</span>
                 </div>
             </div>
 
             <!-- Progress Bar Section -->
             <div class="mt-5 sm:mt-6 p-4 sm:p-5 bg-slate-950/60 border border-slate-800/60 rounded-xl">
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 mb-2">
-                    <span class="text-xs sm:text-sm text-slate-300 font-medium truncate" id="progressLabel">{label}</span>
-                    <span class="text-[10px] sm:text-xs text-slate-400 font-mono" id="progressText">{used_fmt} / {limit_fmt}</span>
+                    <span class="text-xs sm:text-sm text-slate-300 font-medium truncate font-english" id="progressLabel">{label}</span>
+                    <span class="text-[10px] sm:text-xs text-slate-400 font-mono font-english" id="progressText">{used_fmt} / {limit_fmt}</span>
                 </div>
                 <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
                     <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full progress-bar-fill" id="progressBar" style="width: {usage_pct}%;"></div>
                 </div>
                 <div class="flex flex-col xs:flex-row xs:justify-between gap-0.5 xs:gap-0 mt-1.5">
-                    <span class="text-[10px] sm:text-xs text-slate-500" id="usagePercent">{usage_pct}% used</span>
-                    <span class="text-[10px] sm:text-xs text-slate-500" id="remainedText">{remained} remaining</span>
+                    <span class="text-[10px] sm:text-xs text-slate-500 font-english" id="usagePercent">{usage_pct}% used</span>
+                    <span class="text-[10px] sm:text-xs text-slate-500 font-english" id="remainedText">{remained} remaining</span>
                 </div>
             </div>
 
             <!-- VLESS Link -->
             <div class="mt-5 sm:mt-6 p-3 sm:p-4 bg-slate-950/60 border border-slate-800/60 rounded-xl">
-                <p class="text-[10px] sm:text-xs text-slate-400 mb-2 flex items-center gap-2">
+                <p class="text-[10px] sm:text-xs text-slate-400 mb-2 flex items-center gap-2 font-english">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
                         <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
                     </svg>
-                    <span class="truncate">VLESS Link (copy to client):</span>
+                    <span class="truncate font-english">VLESS Link (copy to client):</span>
                 </p>
                 <div class="flex items-center gap-2 mobile-stack">
-                    <input type="text" readonly value="{vless_link}" id="vless-link-input" class="flex-1 min-w-0 bg-slate-950 border border-slate-800/80 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 text-[8px] sm:text-[10px] font-mono text-slate-400 focus:outline-none select-all truncate input-focus-ring">
-                    <button onclick="copyToClipboard('{vless_link}')" class="copy-btn px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition shadow-lg shadow-blue-600/20 flex items-center justify-center gap-1.5 shrink-0">
+                    <input type="text" readonly value="{vless_link}" id="vless-link-input" class="flex-1 min-w-0 bg-slate-950 border border-slate-800/80 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 text-[8px] sm:text-[10px] font-mono text-slate-400 focus:outline-none select-all truncate input-focus-ring font-english">
+                    <button onclick="copyToClipboard('{vless_link}')" class="copy-btn px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition shadow-lg shadow-blue-600/20 flex items-center justify-center gap-1.5 shrink-0 font-english">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                         </svg>
-                        <span class="hidden xs:inline text-[10px] sm:text-xs">Copy</span>
+                        <span class="hidden xs:inline text-[10px] sm:text-xs font-english">Copy</span>
                     </button>
                 </div>
             </div>
 
             <!-- Auto-Update Status Footer with Timer -->
             <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[9px] sm:text-[10px] text-slate-500 border-t border-slate-800/60 pt-3">
-                <span>Last updated: <span id="lastUpdateTime">just now</span></span>
+                <span class="font-english">Last updated: <span id="lastUpdateTime" class="font-english">just now</span></span>
                 <div class="flex items-center gap-3">
-                    <span>Next update in: <span id="timerDisplay" class="font-mono text-blue-400">30</span>s</span>
-                    <button onclick="manualUpdate()" class="text-blue-400 hover:text-blue-300 transition-colors px-2 py-0.5 rounded border border-blue-500/20 hover:border-blue-500/40 text-[9px]">
+                    <span class="font-english">Next update in: <span id="timerDisplay" class="font-mono text-blue-400 font-english">30</span>s</span>
+                    <button onclick="manualUpdate()" class="text-blue-400 hover:text-blue-300 transition-colors px-2 py-0.5 rounded border border-blue-500/20 hover:border-blue-500/40 text-[9px] font-english">
                         ↻ Refresh
                     </button>
                 </div>
             </div>
 
             <!-- Footer -->
-            <div class="mt-2 text-center text-[10px] sm:text-xs text-slate-500">
+            <div class="mt-2 text-center text-[10px] sm:text-xs text-slate-500 font-english">
                 {watermark}
             </div>
         </div>
@@ -2967,12 +3001,12 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                         statusBadge.className = 'status-badge active';
                         statusBadge.innerHTML = '<span class="status-dot active"></span> Active';
                         statusValue.textContent = 'Active';
-                        statusValue.className = 'detail-value text-xs sm:text-sm font-mono text-emerald-400 font-semibold';
+                        statusValue.className = 'detail-value text-xs sm:text-sm font-mono text-emerald-400 font-semibold font-english';
                     }} else {{
                         statusBadge.className = 'status-badge inactive';
                         statusBadge.innerHTML = '<span class="status-dot inactive"></span> Inactive';
                         statusValue.textContent = 'Inactive';
-                        statusValue.className = 'detail-value text-xs sm:text-sm font-mono text-red-400 font-semibold';
+                        statusValue.className = 'detail-value text-xs sm:text-sm font-mono text-red-400 font-semibold font-english';
                     }}
                 }}
 
