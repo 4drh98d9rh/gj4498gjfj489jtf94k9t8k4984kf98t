@@ -10,7 +10,6 @@ from zoneinfo import ZoneInfo
 from urllib.parse import quote, parse_qs
 from collections import deque, defaultdict
 from pathlib import Path
-from qr_generator import generate_qr_base64
 
 import psutil
 from typing import Optional
@@ -21,6 +20,9 @@ import uvicorn
 import httpx
 import logging
 import re
+
+# Import QR generator
+from qr_generator import generate_qr_base64
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("MX-UI")
@@ -395,9 +397,42 @@ async def root():
 async def health():
     return {"status": "ok", "connections": len(connections), "uptime": uptime()}
 
-# ── Subscription endpoints ────────────────────────────────────────────────────
-# ── Subscription endpoints ────────────────────────────────────────────────────
+# ── QR Code Endpoints ────────────────────────────────────────────────────────
+@app.get("/api/qr")
+async def generate_qr(request: Request):
+    """Generate QR code as Base64 or direct image (no text)"""
+    data = request.query_params.get("data", "")
+    size = int(request.query_params.get("size", 300))
+    format_type = request.query_params.get("format", "json")
+    
+    if not data:
+        raise HTTPException(status_code=400, detail="Missing data parameter")
+    
+    qr_base64 = generate_qr_base64(data, size=size)
+    
+    if format_type == "image":
+        import base64
+        from fastapi.responses import Response
+        image_data = base64.b64decode(qr_base64.split(",")[1])
+        return Response(content=image_data, media_type="image/png")
+    
+    return {"qr": qr_base64}
 
+@app.get("/api/qr/{uuid}")
+async def get_qr_code(uuid: str, request: Request):
+    """Generate QR code for a config (requires auth)"""
+    async with LINKS_LOCK:
+        link = LINKS.get(uuid)
+    if not link:
+        raise HTTPException(status_code=404, detail="not found")
+    
+    host = get_host(request)
+    vless = vless_link_for_link(link, uuid, host)
+    qr_base64 = generate_qr_base64(vless, size=400)
+    
+    return {"qr": qr_base64, "uuid": uuid, "label": link.get("label", "Unknown")}
+
+# ── Subscription endpoints ────────────────────────────────────────────────────
 @app.get("/sub/user")
 async def subscription_user_old(request: Request, uuid: str = Query(...)):
     """Redirect old /sub/user to new sub path if changed"""
@@ -412,7 +447,7 @@ async def subscription_user_new(request: Request, uuid: str = Query(...)):
     return await subscription_user_handler(request, uuid)
 
 async def subscription_user_handler(request: Request, uuid: str):
-    """Handle subscription user page with local QR generation"""
+    """Handle subscription user page with local QR generation (no text)"""
     from pages import SUB_USER_HTML
     async with LINKS_LOCK:
         link = LINKS.get(uuid)
@@ -433,11 +468,9 @@ async def subscription_user_handler(request: Request, uuid: str):
             LINKS[uuid]["active"] = False
         await save_state()
         log_activity("link", f"Config «{link.get('label', 'Unknown')}» auto-deactivated (quota exceeded)", "warn")
-        # Re-fetch link after update
         async with LINKS_LOCK:
             link = LINKS.get(uuid)
     
-    # Check active status
     active = is_link_allowed(link)
     
     expiry = link.get("expires_at", "No expiry")
@@ -456,14 +489,14 @@ async def subscription_user_handler(request: Request, uuid: str):
     downloaded = fmt_bytes(used)
     uploaded = "0 B"
     
-    # Generate QR code locally
-    qr_base64 = generate_qr_base64(vless, size=300, with_text=True, text=f"{link.get('label', 'Unknown')} - MX-UI")
+    # Generate QR code locally WITHOUT text
+    qr_base64 = generate_qr_base64(vless, size=300)
     
     return HTMLResponse(content=SUB_USER_HTML.format(
         uuid=uuid,
         label=link.get("label", "Unknown"),
         vless_link=vless,
-        qr_url=qr_base64,  # Now using local Base64 QR
+        qr_url=qr_base64,
         status=status_html,
         downloaded=downloaded,
         uploaded=uploaded,
@@ -479,21 +512,7 @@ async def subscription_user_handler(request: Request, uuid: str):
         watermark="Created by Muvixo",
         theme=""
     ))
-@app.get("/api/qr/{uuid}")
-async def get_qr_code(uuid: str, request: Request):
-    """Generate QR code for a config (requires auth)"""
-    from qr_generator import generate_qr_base64
-    async with LINKS_LOCK:
-        link = LINKS.get(uuid)
-    if not link:
-        raise HTTPException(status_code=404, detail="not found")
-    
-    host = get_host(request)
-    vless = vless_link_for_link(link, uuid, host)
-    
-    qr_base64 = generate_qr_base64(vless, size=400, with_text=True, text=f"{link.get('label', 'Unknown')}")
-    
-    return {"qr": qr_base64, "uuid": uuid, "label": link.get("label", "Unknown")}
+
 @app.get("/sub/{uuid}")
 async def subscription_single_old(uuid: str, request: Request):
     """Redirect old /sub/{uuid} to new sub path if changed"""
@@ -1075,7 +1094,6 @@ async def http_proxy(target_url: str, request: Request):
         raise HTTPException(status_code=502, detail=f"Proxy error: {exc}")
 
 # ── HTML Pages ─────────────────────────────────────────────────────────────────
-# ── HTML Pages ─────────────────────────────────────────────────────────────────
 from pages import LOGIN_HTML, DASHBOARD_HTML
 
 # Dashboard and Login handlers
@@ -1198,5 +1216,6 @@ async def render_login(request: Request):
         )
     
     return HTMLResponse(content=login_html)
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=CONFIG["port"], log_level="info", workers=1)
