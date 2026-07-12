@@ -395,13 +395,23 @@ async def health():
     return {"status": "ok", "connections": len(connections), "uptime": uptime()}
 
 # ── Subscription endpoints ────────────────────────────────────────────────────
+# ── Subscription endpoints ────────────────────────────────────────────────────
 
 @app.get("/sub/user")
-async def subscription_user(request: Request, uuid: str = Query(...)):
+async def subscription_user_old(request: Request, uuid: str = Query(...)):
+    """Redirect old /sub/user to new sub path if changed"""
     sub_path = CONFIG.get("sub_path", "/sub")
-    if not request.url.path.startswith(sub_path):
+    if sub_path != "/sub":
         return RedirectResponse(url=f"{sub_path}/user?uuid={uuid}")
-    
+    return await subscription_user_handler(request, uuid)
+
+@app.get(CONFIG.get("sub_path", "/sub") + "/user")
+async def subscription_user_new(request: Request, uuid: str = Query(...)):
+    """Handle new sub path /user"""
+    return await subscription_user_handler(request, uuid)
+
+async def subscription_user_handler(request: Request, uuid: str):
+    """Handle subscription user page"""
     from pages import SUB_USER_HTML
     async with LINKS_LOCK:
         link = LINKS.get(uuid)
@@ -468,11 +478,20 @@ async def subscription_user(request: Request, uuid: str = Query(...)):
     ))
 
 @app.get("/sub/{uuid}")
-async def subscription_single(uuid: str, request: Request):
+async def subscription_single_old(uuid: str, request: Request):
+    """Redirect old /sub/{uuid} to new sub path if changed"""
     sub_path = CONFIG.get("sub_path", "/sub")
-    if not request.url.path.startswith(sub_path):
+    if sub_path != "/sub":
         return RedirectResponse(url=f"{sub_path}/{uuid}")
-    
+    return await subscription_single_handler(uuid, request)
+
+@app.get(CONFIG.get("sub_path", "/sub") + "/{uuid}")
+async def subscription_single_new(uuid: str, request: Request):
+    """Handle new sub path /{uuid}"""
+    return await subscription_single_handler(uuid, request)
+
+async def subscription_single_handler(uuid: str, request: Request):
+    """Handle single subscription"""
     import base64
     async with LINKS_LOCK:
         link = LINKS.get(uuid)
@@ -484,12 +503,21 @@ async def subscription_single(uuid: str, request: Request):
     return Response(content=content, media_type="text/plain",
                     headers={"profile-title": quote(link["label"]), "support-url": "https://t.me/Farajian2004f"})
 
-@app.get("/sub/{uuid}/info", response_class=HTMLResponse)
-async def subscription_info(uuid: str, request: Request):
+@app.get("/sub/{uuid}/info")
+async def subscription_info_old(uuid: str, request: Request):
+    """Redirect old /sub/{uuid}/info to new sub path if changed"""
     sub_path = CONFIG.get("sub_path", "/sub")
-    if not request.url.path.startswith(sub_path):
+    if sub_path != "/sub":
         return RedirectResponse(url=f"{sub_path}/{uuid}/info")
-    
+    return await subscription_info_handler(uuid, request)
+
+@app.get(CONFIG.get("sub_path", "/sub") + "/{uuid}/info")
+async def subscription_info_new(uuid: str, request: Request):
+    """Handle new sub path /{uuid}/info"""
+    return await subscription_info_handler(uuid, request)
+
+async def subscription_info_handler(uuid: str, request: Request):
+    """Handle subscription info"""
     from pages import SUB_INFO_HTML
     async with LINKS_LOCK:
         link = LINKS.get(uuid)
@@ -504,17 +532,26 @@ async def subscription_info(uuid: str, request: Request):
         expires_at=link.get("expires_at", "No expiry"),
         active=link.get("active", True),
         vless_link=vless_link_for_link(link, uuid, host),
-        sub_url=f"https://{host}/sub/{uuid}",
+        sub_url=f"https://{host}{CONFIG.get('sub_path', '/sub')}/{uuid}",
         watermark="Created by Muvixo"
     ))
 
 # ── Subscription all (requires auth) ──────────────────────────────────────
 @app.get("/sub-all")
-async def subscription_all(request: Request, _=Depends(require_auth)):
+async def subscription_all_old(request: Request, _=Depends(require_auth)):
+    """Redirect old /sub-all to new sub path if changed"""
     sub_path = CONFIG.get("sub_path", "/sub")
-    if not request.url.path.startswith(sub_path + "-all"):
+    if sub_path != "/sub":
         return RedirectResponse(url=f"{sub_path}-all")
-    
+    return await subscription_all_handler(request)
+
+@app.get(CONFIG.get("sub_path", "/sub") + "-all")
+async def subscription_all_new(request: Request, _=Depends(require_auth)):
+    """Handle new sub path -all"""
+    return await subscription_all_handler(request)
+
+async def subscription_all_handler(request: Request):
+    """Handle subscription all"""
     import base64
     host = get_host(request)
     async with LINKS_LOCK:
@@ -1021,6 +1058,7 @@ async def http_proxy(target_url: str, request: Request):
         raise HTTPException(status_code=502, detail=f"Proxy error: {exc}")
 
 # ── HTML Pages ─────────────────────────────────────────────────────────────────
+# ── HTML Pages ─────────────────────────────────────────────────────────────────
 from pages import LOGIN_HTML, DASHBOARD_HTML
 
 # Dashboard and Login handlers
@@ -1082,6 +1120,24 @@ async def dynamic_path_handler(request: Request, path: str):
     if request.url.path == sub_path:
         return RedirectResponse(url=sub_path + "/user")
     
+    # Check if it's a sub path with user or uuid
+    if request.url.path.startswith(sub_path + "/user"):
+        return await subscription_user_handler(request, request.query_params.get("uuid"))
+    
+    # Check if it's a sub path with uuid
+    if request.url.path.startswith(sub_path + "/"):
+        # Extract uuid from path
+        parts = request.url.path.split("/")
+        if len(parts) >= 2:
+            uuid = parts[-1]
+            if uuid and not uuid in ["user", "info", "all"]:
+                return await subscription_single_handler(uuid, request)
+        # If it's /sub/{uuid}/info
+        if len(parts) >= 3 and parts[-1] == "info":
+            uuid = parts[-2]
+            if uuid:
+                return await subscription_info_handler(uuid, request)
+    
     # If it's the default paths but they've been changed, redirect
     if request.url.path == "/dashboard" and dashboard_path != "/dashboard":
         return RedirectResponse(url=dashboard_path)
@@ -1125,6 +1181,5 @@ async def render_login(request: Request):
         )
     
     return HTMLResponse(content=login_html)
-
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=CONFIG["port"], log_level="info", workers=1)
