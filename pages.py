@@ -784,6 +784,7 @@ async function logout() {
 }
 
 // ---- Settings: change password ----
+// ---- Settings: change password ----
 async function changePassword() {
     const cur = document.getElementById('settings-current-pw').value;
     const nw = document.getElementById('settings-new-pw').value;
@@ -816,17 +817,28 @@ async function changePassword() {
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.detail || 'Failed to update password');
 
+        // Close settings modal
         toggleModal('settingsModal', false);
-        document.getElementById('settings-current-pw').value = '';
-        document.getElementById('settings-new-pw').value = '';
-        document.getElementById('settings-confirm-pw').value = '';
-        triggerAlert('Password Updated', 'Your dashboard password has been changed successfully.', 'check-circle');
+        
+        // Show success message
+        triggerAlert('Password Updated', 'Your password has been changed. You will be logged out automatically.', 'check-circle');
+        
+        // Auto logout after 2 seconds
+        setTimeout(async () => {
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                const paths = await getCurrentPaths();
+                location.href = paths.login;
+            } catch(e) {
+                location.href = '/login';
+            }
+        }, 2000);
+        
     } catch (e) {
         errEl.textContent = e.message;
         errEl.classList.remove('hidden');
     }
 }
-
 // ---- Settings: update paths ----
 async function updatePath(type) {
     const errEl = document.getElementById('pathSettingsError');

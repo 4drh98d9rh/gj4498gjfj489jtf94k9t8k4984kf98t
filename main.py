@@ -561,7 +561,6 @@ async def api_logout(request: Request):
 @app.get("/api/me")
 async def api_me(request: Request):
     return {"authenticated": await is_valid_session(request.cookies.get(SESSION_COOKIE))}
-
 @app.post("/api/change-password")
 async def api_change_password(request: Request, token=Depends(require_auth)):
     body = await request.json()
@@ -570,14 +569,31 @@ async def api_change_password(request: Request, token=Depends(require_auth)):
     new = str(body.get("new_password", ""))
     if len(new) < 4:
         raise HTTPException(status_code=400, detail="New password must be at least 4 characters")
+    
+    # Change password
     AUTH["password_hash"] = hash_password(new)
+    
+    # Clear all sessions and create a new one for the current user
     async with SESSIONS_LOCK:
         SESSIONS.clear()
-        SESSIONS[token] = time.time() + SESSION_TTL
+        # Create new session for the current user
+        new_token = secrets.token_urlsafe(32)
+        SESSIONS[new_token] = time.time() + SESSION_TTL
+    
     await save_state()
     log_activity("auth", "Panel password changed", "ok")
-    return {"ok": True}
-
+    
+    # Return new token in response
+    return {"ok": True, "new_token": new_token}
+@app.post("/api/force-logout")
+async def force_logout(request: Request):
+    """Force logout all users (used after password change)"""
+    async with SESSIONS_LOCK:
+        SESSIONS.clear()
+    resp = JSONResponse({"ok": True})
+    secure = request.url.scheme == "https"
+    resp.delete_cookie(SESSION_COOKIE, path="/", secure=secure)
+    return resp
 # ── Settings endpoints ────────────────────────────────────────────────────────
 @app.get("/api/get-paths")
 async def get_paths(_=Depends(require_auth)):
