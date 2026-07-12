@@ -250,6 +250,9 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         }
     </script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
             background-color: #070a13;
         }
@@ -436,51 +439,115 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         .group:hover .toggle-label {
             color: #e2e8f0;
         }
-        /* Slide Animation for System Details */
+        
+        /* ===== SYSTEM DETAILS SLIDE ANIMATION ===== */
         .system-details-wrapper {
             overflow: hidden;
             max-height: 0;
             opacity: 0;
-            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
-                        opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                        margin 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+                        opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                        margin 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             margin-bottom: 0;
+            padding-top: 0;
+            padding-bottom: 0;
         }
         .system-details-wrapper.open {
-            max-height: 2500px;
+            max-height: 2800px;
             opacity: 1;
-            margin-bottom: 1rem;
+            margin-bottom: 1.25rem;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
         }
+        
+        /* Individual card animations */
         .system-details-wrapper .detail-card {
-            transform: translateY(20px);
+            transform: translateY(30px) scale(0.97);
             opacity: 0;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-                        opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform, opacity;
         }
         .system-details-wrapper.open .detail-card {
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
             opacity: 1;
         }
-        /* Staggered delay for each card */
+        
+        /* Staggered delays for each card */
         .system-details-wrapper.open .detail-card:nth-child(1) { transition-delay: 0.05s; }
         .system-details-wrapper.open .detail-card:nth-child(2) { transition-delay: 0.10s; }
         .system-details-wrapper.open .detail-card:nth-child(3) { transition-delay: 0.15s; }
         .system-details-wrapper.open .detail-card:nth-child(4) { transition-delay: 0.20s; }
         .system-details-wrapper.open .detail-card:nth-child(5) { transition-delay: 0.25s; }
         .system-details-wrapper.open .detail-card:nth-child(6) { transition-delay: 0.30s; }
+        
+        /* Card hover effect */
         .detail-card {
-            transition: transform 0.2s ease, border-color 0.2s ease;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+                        border-color 0.25s ease,
+                        box-shadow 0.25s ease;
         }
         .detail-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-3px) scale(1.01);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
-        /* Toggle button rotation */
+        
+        /* Toggle button animation */
+        #toggleSystemBtn {
+            transition: all 0.3s ease;
+        }
+        #toggleSystemBtn:hover {
+            transform: scale(1.05);
+        }
+        #toggleSystemBtn:active {
+            transform: scale(0.95);
+        }
+        
         #toggleSystemIcon {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: inline-block;
         }
         #toggleSystemIcon.rotated {
-            transform: rotate(180deg);
+            transform: rotate(180deg) scale(1.1);
+        }
+        
+        #toggleSystemText {
+            transition: all 0.3s ease;
+        }
+        
+        /* System main stats hover */
+        #systemMainStats > div {
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        #systemMainStats > div:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.25);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.05);
+        }
+        
+        /* Circle chart pulse animation when updating */
+        .circle-chart.updating {
+            animation: pulse-chart 0.5s ease;
+        }
+        @keyframes pulse-chart {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; stroke-width: 4; }
+            100% { opacity: 0.7; }
+        }
+        
+        /* Smooth number transitions */
+        .stat-value {
+            transition: all 0.3s ease;
+        }
+        
+        /* Loading shimmer for config rows */
+        .config-row {
+            transition: all 0.2s ease;
+        }
+        .config-row .toggle-label {
+            transition: all 0.3s ease;
         }
     </style>
 </head>
@@ -489,10 +556,10 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     <div class="toast" id="toast"></div>
 
     <!-- Top Navigation -->
-    <header class="border-b border-slate-800/80 bg-slate-900/40 backdrop-blur-md sticky top-0 z-40">
+    <header class="border-b border-slate-800/80 bg-slate-900/40 backdrop-blur-md sticky top-0 z-40 transition-all duration-300">
         <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-2 mobile-padding">
             <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
-                <div class="bg-blue-600 p-1.5 sm:p-2 rounded-xl text-white glow-effect flex-shrink-0">
+                <div class="bg-blue-600 p-1.5 sm:p-2 rounded-xl text-white glow-effect flex-shrink-0 transition-transform duration-300 hover:scale-110">
                     <i data-lucide="shield-check" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 </div>
                 <div class="min-w-0">
@@ -501,15 +568,15 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 </div>
             </div>
             <div class="flex items-center space-x-1 sm:space-x-3 flex-shrink-0">
-                <span class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">
+                <span class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap transition-all duration-300 hover:bg-emerald-500/20">
                     <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                     Node Online
                 </span>
-                <button onclick="toggleModal('settingsModal', true)" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0">
+                <button onclick="toggleModal('settingsModal', true)" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0 transition-all duration-300 hover:scale-105">
                     <i data-lucide="settings" class="w-4 h-4"></i>
                     <span class="hidden xs:inline">Settings</span>
                 </button>
-                <button onclick="logout()" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0">
+                <button onclick="logout()" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0 transition-all duration-300 hover:scale-105">
                     <i data-lucide="log-out" class="w-4 h-4"></i>
                     <span class="hidden xs:inline">Logout</span>
                 </button>
@@ -522,29 +589,29 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
         <!-- Stats Summary -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center transition-all duration-300 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5">
                 <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Traffic</p>
-                <p class="text-sm sm:text-lg font-bold text-blue-400 font-mono truncate" id="total-traffic">0 MB</p>
+                <p class="text-sm sm:text-lg font-bold text-blue-400 font-mono truncate stat-value" id="total-traffic">0 MB</p>
             </div>
-            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center transition-all duration-300 hover:border-amber-500/30 hover:shadow-lg hover:shadow-amber-500/5">
                 <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Usage</p>
-                <p class="text-sm sm:text-lg font-bold text-amber-400 font-mono truncate" id="total-usage">0 GB</p>
+                <p class="text-sm sm:text-lg font-bold text-amber-400 font-mono truncate stat-value" id="total-usage">0 GB</p>
             </div>
-            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5">
                 <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Inbounds</p>
-                <p class="text-sm sm:text-lg font-bold text-emerald-400 font-mono truncate" id="total-inbounds">0</p>
+                <p class="text-sm sm:text-lg font-bold text-emerald-400 font-mono truncate stat-value" id="total-inbounds">0</p>
             </div>
-            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center">
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 text-center transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5">
                 <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Connections</p>
-                <p class="text-sm sm:text-lg font-bold text-purple-400 font-mono truncate" id="active-connections">0</p>
+                <p class="text-sm sm:text-lg font-bold text-purple-400 font-mono truncate stat-value" id="active-connections">0</p>
             </div>
         </div>
 
         <!-- Hardware Diagnostic Rings with Show More -->
         <div class="flex items-center justify-between mb-3 px-1">
             <h2 class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest">System Diagnostics</h2>
-            <button onclick="toggleSystemDetails()" id="toggleSystemBtn" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition flex items-center gap-1 group">
-                <i data-lucide="chevron-down" id="toggleSystemIcon" class="w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-400 group-hover:scale-110"></i>
+            <button onclick="toggleSystemDetails()" id="toggleSystemBtn" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center gap-1 group cursor-pointer select-none">
+                <i data-lucide="chevron-down" id="toggleSystemIcon" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                 <span id="toggleSystemText" class="transition-all duration-300">Show More</span>
             </button>
         </div>
@@ -552,59 +619,59 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         <!-- Main System Stats -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-3 sm:mb-4" id="systemMainStats">
             <!-- CPU -->
-            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4 cursor-default">
                 <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
                     <svg class="w-full h-full" viewBox="0 0 36 36">
                         <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         <path class="text-blue-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     </svg>
-                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-blue-400" id="ring-cpu-pct">0%</div>
+                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-blue-400 transition-all duration-300" id="ring-cpu-pct">0%</div>
                 </div>
                 <div class="text-right flex-1 min-w-0">
                     <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">CPU</p>
-                    <p class="text-xs sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-cpu-val">0 Cores</p>
+                    <p class="text-xs sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate transition-all duration-300" id="ring-cpu-val">0 Cores</p>
                 </div>
             </div>
             <!-- RAM -->
-            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4 cursor-default">
                 <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
                     <svg class="w-full h-full" viewBox="0 0 36 36">
                         <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         <path class="text-indigo-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     </svg>
-                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-indigo-400" id="ring-ram-pct">0%</div>
+                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-indigo-400 transition-all duration-300" id="ring-ram-pct">0%</div>
                 </div>
                 <div class="text-right flex-1 min-w-0">
                     <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">RAM</p>
-                    <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-ram-val">0 GB</p>
+                    <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate transition-all duration-300" id="ring-ram-val">0 GB</p>
                 </div>
             </div>
             <!-- Swap -->
-            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4 cursor-default">
                 <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
                     <svg class="w-full h-full" viewBox="0 0 36 36">
                         <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         <path class="text-amber-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     </svg>
-                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-amber-400" id="ring-swap-pct">0%</div>
+                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-amber-400 transition-all duration-300" id="ring-swap-pct">0%</div>
                 </div>
                 <div class="text-right flex-1 min-w-0">
                     <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Swap</p>
-                    <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-swap-val">0 GB</p>
+                    <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate transition-all duration-300" id="ring-swap-val">0 GB</p>
                 </div>
             </div>
             <!-- Storage -->
-            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
+            <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4 cursor-default">
                 <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
                     <svg class="w-full h-full" viewBox="0 0 36 36">
                         <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         <path class="text-rose-500 circle-chart" stroke-dasharray="0, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     </svg>
-                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-rose-400" id="ring-disk-pct">0%</div>
+                    <div class="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-mono font-bold text-rose-400 transition-all duration-300" id="ring-disk-pct">0%</div>
                 </div>
                 <div class="text-right flex-1 min-w-0">
                     <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Storage</p>
-                    <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-disk-val">0 GB</p>
+                    <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate transition-all duration-300" id="ring-disk-val">0 GB</p>
                 </div>
             </div>
         </div>
@@ -621,23 +688,23 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     <div class="space-y-1.5 text-[10px] sm:text-xs">
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Load Average</span>
-                            <span class="text-slate-200 font-mono" id="cpu-load-avg">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="cpu-load-avg">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Cores / Threads</span>
-                            <span class="text-slate-200 font-mono" id="cpu-cores-detail">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="cpu-cores-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Usage (User)</span>
-                            <span class="text-slate-200 font-mono" id="cpu-user">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="cpu-user">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Usage (System)</span>
-                            <span class="text-slate-200 font-mono" id="cpu-system">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="cpu-system">--</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-slate-400">Usage (Idle)</span>
-                            <span class="text-slate-200 font-mono" id="cpu-idle">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="cpu-idle">--</span>
                         </div>
                     </div>
                 </div>
@@ -651,23 +718,23 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     <div class="space-y-1.5 text-[10px] sm:text-xs">
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Total</span>
-                            <span class="text-slate-200 font-mono" id="ram-total-detail">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="ram-total-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Used</span>
-                            <span class="text-slate-200 font-mono" id="ram-used-detail">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="ram-used-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Free</span>
-                            <span class="text-slate-200 font-mono" id="ram-free-detail">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="ram-free-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Available</span>
-                            <span class="text-slate-200 font-mono" id="ram-available-detail">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="ram-available-detail">--</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-slate-400">Cached</span>
-                            <span class="text-slate-200 font-mono" id="ram-cached-detail">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="ram-cached-detail">--</span>
                         </div>
                     </div>
                 </div>
@@ -681,19 +748,19 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     <div class="space-y-1.5 text-[10px] sm:text-xs">
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Total</span>
-                            <span class="text-slate-200 font-mono" id="swap-total-detail">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="swap-total-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Used</span>
-                            <span class="text-slate-200 font-mono" id="swap-used-detail">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="swap-used-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Free</span>
-                            <span class="text-slate-200 font-mono" id="swap-free-detail">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="swap-free-detail">--</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-slate-400">Usage</span>
-                            <span class="text-slate-200 font-mono" id="swap-usage-detail">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="swap-usage-detail">--</span>
                         </div>
                     </div>
                 </div>
@@ -707,19 +774,19 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     <div class="space-y-1.5 text-[10px] sm:text-xs">
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Total</span>
-                            <span class="text-slate-200 font-mono" id="disk-total-detail">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="disk-total-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Used</span>
-                            <span class="text-slate-200 font-mono" id="disk-used-detail">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="disk-used-detail">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Free</span>
-                            <span class="text-slate-200 font-mono" id="disk-free-detail">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="disk-free-detail">--</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-slate-400">Usage</span>
-                            <span class="text-slate-200 font-mono" id="disk-usage-detail">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="disk-usage-detail">--</span>
                         </div>
                     </div>
                 </div>
@@ -733,19 +800,19 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     <div class="space-y-1.5 text-[10px] sm:text-xs">
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Total Traffic</span>
-                            <span class="text-slate-200 font-mono" id="network-total">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="network-total">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Total Requests</span>
-                            <span class="text-slate-200 font-mono" id="network-requests">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="network-requests">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Active Connections</span>
-                            <span class="text-slate-200 font-mono" id="network-connections">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="network-connections">--</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-slate-400">Errors</span>
-                            <span class="text-slate-200 font-mono" id="network-errors">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="network-errors">--</span>
                         </div>
                     </div>
                 </div>
@@ -759,19 +826,19 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     <div class="space-y-1.5 text-[10px] sm:text-xs">
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Uptime</span>
-                            <span class="text-slate-200 font-mono" id="sys-uptime">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="sys-uptime">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Active Configs</span>
-                            <span class="text-slate-200 font-mono" id="sys-active-configs">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="sys-active-configs">--</span>
                         </div>
                         <div class="flex justify-between border-b border-slate-800/40 pb-1">
                             <span class="text-slate-400">Total Configs</span>
-                            <span class="text-slate-200 font-mono" id="sys-total-configs">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="sys-total-configs">--</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-slate-400">Expired Configs</span>
-                            <span class="text-slate-200 font-mono" id="sys-expired-configs">--</span>
+                            <span class="text-slate-200 font-mono transition-all duration-300" id="sys-expired-configs">--</span>
                         </div>
                     </div>
                 </div>
@@ -779,13 +846,13 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         </div>
 
         <!-- Configurations Container -->
-        <div class="bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden glow-effect">
+        <div class="bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden glow-effect transition-all duration-300">
             <div class="p-4 sm:p-6 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-900/40">
                 <div class="min-w-0">
                     <h2 class="text-lg sm:text-xl font-bold text-slate-100 truncate">V2Ray Inbound Proxies</h2>
                     <p class="text-xs sm:text-sm text-slate-400 mt-0.5 truncate">Manage virtual server bridges, generate QR structures, or modify framework credentials.</p>
                 </div>
-                <button onclick="toggleModal('inboundModal', true)" class="flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition duration-200 shadow-lg shadow-blue-600/10 shrink-0">
+                <button onclick="toggleModal('inboundModal', true)" class="flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25 hover:scale-105 active:scale-95 shrink-0">
                     <i data-lucide="plus" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                     <span>Add Config</span>
                 </button>
@@ -801,20 +868,20 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 mobile-padding">
             <div class="flex items-center space-x-2 sm:space-x-3 flex-wrap justify-center sm:justify-start">
                 <p>MX-UI v1.0.0</p>
-                <span class="text-[8px] sm:text-[9px] font-mono font-bold tracking-widest text-slate-400 border border-slate-800 px-1.5 py-0.5 rounded bg-slate-900/60 select-none">
+                <span class="text-[8px] sm:text-[9px] font-mono font-bold tracking-widest text-slate-400 border border-slate-800 px-1.5 py-0.5 rounded bg-slate-900/60 select-none transition-all duration-300 hover:border-slate-600">
                     Created by Muvixo
                 </span>
             </div>
             <div class="flex items-center space-x-3 sm:space-x-4 flex-wrap justify-center">
-                <span>Core: <strong class="text-slate-400 font-mono text-[10px] sm:text-[11px]" id="uptime-display">00:00:00</strong></span>
-                <span>API: <strong class="text-emerald-400">Connected</strong></span>
+                <span>Core: <strong class="text-slate-400 font-mono text-[10px] sm:text-[11px] transition-all duration-300" id="uptime-display">00:00:00</strong></span>
+                <span>API: <strong class="text-emerald-400 transition-all duration-300">Connected</strong></span>
             </div>
         </div>
     </footer>
 
     <!-- ===== MODAL: CREATE CONFIG ===== -->
     <div id="inboundModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
             <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
                 <div class="flex items-center space-x-3 min-w-0">
                     <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20 shrink-0"><i data-lucide="plus-circle" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
@@ -823,17 +890,17 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         <p class="text-[10px] sm:text-xs text-slate-400 truncate">Deploy a new VLESS or XHTTP configuration.</p>
                     </div>
                 </div>
-                <button onclick="toggleModal('inboundModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition shrink-0"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
+                <button onclick="toggleModal('inboundModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all duration-300"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
             </div>
             <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-5">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Remark / Label</label>
-                        <input type="text" id="new-label" placeholder="e.g., US-Reality" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+                        <input type="text" id="new-label" placeholder="e.g., US-Reality" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring">
                     </div>
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Protocol</label>
-                        <select id="new-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition font-mono text-xs">
+                        <select id="new-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 font-mono text-xs">
                             <option value="vless-ws">VLESS + WS</option>
                             <option value="xhttp-packet-up">XHTTP (packet-up)</option>
                             <option value="xhttp-stream-up">XHTTP (stream-up)</option>
@@ -843,7 +910,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Fingerprint (uTLS)</label>
-                        <select id="new-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition font-mono text-xs">
+                        <select id="new-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 font-mono text-xs">
                             <option value="chrome">chrome</option>
                             <option value="firefox">firefox</option>
                             <option value="safari">safari</option>
@@ -858,29 +925,29 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     </div>
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">ALPN (optional)</label>
-                        <input type="text" id="new-alpn" placeholder="e.g., h2,http/1.1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+                        <input type="text" id="new-alpn" placeholder="e.g., h2,http/1.1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Traffic Limit (MB)</label>
-                        <input type="number" id="new-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+                        <input type="number" id="new-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring">
                     </div>
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Expiry (days, 0 = unlimited)</label>
-                        <input type="number" id="new-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+                        <input type="number" id="new-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">IP Limit (0 = unlimited)</label>
-                        <input type="number" id="new-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
+                        <input type="number" id="new-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring">
                     </div>
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Speed Limit (0 = unlimited)</label>
                         <div class="flex gap-2">
-                            <input type="number" id="new-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring">
-                            <select id="new-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition font-mono">
+                            <input type="number" id="new-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring">
+                            <select id="new-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 font-mono">
                                 <option value="MBIT">Mbps</option>
                                 <option value="KB">KB/s</option>
                                 <option value="MB">MB/s</option>
@@ -890,15 +957,15 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 </div>
             </div>
             <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex flex-col sm:flex-row items-center justify-end space-y-2 sm:space-y-0 sm:space-x-3 shrink-0">
-                <button onclick="toggleModal('inboundModal', false)" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition">Cancel</button>
-                <button onclick="createConfig()" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-blue-600/10">Deploy Config</button>
+                <button onclick="toggleModal('inboundModal', false)" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300">Cancel</button>
+                <button onclick="createConfig()" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25">Deploy Config</button>
             </div>
         </div>
     </div>
 
     <!-- ===== MODAL: EDIT ===== -->
     <div id="editModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
             <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
                 <div class="flex items-center space-x-3 min-w-0">
                     <div class="p-2 bg-amber-500/10 rounded-lg text-amber-400 border border-amber-500/20 shrink-0"><i data-lucide="edit" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
@@ -907,18 +974,18 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         <p class="text-[10px] sm:text-xs text-slate-400 truncate">Altering production values resets live connection pipelines.</p>
                     </div>
                 </div>
-                <button onclick="toggleModal('editModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition shrink-0"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
+                <button onclick="toggleModal('editModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all duration-300"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
             </div>
             <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-5">
                 <input type="hidden" id="edit-uuid">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Remark Label</label>
-                        <input type="text" id="edit-label" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono input-focus-ring-amber">
+                        <input type="text" id="edit-label" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 font-mono input-focus-ring-amber">
                     </div>
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Protocol</label>
-                        <select id="edit-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono text-xs">
+                        <select id="edit-protocol" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 font-mono text-xs">
                             <option value="vless-ws">VLESS + WS</option>
                             <option value="xhttp-packet-up">XHTTP (packet-up)</option>
                             <option value="xhttp-stream-up">XHTTP (stream-up)</option>
@@ -928,7 +995,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Fingerprint</label>
-                        <select id="edit-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono text-xs">
+                        <select id="edit-fp" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 font-mono text-xs">
                             <option value="chrome">chrome</option>
                             <option value="firefox">firefox</option>
                             <option value="safari">safari</option>
@@ -943,29 +1010,29 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     </div>
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">ALPN (optional)</label>
-                        <input type="text" id="edit-alpn" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
+                        <input type="text" id="edit-alpn" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Traffic Limit (MB)</label>
-                        <input type="number" id="edit-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
+                        <input type="number" id="edit-limit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber">
                     </div>
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Expiry (days from now)</label>
-                        <input type="number" id="edit-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
+                        <input type="number" id="edit-expiry" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">IP Limit</label>
-                        <input type="number" id="edit-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
+                        <input type="number" id="edit-iplimit" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber">
                     </div>
                     <div>
                         <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Speed Limit</label>
                         <div class="flex gap-2">
-                            <input type="number" id="edit-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition input-focus-ring-amber">
-                            <select id="edit-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition font-mono">
+                            <input type="number" id="edit-speed" value="0" step="0.5" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 input-focus-ring-amber">
+                            <select id="edit-speed-unit" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-all duration-300 font-mono">
                                 <option value="MBIT">Mbps</option>
                                 <option value="KB">KB/s</option>
                                 <option value="MB">MB/s</option>
@@ -975,15 +1042,15 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 </div>
             </div>
             <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex flex-col sm:flex-row items-center justify-end space-y-2 sm:space-y-0 sm:space-x-3 shrink-0">
-                <button onclick="toggleModal('editModal', false)" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition">Discard</button>
-                <button onclick="saveEdit()" class="w-full sm:w-auto px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-amber-600/10">Commit Changes</button>
+                <button onclick="toggleModal('editModal', false)" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300">Discard</button>
+                <button onclick="saveEdit()" class="w-full sm:w-auto px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-amber-600/10 hover:shadow-amber-600/25">Commit Changes</button>
             </div>
         </div>
     </div>
 
     <!-- ===== MODAL: QR ===== -->
     <div id="qrModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 space-y-4 max-h-[95vh] overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 space-y-4 max-h-[95vh] overflow-y-auto transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
             <div class="flex items-center justify-between border-b border-slate-800 pb-2 flex-wrap gap-2">
                 <div class="min-w-0">
                     <h3 class="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2">
@@ -992,9 +1059,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     </h3>
                     <p class="text-[10px] sm:text-xs text-slate-400 font-mono truncate" id="qrTargetLabel">Default Link</p>
                 </div>
-                <button onclick="toggleModal('qrModal', false)" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition shrink-0">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
+                <button onclick="toggleModal('qrModal', false)" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-all duration-300"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3 sm:p-4 text-center qr-code-container">
@@ -1003,10 +1068,10 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         Config Link QR
                     </p>
                     <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50">
-                        <img id="qrImage" src="" alt="Config QR Code" class="w-full h-full object-contain">
+                        <img id="qrImage" src="" alt="Config QR Code" class="w-full h-full object-contain transition-all duration-300">
                     </div>
                     <div class="mt-2 sm:mt-3">
-                        <button onclick="copyText(document.getElementById('qrTextPayload').textContent)" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition flex items-center justify-center gap-1">
+                        <button onclick="copyText(document.getElementById('qrTextPayload').textContent)" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center justify-center gap-1">
                             <i data-lucide="copy" class="w-3 h-3"></i>
                             Copy Config Link
                         </button>
@@ -1018,10 +1083,10 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         Subscription Link QR
                     </p>
                     <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50">
-                        <img id="qrSubImage" src="" alt="Subscription QR Code" class="w-full h-full object-contain">
+                        <img id="qrSubImage" src="" alt="Subscription QR Code" class="w-full h-full object-contain transition-all duration-300">
                     </div>
                     <div class="mt-2 sm:mt-3">
-                        <button onclick="copyText(document.getElementById('qrSubPayload').textContent)" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition flex items-center justify-center gap-1">
+                        <button onclick="copyText(document.getElementById('qrSubPayload').textContent)" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center justify-center gap-1">
                             <i data-lucide="copy" class="w-3 h-3"></i>
                             Copy Sub Link
                         </button>
@@ -1044,7 +1109,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     <p id="qrSubPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate">https://example.com/sub</p>
                 </div>
             </div>
-            <button onclick="toggleModal('qrModal', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition">
+            <button onclick="toggleModal('qrModal', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition-all duration-300">
                 Close
             </button>
         </div>
@@ -1052,7 +1117,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
     <!-- ===== MODAL: CONFIRM ===== -->
     <div id="confirmModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 text-center space-y-3 sm:space-y-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 text-center space-y-3 sm:space-y-4 transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
             <div class="mx-auto w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
                 <i data-lucide="alert-triangle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
             </div>
@@ -1061,15 +1126,15 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <p id="confirmMessage" class="text-[11px] sm:text-xs text-slate-400 leading-relaxed px-2">Are you sure?</p>
             </div>
             <div class="flex gap-3">
-                <button onclick="_confirmNo()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition">Cancel</button>
-                <button onclick="_confirmYes()" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-[10px] sm:text-xs font-semibold rounded-xl transition">Delete</button>
+                <button onclick="_confirmNo()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition-all duration-300">Cancel</button>
+                <button onclick="_confirmYes()" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-[10px] sm:text-xs font-semibold rounded-xl transition-all duration-300">Delete</button>
             </div>
         </div>
     </div>
 
     <!-- ===== MODAL: SETTINGS ===== -->
     <div id="settingsModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
             <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
                 <div class="flex items-center space-x-3 min-w-0">
                     <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20 shrink-0"><i data-lucide="settings" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
@@ -1078,7 +1143,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         <p class="text-[10px] sm:text-xs text-slate-400 truncate">Manage dashboard paths and security</p>
                     </div>
                 </div>
-                <button onclick="toggleModal('settingsModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition shrink-0"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
+                <button onclick="toggleModal('settingsModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all duration-300"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
             </div>
             <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-6">
                 <!-- Change Password Section -->
@@ -1090,18 +1155,18 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     <div class="space-y-3 sm:space-y-4">
                         <div>
                             <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Current Password</label>
-                            <input type="password" id="settings-current-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="Enter current password">
+                            <input type="password" id="settings-current-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring" placeholder="Enter current password">
                         </div>
                         <div>
                             <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">New Password</label>
-                            <input type="password" id="settings-new-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="At least 4 characters">
+                            <input type="password" id="settings-new-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring" placeholder="At least 4 characters">
                         </div>
                         <div>
                             <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Confirm New Password</label>
-                            <input type="password" id="settings-confirm-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring" placeholder="Repeat new password">
+                            <input type="password" id="settings-confirm-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring" placeholder="Repeat new password">
                         </div>
                         <div id="settingsError" class="text-[10px] sm:text-xs text-red-400 hidden"></div>
-                        <button onclick="changePassword()" class="w-full py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-blue-600/10">
+                        <button onclick="changePassword()" class="w-full py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25">
                             Update Password
                         </button>
                     </div>
@@ -1117,24 +1182,24 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         <div>
                             <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Dashboard Path</label>
                             <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="settings-dashboard-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition input-focus-ring-purple" placeholder="/dashboard">
-                                <button onclick="updatePath('dashboard')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">Update</button>
+                                <input type="text" id="settings-dashboard-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple" placeholder="/dashboard">
+                                <button onclick="updatePath('dashboard')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25">Update</button>
                             </div>
                             <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-dashboard-path" class="text-slate-400 font-mono">/dashboard</span></p>
                         </div>
                         <div>
                             <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Login Path</label>
                             <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="settings-login-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition input-focus-ring-purple" placeholder="/login">
-                                <button onclick="updatePath('login')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">Update</button>
+                                <input type="text" id="settings-login-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple" placeholder="/login">
+                                <button onclick="updatePath('login')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25">Update</button>
                             </div>
                             <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-login-path" class="text-slate-400 font-mono">/login</span></p>
                         </div>
                         <div>
                             <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Subscription Path</label>
                             <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="settings-sub-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition input-focus-ring-purple" placeholder="/sub">
-                                <button onclick="updatePath('sub')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition shadow-lg shadow-purple-600/10">Update</button>
+                                <input type="text" id="settings-sub-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple" placeholder="/sub">
+                                <button onclick="updatePath('sub')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25">Update</button>
                             </div>
                             <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1">Current: <span id="current-sub-path" class="text-slate-400 font-mono">/sub</span></p>
                         </div>
@@ -1143,14 +1208,14 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 </div>
             </div>
             <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end shrink-0">
-                <button onclick="toggleModal('settingsModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition">Close</button>
+                <button onclick="toggleModal('settingsModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300">Close</button>
             </div>
         </div>
     </div>
 
     <!-- ===== MODAL: ALERT ===== -->
     <div id="customAlert" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 text-center space-y-3 sm:space-y-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl overflow-hidden modal-glow p-4 sm:p-6 text-center space-y-3 sm:space-y-4 transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
             <div class="mx-auto w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
                 <i id="alertIcon" data-lucide="info" class="w-5 h-5 sm:w-6 sm:h-6"></i>
             </div>
@@ -1158,7 +1223,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <h3 id="alertTitle" class="text-sm sm:text-base font-bold text-slate-100">Notification</h3>
                 <p id="alertMessage" class="text-[11px] sm:text-xs text-slate-400 leading-relaxed px-2">Pipeline structural modifications updated successfully.</p>
             </div>
-            <button onclick="toggleModal('customAlert', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition">Acknowledge</button>
+            <button onclick="toggleModal('customAlert', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] sm:text-xs font-semibold rounded-xl transition-all duration-300">Acknowledge</button>
         </div>
     </div>
 
@@ -1189,12 +1254,22 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         // Modal toggles
         function toggleModal(modalId, show) {
             const target = document.getElementById(modalId);
+            const modalContent = target.querySelector('.bg-slate-900, .bg-slate-900.border');
             if (show) {
                 target.classList.add('active');
                 document.body.style.overflow = 'hidden';
+                // Animate modal content
+                if (modalContent) {
+                    modalContent.style.transform = 'scale(1)';
+                    modalContent.style.opacity = '1';
+                }
             } else {
                 target.classList.remove('active');
                 document.body.style.overflow = '';
+                if (modalContent) {
+                    modalContent.style.transform = 'scale(0.95)';
+                    modalContent.style.opacity = '0';
+                }
             }
             if (modalId === 'settingsModal' && show) {
                 loadSettingsPaths();
@@ -1330,13 +1405,18 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 icon.classList.add('rotated');
                 text.textContent = 'Show Less';
                 // Update details when opened
-                updateSystemDetails();
+                setTimeout(() => {
+                    updateSystemDetails();
+                }, 100);
             } else {
                 wrapper.classList.remove('open');
                 icon.classList.remove('rotated');
                 text.textContent = 'Show More';
             }
-            lucide.createIcons();
+            // Refresh icons
+            setTimeout(() => {
+                lucide.createIcons();
+            }, 50);
         }
 
         // ---- Update System Details ----
@@ -1620,14 +1700,14 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                         'text-red-400 bg-red-500/10 border-red-500/20';
 
                     return `
-                    <div class="p-4 sm:p-6 config-row" data-uuid="${l.uuid}">
+                    <div class="p-4 sm:p-6 config-row transition-all duration-200 hover:bg-slate-800/20" data-uuid="${l.uuid}">
                         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-6">
                             <div class="flex items-start space-x-3 sm:space-x-4 min-w-0">
                                 <span class="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-[9px] sm:text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wide mt-0.5 font-mono shrink-0">${protoLabels[proto] || proto}</span>
                                 <div class="min-w-0 flex-1">
                                     <div class="flex flex-wrap items-center gap-2">
                                         <h3 class="text-sm sm:text-base font-semibold text-slate-200 truncate">${label}</h3>
-                                        <span class="text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium ${statusClass} shrink-0">
+                                        <span class="text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium ${statusClass} shrink-0 transition-all duration-300">
                                             <span class="${statusDot}"></span>${statusText}
                                         </span>
                                     </div>
@@ -1651,18 +1731,18 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                                 <label class="relative inline-flex items-center cursor-pointer group shrink-0">
                                     <input type="checkbox" class="sr-only peer" ${active ? 'checked' : ''} onchange="toggleConfigStatus('${l.uuid}', this.checked)">
                                     <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600 peer-checked:border-emerald-600"></div>
-                                    <span class="toggle-label">${active ? 'Enabled' : 'Disabled'}</span>
+                                    <span class="toggle-label transition-all duration-300 group-hover:text-slate-200">${active ? 'Enabled' : 'Disabled'}</span>
                                 </label>
                                 
                                 <div class="relative flex-grow sm:flex-grow-0 min-w-[180px] sm:min-w-[220px] max-w-full sm:max-w-xs">
                                     <input type="text" id="uri-${l.uuid}" readonly value="${l.vless_link}" class="w-full bg-slate-950 border border-slate-800/80 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 pr-7 sm:pr-10 text-[8px] sm:text-[10px] font-mono text-slate-400 focus:outline-none select-all truncate">
-                                    <button onclick="copyLink('uri-${l.uuid}')" class="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 p-0.5 sm:p-1 text-slate-500 hover:text-slate-300 transition" title="Copy URI"><i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                                    <button onclick="copyLink('uri-${l.uuid}')" class="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 p-0.5 sm:p-1 text-slate-500 hover:text-slate-300 transition-all duration-300"><i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
                                 </div>
-                                <button onclick="openQrModal('${label}', '${l.vless_link}', '${l.sub_url}')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="QR"><i data-lucide="qr-code" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
-                                <button onclick="window.open('/sub/user?uuid=${l.uuid}', '_blank')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Subscription"><i data-lucide="external-link" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
-                                <button onclick="openEditModal('${label}','${proto}','${l.fingerprint||'chrome'}','${l.alpn||''}',${l.limit_bytes ? (l.limit_bytes / 1024 / 1024) : 0},${l.expires_at ? Math.ceil((new Date(l.expires_at) - Date.now()) / (86400000)) : 0},${l.ip_limit||0},${l.speed_limit_bytes ? (l.speed_limit_bytes * 8 / 1024 / 1024) : 0},'${l.speed_limit_unit || 'MBIT'}','${l.uuid}')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Edit"><i data-lucide="edit-3" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
-                                <button onclick="resetTraffic('${l.uuid}')" class="p-1.5 sm:p-2 bg-blue-800/20 hover:bg-blue-800/40 border border-blue-700/30 text-blue-300 rounded-xl transition" title="Reset Traffic"><i data-lucide="rotate-ccw" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
-                                <button onclick="deleteConfig('${l.uuid}')" class="p-1.5 sm:p-2 bg-red-800/20 hover:bg-red-800/40 border border-red-700/30 text-red-300 rounded-xl transition" title="Delete"><i data-lucide="trash-2" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                                <button onclick="openQrModal('${label}', '${l.vless_link}', '${l.sub_url}')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition-all duration-300" title="QR"><i data-lucide="qr-code" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                                <button onclick="window.open('/sub/user?uuid=${l.uuid}', '_blank')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition-all duration-300" title="Subscription"><i data-lucide="external-link" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                                <button onclick="openEditModal('${label}','${proto}','${l.fingerprint||'chrome'}','${l.alpn||''}',${l.limit_bytes ? (l.limit_bytes / 1024 / 1024) : 0},${l.expires_at ? Math.ceil((new Date(l.expires_at) - Date.now()) / (86400000)) : 0},${l.ip_limit||0},${l.speed_limit_bytes ? (l.speed_limit_bytes * 8 / 1024 / 1024) : 0},'${l.speed_limit_unit || 'MBIT'}','${l.uuid}')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition-all duration-300" title="Edit"><i data-lucide="edit-3" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                                <button onclick="resetTraffic('${l.uuid}')" class="p-1.5 sm:p-2 bg-blue-800/20 hover:bg-blue-800/40 border border-blue-700/30 text-blue-300 rounded-xl transition-all duration-300" title="Reset Traffic"><i data-lucide="rotate-ccw" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                                <button onclick="deleteConfig('${l.uuid}')" class="p-1.5 sm:p-2 bg-red-800/20 hover:bg-red-800/40 border border-red-700/30 text-red-300 rounded-xl transition-all duration-300" title="Delete"><i data-lucide="trash-2" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
                             </div>
                         </div>
                     </div>`;
