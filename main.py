@@ -19,6 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import httpx
 import logging
+import re
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("MX-UI")
@@ -392,7 +393,8 @@ async def root():
 async def health():
     return {"status": "ok", "connections": len(connections), "uptime": uptime()}
 
-# ── Subscription (single link) ────────────────────────────────────────────────
+# ── Subscription endpoints ────────────────────────────────────────────────────
+
 @app.get("/sub/user")
 async def subscription_user(request: Request, uuid: str = Query(...)):
     sub_path = CONFIG.get("sub_path", "/sub")
@@ -483,7 +485,7 @@ async def subscription_info(uuid: str, request: Request):
         watermark="Created by Muvixo"
     ))
 
-# ── NEW: Public subscription details page ──────────────────────────────────
+# ── Subscription all (requires auth) ──────────────────────────────────────
 @app.get("/sub-all")
 async def subscription_all(request: Request, _=Depends(require_auth)):
     sub_path = CONFIG.get("sub_path", "/sub")
@@ -512,7 +514,6 @@ async def api_login(request: Request):
     token = await create_session()
     log_activity("auth", f"Successful login from {ip}", "ok")
     
-    # همیشه secure=False برای تست (در محیط تولید میتوانید شرط بگذارید)
     secure = False  # برای تست
     resp = JSONResponse({"ok": True})
     resp.set_cookie(
@@ -524,7 +525,6 @@ async def api_login(request: Request):
         path="/",
         secure=secure,
     )
-    # لاگ برای دیباگ
     logger.info(f"Login cookie set: secure={secure}, token={token[:8]}...")
     return resp
 
@@ -591,9 +591,16 @@ async def update_path(request: Request, _=Depends(require_auth)):
 
 @app.get("/api/is-default-password")
 async def is_default_password():
-    # Check if current password is the default one
     default_hash = hash_password("MUVIXO")
     return {"is_default": AUTH["password_hash"] == default_hash}
+
+@app.get("/api/current-paths")
+async def get_current_paths():
+    return {
+        "dashboard": CONFIG.get("dashboard_path", "/dashboard"),
+        "login": CONFIG.get("login_path", "/login"),
+        "sub": CONFIG.get("sub_path", "/sub"),
+    }
 
 # ── Stats ─────────────────────────────────────────────────────────────────────
 @app.get("/stats")
@@ -763,7 +770,7 @@ async def create_link(request: Request, _=Depends(require_auth)):
         ip_limit = 0
 
     sv = float(body.get("speed_limit_value") or 0)
-    su = body.get("speed_limit_unit") or "MBIT"  # can be KB, MB, MBIT
+    su = body.get("speed_limit_unit") or "MBIT"
     speed_limit_bytes = 0 if sv <= 0 else parse_speed_to_bytes(sv, su)
 
     uid, link = await make_link(
@@ -895,37 +902,24 @@ async def http_proxy(target_url: str, request: Request):
 
 # ── HTML Pages ─────────────────────────────────────────────────────────────────
 from pages import LOGIN_HTML, DASHBOARD_HTML
-import re
 
-@app.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request):
-    login_path = CONFIG.get("login_path", "/login")
-    if request.url.path != login_path:
-        return RedirectResponse(url=login_path)
-    if await is_valid_session(request.cookies.get(SESSION_COOKIE)):
-        dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
+# Redirect old dashboard to new path
+@app.get("/dashboard")
+async def redirect_old_dashboard(request: Request):
+    dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
+    if dashboard_path != "/dashboard":
         return RedirectResponse(url=dashboard_path)
-    
-    # Check if default password is used
-    is_default = AUTH["password_hash"] == hash_password("MUVIXO")
-    login_html = LOGIN_HTML
-    
-    # If default password is changed, show message
-    if not is_default:
-        # Replace the default password display with a message
-        login_html = login_html.replace(
-            '<span class="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20 cursor-pointer hover:bg-blue-500/20 transition" onclick="document.getElementById(\'pw\').value=\'MUVIXO\';document.getElementById(\'pw\').focus()">MUVIXO</span>',
-            '<span class="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20">Password changed</span>'
-        )
-        # Add an indicator that default password is no longer used
-        login_html = login_html.replace(
-            '<span class="text-xs text-slate-400">Default password</span>',
-            '<span class="text-xs text-slate-400">Default password</span><span class="text-xs text-amber-400 ml-2">(changed)</span>'
-        )
-    
-    return HTMLResponse(content=login_html)
+    # If path is default, serve dashboard directly
+    token = request.cookies.get(SESSION_COOKIE)
+    valid = await is_valid_session(token)
+    if not valid:
+        login_path = CONFIG.get("login_path", "/login")
+        return RedirectResponse(url=login_path)
+    await ensure_default_link()
+    return HTMLResponse(content=DASHBOARD_HTML)
 
-@app.get("/dashboard", response_class=HTMLResponse)
+# New dashboard path (dynamic)
+@app.get(CONFIG.get("dashboard_path", "/dashboard"))
 async def dashboard(request: Request):
     dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
     if request.url.path != dashboard_path:
@@ -940,6 +934,50 @@ async def dashboard(request: Request):
         return RedirectResponse(url=login_path)
     await ensure_default_link()
     return HTMLResponse(content=DASHBOARD_HTML)
+
+# Redirect old login to new path
+@app.get("/login")
+async def redirect_old_login(request: Request):
+    login_path = CONFIG.get("login_path", "/login")
+    if login_path != "/login":
+        return RedirectResponse(url=login_path)
+    # If path is default, serve login directly
+    return await login_page(request)
+
+# New login path (dynamic)
+@app.get(CONFIG.get("login_path", "/login"))
+async def login_page(request: Request):
+    login_path = CONFIG.get("login_path", "/login")
+    if request.url.path != login_path:
+        return RedirectResponse(url=login_path)
+    if await is_valid_session(request.cookies.get(SESSION_COOKIE)):
+        dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
+        return RedirectResponse(url=dashboard_path)
+    
+    # Check if default password is used
+    is_default = AUTH["password_hash"] == hash_password("MUVIXO")
+    login_html = LOGIN_HTML
+    
+    # If default password is changed, show message
+    if not is_default:
+        login_html = login_html.replace(
+            '<span class="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20 cursor-pointer hover:bg-blue-500/20 transition" onclick="document.getElementById(\'pw\').value=\'MUVIXO\';document.getElementById(\'pw\').focus()">MUVIXO</span>',
+            '<span class="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20">Password changed</span>'
+        )
+        login_html = login_html.replace(
+            '<span class="text-xs text-slate-400">Default password</span>',
+            '<span class="text-xs text-slate-400">Default password</span><span class="text-xs text-amber-400 ml-2">(changed)</span>'
+        )
+    
+    return HTMLResponse(content=login_html)
+
+# Redirect old sub paths
+@app.get("/sub")
+async def redirect_old_sub():
+    sub_path = CONFIG.get("sub_path", "/sub")
+    if sub_path != "/sub":
+        return RedirectResponse(url=sub_path)
+    return RedirectResponse(url="/sub")
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=CONFIG["port"], log_level="info", workers=1)

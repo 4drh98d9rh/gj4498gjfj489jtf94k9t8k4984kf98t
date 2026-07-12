@@ -712,11 +712,30 @@ function openEditModal(label, protocol, fingerprint, alpn, limit, expiry, iplimi
     document.getElementById('edit-speed-unit').value = unit || 'MBIT';
     toggleModal('editModal', true);
 }
+async function getCurrentPaths() {
+    try {
+        const res = await fetch('/api/current-paths');
+        if (!res.ok) throw new Error('Failed to fetch paths');
+        const data = await res.json();
+        return data;
+    } catch(e) {
+        console.error('Error fetching paths:', e);
+        return { dashboard: '/dashboard', login: '/login', sub: '/sub' };
+    }
+}
 
 // Logout
+// Logout
 async function logout() {
-    await fetch('/api/logout', { method: 'POST' });
-    location.href = '/login';
+    try {
+        const paths = await getCurrentPaths();
+        await fetch('/api/logout', { method: 'POST' });
+        location.href = paths.login;
+    } catch(e) {
+        // Fallback if API fails
+        await fetch('/api/logout', { method: 'POST' });
+        location.href = '/login';
+    }
 }
 
 // ---- Settings: change password ----
