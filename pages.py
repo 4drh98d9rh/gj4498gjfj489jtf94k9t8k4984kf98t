@@ -1,6 +1,7 @@
 # pages.py - MX-UI v1.0.0
 # All templates with escaped braces for Python .format()
 
+# ---------- LOGIN_HTML ----------
 # ---------- LOGIN_HTML (with Persian font support) ----------
 LOGIN_HTML = r"""<!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -2140,96 +2141,121 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         }
 
         // Fetch and render configs
-        async function loadConfigs() {
-            try {
-                const res = await fetch('/api/links');
-                if (!res.ok) throw new Error('Unauthorized');
-                const data = await res.json();
-                const links = data.links || [];
-                const container = document.getElementById('config-list');
-                if (!links.length) {
-                    container.innerHTML = '<div class="p-6 text-center text-slate-400 text-sm font-english">No configurations yet. Click "Add Config" to create one.</div>';
-                    return;
-                }
-                container.innerHTML = links.map(l => {
-                    const protoLabels = {
-                        'vless-ws': 'VLESS',
-                        'xhttp-packet-up': 'XHTTP',
-                        'xhttp-stream-up': 'XHTTP'
-                    };
-                    const proto = l.protocol || 'vless-ws';
-                    const label = l.label || 'Unnamed';
-                    const active = l.active && !l.expired;
-                    const limit = l.limit_bytes === 0 ? '∞' : fmtBytes(l.limit_bytes);
-                    const used = fmtBytes(l.used_bytes || 0);
-                    const pct = l.limit_bytes === 0 ? 0 : Math.min(100, (l.used_bytes / l.limit_bytes) * 100);
-                    const color = pct > 90 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#3b82f6';
-                    let speedDisplay = '∞';
-                    if (l.speed_limit_bytes && l.speed_limit_bytes > 0) {
-                        speedDisplay = (l.speed_limit_bytes * 8 / 1024 / 1024).toFixed(1) + ' Mbps';
-                    }
-                    const statusDot = active ? 'status-dot active' : 'status-dot inactive';
-                    const statusText = active ? 'Active' : 'Inactive';
-                    const statusClass = active ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' :
-                        'text-red-400 bg-red-500/10 border-red-500/20';
+        // Fetch and render configs
+async function loadConfigs() {
+    try {
+        const res = await fetch('/api/links');
+        if (!res.ok) throw new Error('Unauthorized');
+        const data = await res.json();
+        const links = data.links || [];
+        const container = document.getElementById('config-list');
+        if (!links.length) {
+            container.innerHTML = '<div class="p-6 text-center text-slate-400 text-sm font-english">No configurations yet. Click "Add Config" to create one.</div>';
+            return;
+        }
+        container.innerHTML = links.map(l => {
+            const protoLabels = {
+                'vless-ws': 'VLESS',
+                'xhttp-packet-up': 'XHTTP',
+                'xhttp-stream-up': 'XHTTP'
+            };
+            const proto = l.protocol || 'vless-ws';
+            const label = l.label || 'Unnamed';
+            const isDefault = l.is_default || false;
+            const active = l.active && !l.expired;
+            const limit = l.limit_bytes === 0 ? '∞' : fmtBytes(l.limit_bytes);
+            const used = fmtBytes(l.used_bytes || 0);
+            const pct = l.limit_bytes === 0 ? 0 : Math.min(100, (l.used_bytes / l.limit_bytes) * 100);
+            const color = pct > 90 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#3b82f6';
+            let speedDisplay = '∞';
+            if (l.speed_limit_bytes && l.speed_limit_bytes > 0) {
+                speedDisplay = (l.speed_limit_bytes * 8 / 1024 / 1024).toFixed(1) + ' Mbps';
+            }
+            const statusDot = active ? 'status-dot active' : 'status-dot inactive';
+            const statusText = active ? 'Active' : 'Inactive';
+            const statusClass = active ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' :
+                'text-red-400 bg-red-500/10 border-red-500/20';
 
-                    return `
-                    <div class="p-4 sm:p-6 config-row transition-all duration-200 hover:bg-slate-800/20" data-uuid="${l.uuid}">
-                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-6">
-                            <div class="flex items-start space-x-3 sm:space-x-4 min-w-0">
-                                <span class="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-[9px] sm:text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wide mt-0.5 font-mono shrink-0 font-english">${protoLabels[proto] || proto}</span>
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex flex-wrap items-center gap-2">
-                                        <h3 class="text-sm sm:text-base font-semibold text-slate-200 truncate font-english">${label}</h3>
-                                        <span class="text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium ${statusClass} shrink-0 transition-all duration-300 font-english">
-                                            <span class="${statusDot}"></span>${statusText}
-                                        </span>
-                                    </div>
-                                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-0.5 mt-1 text-[10px] sm:text-xs text-slate-400">
-                                        <div class="font-english">Network: <span class="text-slate-300 font-mono font-english">${proto.includes('ws') ? 'ws' : 'tcp'}</span></div>
-                                        <div class="font-english">Security: <span class="text-slate-300 font-mono font-english">tls</span></div>
-                                        <div class="col-span-2 sm:col-span-1 font-english">Expiry: <span class="text-slate-300 font-mono font-english">${l.expires_at ? new Date(l.expires_at).toISOString().slice(0,10) : 'Unlimited'}</span></div>
-                                    </div>
-                                    <div class="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-slate-400">
-                                        <span class="font-english">Usage: <span class="text-slate-300 font-mono font-english">${used} / ${limit}</span></span>
-                                        <span class="font-english">IP: <span class="text-slate-300 font-mono font-english">${l.ip_limit || '∞'}</span></span>
-                                        <span class="font-english">Speed: <span class="text-slate-300 font-mono font-english">${speedDisplay}</span></span>
-                                    </div>
-                                    <div class="w-full max-w-xs mt-1.5 h-1.5 bg-slate-800/60 rounded-full overflow-hidden">
-                                        <div class="h-full rounded-full transition-all duration-500" style="width: ${pct}%; background: ${color};"></div>
-                                    </div>
-                                </div>
+            // اگر کانفیگ پیش‌فرض است، دکمه‌های اکشن رو غیرفعال یا مخفی کن
+            const actionButtons = isDefault ? `
+                <span class="text-[10px] text-amber-400 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20 font-english" title="Default configuration - cannot be modified">
+                    <i data-lucide="shield" class="w-3 h-3 inline mr-1"></i>Protected
+                </span>
+            ` : `
+                <button onclick="openEditModal('${label}','${proto}','${l.fingerprint||'chrome'}','${l.alpn||''}',${l.limit_bytes ? (l.limit_bytes / 1024 / 1024) : 0},${l.expires_at ? Math.ceil((new Date(l.expires_at) - Date.now()) / (86400000)) : 0},${l.ip_limit||0},${l.speed_limit_bytes ? (l.speed_limit_bytes * 8 / 1024 / 1024) : 0},'${l.speed_limit_unit || 'MBIT'}','${l.uuid}')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition-all duration-300" title="Edit"><i data-lucide="edit-3" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                <button onclick="resetTraffic('${l.uuid}')" class="p-1.5 sm:p-2 bg-blue-800/20 hover:bg-blue-800/40 border border-blue-700/30 text-blue-300 rounded-xl transition-all duration-300" title="Reset Traffic"><i data-lucide="rotate-ccw" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                <button onclick="deleteConfig('${l.uuid}')" class="p-1.5 sm:p-2 bg-red-800/20 hover:bg-red-800/40 border border-red-700/30 text-red-300 rounded-xl transition-all duration-300" title="Delete"><i data-lucide="trash-2" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+            `;
+
+            // اگر کانفیگ پیش‌فرض است، toggle رو غیرفعال کن
+            const toggleHtml = isDefault ? `
+                <label class="relative inline-flex items-center cursor-not-allowed group shrink-0 opacity-60">
+                    <input type="checkbox" class="sr-only" ${active ? 'checked' : ''} disabled>
+                    <div class="w-9 h-5 bg-slate-600 rounded-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all ${active ? 'after:translate-x-full' : ''}"></div>
+                    <span class="toggle-label transition-all duration-300 font-english">${active ? 'Enabled' : 'Disabled'}</span>
+                </label>
+            ` : `
+                <label class="relative inline-flex items-center cursor-pointer group shrink-0">
+                    <input type="checkbox" class="sr-only peer" ${active ? 'checked' : ''} onchange="toggleConfigStatus('${l.uuid}', this.checked)">
+                    <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600 peer-checked:border-emerald-600"></div>
+                    <span class="toggle-label transition-all duration-300 group-hover:text-slate-200 font-english">${active ? 'Enabled' : 'Disabled'}</span>
+                </label>
+            `;
+
+            // اضافه کردن نشان Default به نام
+            const defaultBadge = isDefault ? `<span class="text-[8px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded font-mono font-english">Default</span>` : '';
+
+            return `
+            <div class="p-4 sm:p-6 config-row transition-all duration-200 hover:bg-slate-800/20 ${isDefault ? 'border-l-2 border-amber-500/50' : ''}" data-uuid="${l.uuid}">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-6">
+                    <div class="flex items-start space-x-3 sm:space-x-4 min-w-0">
+                        <span class="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-[9px] sm:text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wide mt-0.5 font-mono shrink-0 font-english">${protoLabels[proto] || proto}</span>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h3 class="text-sm sm:text-base font-semibold text-slate-200 truncate font-mixed">${label}</h3>
+                                ${defaultBadge}
+                                <span class="text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded font-medium ${statusClass} shrink-0 transition-all duration-300 font-english">
+                                    <span class="${statusDot}"></span>${statusText}
+                                </span>
                             </div>
-                            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 lg:justify-end">
-                                <label class="relative inline-flex items-center cursor-pointer group shrink-0">
-                                    <input type="checkbox" class="sr-only peer" ${active ? 'checked' : ''} onchange="toggleConfigStatus('${l.uuid}', this.checked)">
-                                    <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600 peer-checked:border-emerald-600"></div>
-                                    <span class="toggle-label transition-all duration-300 group-hover:text-slate-200 font-english">${active ? 'Enabled' : 'Disabled'}</span>
-                                </label>
-                                
-                                <div class="relative flex-grow sm:flex-grow-0 min-w-[180px] sm:min-w-[220px] max-w-full sm:max-w-xs">
-                                    <input type="text" id="uri-${l.uuid}" readonly value="${l.vless_link}" class="w-full bg-slate-950 border border-slate-800/80 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 pr-7 sm:pr-10 text-[8px] sm:text-[10px] font-mono text-slate-400 focus:outline-none select-all truncate font-english">
-                                    <button onclick="copyLink('uri-${l.uuid}')" class="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 p-0.5 sm:p-1 text-slate-500 hover:text-slate-300 transition-all duration-300"><i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
-                                </div>
-                                <button onclick="openQrModal('${label}', '${l.vless_link}', '${l.sub_url}')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition-all duration-300" title="QR"><i data-lucide="qr-code" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
-                                <button onclick="window.open('/sub/user?uuid=${l.uuid}', '_blank')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition-all duration-300" title="Subscription"><i data-lucide="external-link" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
-                                <button onclick="openEditModal('${label}','${proto}','${l.fingerprint||'chrome'}','${l.alpn||''}',${l.limit_bytes ? (l.limit_bytes / 1024 / 1024) : 0},${l.expires_at ? Math.ceil((new Date(l.expires_at) - Date.now()) / (86400000)) : 0},${l.ip_limit||0},${l.speed_limit_bytes ? (l.speed_limit_bytes * 8 / 1024 / 1024) : 0},'${l.speed_limit_unit || 'MBIT'}','${l.uuid}')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition-all duration-300" title="Edit"><i data-lucide="edit-3" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
-                                <button onclick="resetTraffic('${l.uuid}')" class="p-1.5 sm:p-2 bg-blue-800/20 hover:bg-blue-800/40 border border-blue-700/30 text-blue-300 rounded-xl transition-all duration-300" title="Reset Traffic"><i data-lucide="rotate-ccw" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
-                                <button onclick="deleteConfig('${l.uuid}')" class="p-1.5 sm:p-2 bg-red-800/20 hover:bg-red-800/40 border border-red-700/30 text-red-300 rounded-xl transition-all duration-300" title="Delete"><i data-lucide="trash-2" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-0.5 mt-1 text-[10px] sm:text-xs text-slate-400">
+                                <div class="font-english">Network: <span class="text-slate-300 font-mono font-english">${proto.includes('ws') ? 'ws' : 'tcp'}</span></div>
+                                <div class="font-english">Security: <span class="text-slate-300 font-mono font-english">tls</span></div>
+                                <div class="col-span-2 sm:col-span-1 font-english">Expiry: <span class="text-slate-300 font-mono font-english">${l.expires_at ? new Date(l.expires_at).toISOString().slice(0,10) : 'Unlimited'}</span></div>
+                            </div>
+                            <div class="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-slate-400">
+                                <span class="font-english">Usage: <span class="text-slate-300 font-mono font-english">${used} / ${limit}</span></span>
+                                <span class="font-english">IP: <span class="text-slate-300 font-mono font-english">${l.ip_limit || '∞'}</span></span>
+                                <span class="font-english">Speed: <span class="text-slate-300 font-mono font-english">${speedDisplay}</span></span>
+                            </div>
+                            <div class="w-full max-w-xs mt-1.5 h-1.5 bg-slate-800/60 rounded-full overflow-hidden">
+                                <div class="h-full rounded-full transition-all duration-500" style="width: ${pct}%; background: ${color};"></div>
                             </div>
                         </div>
-                    </div>`;
-                }).join('');
-                lucide.createIcons();
-                updateStats();
-                if (systemDetailsVisible) {
-                    updateSystemDetails();
-                }
-            } catch (e) {
-                if (e.message.includes('Unauthorized')) location.href = '/login';
-            }
+                    </div>
+                    <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 lg:justify-end">
+                        ${toggleHtml}
+                        
+                        <div class="relative flex-grow sm:flex-grow-0 min-w-[180px] sm:min-w-[220px] max-w-full sm:max-w-xs">
+                            <input type="text" id="uri-${l.uuid}" readonly value="${l.vless_link}" class="w-full bg-slate-950 border border-slate-800/80 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 pr-7 sm:pr-10 text-[8px] sm:text-[10px] font-mono text-slate-400 focus:outline-none select-all truncate font-english">
+                            <button onclick="copyLink('uri-${l.uuid}')" class="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 p-0.5 sm:p-1 text-slate-500 hover:text-slate-300 transition-all duration-300"><i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                        </div>
+                        <button onclick="openQrModal('${label}', '${l.vless_link}', '${l.sub_url}')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition-all duration-300" title="QR"><i data-lucide="qr-code" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                        <button onclick="window.open('/sub/user?uuid=${l.uuid}', '_blank')" class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition-all duration-300" title="Subscription"><i data-lucide="external-link" class="w-3 h-3 sm:w-4 sm:h-4"></i></button>
+                        ${actionButtons}
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+        lucide.createIcons();
+        updateStats();
+        if (systemDetailsVisible) {
+            updateSystemDetails();
         }
-
+    } catch (e) {
+        if (e.message.includes('Unauthorized')) location.href = '/login';
+    }
+}
         async function updateStats() {
             try {
                 const res = await fetch('/stats');
