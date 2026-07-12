@@ -3249,7 +3249,8 @@ SETUP_HTML = r"""<!DOCTYPE html>
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'Vazirmatn', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        persian: ['Vazirmatn', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
                     }
                 }
@@ -3266,21 +3267,14 @@ SETUP_HTML = r"""<!DOCTYPE html>
         .input-focus-ring:focus {
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
         .font-persian {
-            font-family: 'Vazirmatn', 'Inter', sans-serif;
+            font-family: 'Vazirmatn', sans-serif;
         }
         .font-english {
-            font-family: 'Inter', 'Vazirmatn', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
         .font-mixed {
-            font-family: 'Inter', 'Vazirmatn', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
         @media (max-width: 640px) {
             .mobile-padding {
@@ -3331,7 +3325,7 @@ SETUP_HTML = r"""<!DOCTYPE html>
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_100%,rgba(99,102,241,0.05),transparent_70%)] pointer-events-none"></div>
     <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(circle at 1px 1px, #3b82f6 1px, transparent 0); background-size: 24px 24px;"></div>
     
-    <div class="w-full max-w-md relative z-10 fade-in">
+    <div class="w-full max-w-md relative z-10">
         <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-6 sm:p-8 backdrop-blur-xl glow-effect transition-all duration-300 hover:border-slate-700/80">
             
             <!-- Logo & Brand -->
