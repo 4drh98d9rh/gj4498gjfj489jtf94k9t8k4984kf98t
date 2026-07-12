@@ -2380,8 +2380,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     </script>
 </body>
 </html>"""
-# ---------- SUB_USER_HTML (for /sub/user with auto-update every 30s - NO TAB RESET) ----------
-# ---------- SUB_USER_HTML (for /sub/user with auto-update every 30s - TIMER CONTINUES IN BACKGROUND) ----------
+# ---------- SUB_USER_HTML (for /sub/user with fixed timer - rounded numbers, continues in background) ----------
 SUB_USER_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2808,6 +2807,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
         let lastUpdateTime = Date.now();
         let timerStartTime = Date.now();
         let timerLastTick = Date.now();
+        let accumulatedTime = 0;
 
         // Toast notification system
         function showToast(message, type) {{
@@ -2860,21 +2860,24 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             return (b / 1024 ** 3).toFixed(2) + ' GB';
         }}
 
-        // Update timer display
+        // Update timer display with rounded integer
         function updateTimer() {{
             const timerDisplay = document.getElementById('timerDisplay');
             const timerRing = document.getElementById('timerRing');
             
+            // Round to nearest integer for display
+            const displayCountdown = Math.round(countdown);
+            
             if (timerDisplay) {{
-                timerDisplay.textContent = countdown;
+                timerDisplay.textContent = displayCountdown;
             }}
             
             if (timerRing) {{
-                timerRing.textContent = countdown;
+                timerRing.textContent = displayCountdown;
                 timerRing.classList.remove('warning', 'critical');
-                if (countdown <= 5) {{
+                if (displayCountdown <= 5) {{
                     timerRing.classList.add('critical');
-                }} else if (countdown <= 10) {{
+                }} else if (displayCountdown <= 10) {{
                     timerRing.classList.add('warning');
                 }}
             }}
@@ -2882,9 +2885,11 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
 
         // Manual update trigger
         function manualUpdate() {{
-            // Reset countdown
+            // Reset countdown to exactly 30
             countdown = 30;
             timerStartTime = Date.now();
+            timerLastTick = Date.now();
+            accumulatedTime = 0;
             updateTimer();
             // Force update
             updateSubscriptionData();
@@ -2977,9 +2982,11 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                 lastUpdateTime = Date.now();
                 document.getElementById('lastUpdateTime').textContent = new Date().toLocaleTimeString();
 
-                // Reset countdown after successful update
+                // Reset countdown to exactly 30 after successful update
                 countdown = 30;
                 timerStartTime = Date.now();
+                timerLastTick = Date.now();
+                accumulatedTime = 0;
                 updateTimer();
 
             }} catch (error) {{
@@ -2997,12 +3004,13 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             }}
         }}
 
-        // Timer countdown function - Uses REAL time, not interval ticks
+        // Timer countdown function - Uses REAL time with proper rounding
         function startTimer() {{
             if (timerInterval) clearInterval(timerInterval);
             
             timerStartTime = Date.now();
             timerLastTick = Date.now();
+            accumulatedTime = 0;
             
             timerInterval = setInterval(() => {{
                 if (isPaused) return;
@@ -3012,19 +3020,21 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                 const elapsedSeconds = (now - timerLastTick) / 1000;
                 timerLastTick = now;
                 
-                // Decrease countdown by elapsed seconds (minimum 1)
+                // Decrease countdown by elapsed seconds
                 countdown = Math.max(0, countdown - elapsedSeconds);
                 
                 // If countdown reached 0 or below, trigger update
                 if (countdown <= 0) {{
                     countdown = 30;
                     timerStartTime = Date.now();
+                    timerLastTick = Date.now();
+                    accumulatedTime = 0;
                     updateTimer();
                     updateSubscriptionData();
                 }} else {{
                     updateTimer();
                 }}
-            }}, 200); // Check every 200ms for accuracy
+            }}, 100); // Check every 100ms for accuracy
         }}
 
         // Start auto-update
@@ -3043,7 +3053,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             }}
         }}
 
-        // Resume auto-update
+        // Resume auto-update - Continue from where we left off
         function resumeAutoUpdate() {{
             isPaused = false;
             timerLastTick = Date.now();
@@ -3107,19 +3117,40 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             }}
         }});
 
-        // Handle page visibility change - Timer continues in background
+        // Handle page visibility change - Timer CONTINUES in background
+        // When tab is hidden, we just pause UI updates but timer continues
+        let hiddenStartTime = 0;
+        let hiddenElapsed = 0;
+
         document.addEventListener('visibilitychange', function() {{
             if (document.hidden) {{
-                // Tab is hidden - just mark as paused but timer continues running
-                // We DON'T stop the timer, just prevent UI updates
+                // Tab is hidden - mark time and pause UI updates
+                hiddenStartTime = Date.now();
                 isPaused = true;
             }} else {{
                 // Tab is visible again - resume UI updates
-                // Countdown continues from where it was
+                // Calculate how long we were hidden
+                const hiddenDuration = (Date.now() - hiddenStartTime) / 1000;
+                
+                // Apply the hidden time to countdown (timer continued in background)
+                countdown = Math.max(0, countdown - hiddenDuration);
+                
+                // If countdown reached 0 or below while hidden, trigger update now
+                if (countdown <= 0) {{
+                    countdown = 30;
+                    timerStartTime = Date.now();
+                    timerLastTick = Date.now();
+                    accumulatedTime = 0;
+                    updateTimer();
+                    updateSubscriptionData();
+                }} else {{
+                    updateTimer();
+                }}
+                
+                // Resume timer
                 isPaused = false;
                 timerLastTick = Date.now();
-                // Force update timer display
-                updateTimer();
+                startTimer();
             }}
         }});
 
