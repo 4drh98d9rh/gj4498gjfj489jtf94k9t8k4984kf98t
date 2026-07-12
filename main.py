@@ -180,6 +180,11 @@ async def destroy_session(token: str | None):
     async with SESSIONS_LOCK:
         SESSIONS.pop(token, None)
 
+async def clear_all_sessions():
+    """Clear all active sessions"""
+    async with SESSIONS_LOCK:
+        SESSIONS.clear()
+
 async def require_auth(request: Request):
     token = request.cookies.get(SESSION_COOKIE)
     if not await is_valid_session(token):
@@ -389,9 +394,9 @@ async def ensure_default_link():
 
 # ── Basic endpoints ───────────────────────────────────────────────────────────
 @app.get("/")
-async def root():
+async def root(request: Request):
     dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
-    # If dashboard path is "/", avoid loop
+    # If dashboard path is "/", render directly (avoid loop)
     if dashboard_path == "/":
         return await render_dashboard(request)
     return RedirectResponse(url=dashboard_path, status_code=302)
@@ -480,9 +485,13 @@ async def restore_database(request: Request, _=Depends(require_auth)):
                 if key in CONFIG:
                     CONFIG[key] = value
     
+    # Clear all sessions to force re-login with new password
+    await clear_all_sessions()
+    
     await save_state()
     log_activity("database", f"Database restored from backup ({len(LINKS)} links)", "ok")
-    return {"ok": True, "restored": len(LINKS)}
+    
+    return {"ok": True, "restored": len(LINKS), "requires_login": True}
 
 # ── Subscription endpoints ────────────────────────────────────────────────────
 @app.get("/sub/user")
@@ -490,7 +499,7 @@ async def subscription_user_old(request: Request, uuid: str = Query(...)):
     """Redirect old /sub/user to new sub path if changed"""
     sub_path = CONFIG.get("sub_path", "/sub")
     if sub_path != "/sub":
-        return RedirectResponse(url=f"{sub_path}/user?uuid={uuid}")
+        return RedirectResponse(url=f"{sub_path}/user?uuid={uuid}", status_code=302)
     return await subscription_user_handler(request, uuid)
 
 @app.get(CONFIG.get("sub_path", "/sub") + "/user")
@@ -570,7 +579,7 @@ async def subscription_single_old(uuid: str, request: Request):
     """Redirect old /sub/{uuid} to new sub path if changed"""
     sub_path = CONFIG.get("sub_path", "/sub")
     if sub_path != "/sub":
-        return RedirectResponse(url=f"{sub_path}/{uuid}")
+        return RedirectResponse(url=f"{sub_path}/{uuid}", status_code=302)
     return await subscription_single_handler(uuid, request)
 
 @app.get(CONFIG.get("sub_path", "/sub") + "/{uuid}")
@@ -596,7 +605,7 @@ async def subscription_info_old(uuid: str, request: Request):
     """Redirect old /sub/{uuid}/info to new sub path if changed"""
     sub_path = CONFIG.get("sub_path", "/sub")
     if sub_path != "/sub":
-        return RedirectResponse(url=f"{sub_path}/{uuid}/info")
+        return RedirectResponse(url=f"{sub_path}/{uuid}/info", status_code=302)
     return await subscription_info_handler(uuid, request)
 
 @app.get(CONFIG.get("sub_path", "/sub") + "/{uuid}/info")
@@ -630,7 +639,7 @@ async def subscription_all_old(request: Request, _=Depends(require_auth)):
     """Redirect old /sub-all to new sub path if changed"""
     sub_path = CONFIG.get("sub_path", "/sub")
     if sub_path != "/sub":
-        return RedirectResponse(url=f"{sub_path}-all")
+        return RedirectResponse(url=f"{sub_path}-all", status_code=302)
     return await subscription_all_handler(request)
 
 @app.get(CONFIG.get("sub_path", "/sub") + "-all")
@@ -700,24 +709,18 @@ async def api_change_password(request: Request, token=Depends(require_auth)):
     # Change password
     AUTH["password_hash"] = hash_password(new)
     
-    # Clear all sessions and create a new one for the current user
-    async with SESSIONS_LOCK:
-        SESSIONS.clear()
-        # Create new session for the current user
-        new_token = secrets.token_urlsafe(32)
-        SESSIONS[new_token] = time.time() + SESSION_TTL
+    # Clear all sessions
+    await clear_all_sessions()
     
     await save_state()
     log_activity("auth", "Panel password changed", "ok")
     
-    # Return new token in response
-    return {"ok": True, "new_token": new_token}
+    return {"ok": True, "requires_login": True}
 
 @app.post("/api/force-logout")
 async def force_logout(request: Request):
     """Force logout all users (used after password change)"""
-    async with SESSIONS_LOCK:
-        SESSIONS.clear()
+    await clear_all_sessions()
     resp = JSONResponse({"ok": True})
     secure = request.url.scheme == "https"
     resp.delete_cookie(SESSION_COOKIE, path="/", secure=secure)
@@ -1146,15 +1149,14 @@ async def http_proxy(target_url: str, request: Request):
         raise HTTPException(status_code=502, detail=f"Proxy error: {exc}")
 
 # ── HTML Pages ─────────────────────────────────────────────────────────────────
-# ── HTML Pages ─────────────────────────────────────────────────────────────────
 from pages import LOGIN_HTML, DASHBOARD_HTML
 
 # Dashboard and Login handlers
 @app.get("/dash")
-async def dash_redirect():
+async def dash_redirect(request: Request):
     """Redirect /dash to current dashboard path"""
     dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
-    # Don't redirect if it's the same path (avoid loop)
+    # If dashboard path is "/dash", render directly (avoid loop)
     if dashboard_path == "/dash":
         return await render_dashboard(request)
     return RedirectResponse(url=dashboard_path, status_code=302)
@@ -1264,7 +1266,7 @@ async def render_login(request: Request):
     """Render the login page"""
     if await is_valid_session(request.cookies.get(SESSION_COOKIE)):
         dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
-        return RedirectResponse(url=dashboard_path)
+        return RedirectResponse(url=dashboard_path, status_code=302)
     
     is_default = AUTH["password_hash"] == hash_password("MUVIXO")
     login_html = LOGIN_HTML
