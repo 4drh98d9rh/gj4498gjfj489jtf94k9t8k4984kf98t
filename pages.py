@@ -1998,6 +1998,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 # ---------- SUB_USER_HTML (for /sub/user with clean QR) ----------
 # ---------- SUB_USER_HTML (for /sub/user with auto-update) ----------
 # ---------- SUB_USER_HTML (for /sub/user with auto-update and timer) ----------
+# ---------- SUB_USER_HTML (for /sub/user with auto-update every 30s) ----------
 SUB_USER_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2420,6 +2421,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
         let isUpdating = false;
         let countdown = 30;
         let isPaused = false;
+        let isFirstLoad = true;
 
         // Toast notification system
         function showToast(message, type) {{
@@ -2483,7 +2485,6 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             
             if (timerRing) {{
                 timerRing.textContent = countdown;
-                // Change color based on remaining time
                 timerRing.classList.remove('warning', 'critical');
                 if (countdown <= 5) {{
                     timerRing.classList.add('critical');
@@ -2503,7 +2504,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             showToast('Refreshing...', 'info');
         }}
 
-        // Update the subscription page data
+        // Update ONLY the data (not the whole page)
         async function updateSubscriptionData() {{
             if (isUpdating) return;
             isUpdating = true;
@@ -2520,73 +2521,71 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             if (qrImage) qrImage.classList.add('loading');
 
             try {{
-                // Fetch fresh data from the same endpoint with a cache-busting parameter
-                const response = await fetch(window.location.pathname + '?uuid=' + CURRENT_UUID + '&_t=' + Date.now());
+                // Fetch ONLY the data from API
+                const response = await fetch('/api/link-status/' + CURRENT_UUID + '?_t=' + Date.now());
                 
                 if (!response.ok) {{
                     throw new Error('Failed to fetch updates');
                 }}
 
-                const html = await response.text();
+                const data = await response.json();
                 
-                // Parse the HTML response to extract updated data
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
+                // Update ONLY the data fields
+                // Update usage values
+                const usedBytes = data.used_bytes || 0;
+                const limitBytes = data.limit_bytes || 0;
+                const usagePercent = data.usage_percent || 0;
+                const isActive = data.active || false;
 
-                // Update all elements with new data
-                const elements = {{
-                    'labelValue': doc.getElementById('labelValue')?.textContent || '{label}',
-                    'uuidValue': doc.getElementById('uuidValue')?.textContent || '{uuid}',
-                    'statusValue': doc.getElementById('statusValue')?.innerHTML || '{status}',
-                    'downloadedValue': doc.getElementById('downloadedValue')?.textContent || '{downloaded}',
-                    'uploadedValue': doc.getElementById('uploadedValue')?.textContent || '{uploaded}',
-                    'usageValue': doc.getElementById('usageValue')?.textContent || '{usage} / {total_quota}',
-                    'totalQuotaValue': doc.getElementById('totalQuotaValue')?.textContent || '{total_quota}',
-                    'remainedValue': doc.getElementById('remainedValue')?.textContent || '{remained}',
-                    'lastOnlineValue': doc.getElementById('lastOnlineValue')?.textContent || '{last_online}',
-                    'expiryValue': doc.getElementById('expiryValue')?.textContent || '{expiry}',
-                    'ipsValue': doc.getElementById('ipsValue')?.textContent || '{ips}',
-                    'progressLabel': doc.getElementById('progressLabel')?.textContent || '{label}',
-                    'progressText': doc.getElementById('progressText')?.textContent || '{used_fmt} / {limit_fmt}',
-                    'usagePercent': doc.getElementById('usagePercent')?.textContent || '{usage_pct}% used',
-                    'remainedText': doc.getElementById('remainedText')?.textContent || '{remained} remaining',
-                    'vlessLink': doc.getElementById('vless-link-input')?.value || '{vless_link}',
-                }};
+                // Format values
+                const usedFormatted = fmtBytes(usedBytes);
+                const limitFormatted = limitBytes === 0 ? '∞' : fmtBytes(limitBytes);
+                const remainedFormatted = limitBytes === 0 ? '∞' : fmtBytes(Math.max(0, limitBytes - usedBytes));
 
-                // Update status badge
-                const newStatusBadge = doc.getElementById('status-badge');
-                const statusBadge = document.getElementById('status-badge');
-                if (newStatusBadge) {{
-                    statusBadge.className = newStatusBadge.className;
-                    statusBadge.innerHTML = newStatusBadge.innerHTML;
-                }}
+                // Update Downloaded
+                const downloadedEl = document.getElementById('downloadedValue');
+                if (downloadedEl) downloadedEl.textContent = usedFormatted;
 
-                // Update progress bar width
-                const newProgressBar = doc.getElementById('progressBar');
+                // Update Usage
+                const usageEl = document.getElementById('usageValue');
+                if (usageEl) usageEl.textContent = usedFormatted + ' / ' + limitFormatted;
+
+                // Update Remained
+                const remainedEl = document.getElementById('remainedValue');
+                if (remainedEl) remainedEl.textContent = remainedFormatted;
+
+                // Update Progress Bar
                 const progressBar = document.getElementById('progressBar');
-                if (newProgressBar) {{
-                    progressBar.style.width = newProgressBar.style.width;
-                }}
+                if (progressBar) progressBar.style.width = usagePercent + '%';
 
-                // Update QR image (only if URL changed)
-                const newQrImg = doc.getElementById('qrImage');
-                if (newQrImg && newQrImg.src !== qrImage.src) {{
-                    qrImage.src = newQrImg.src;
-                }}
+                // Update Progress Text
+                const progressText = document.getElementById('progressText');
+                if (progressText) progressText.textContent = usedFormatted + ' / ' + limitFormatted;
 
-                // Update all text elements
-                Object.keys(elements).forEach(id => {{
-                    const el = document.getElementById(id);
-                    if (el) {{
-                        if (id === 'vlessLink') {{
-                            el.value = elements[id];
-                        }} else if (id === 'statusValue') {{
-                            el.innerHTML = elements[id];
-                        }} else {{
-                            el.textContent = elements[id];
-                        }}
+                // Update Usage Percent
+                const usagePercentEl = document.getElementById('usagePercent');
+                if (usagePercentEl) usagePercentEl.textContent = usagePercent.toFixed(1) + '% used';
+
+                // Update Remained Text
+                const remainedText = document.getElementById('remainedText');
+                if (remainedText) remainedText.textContent = remainedFormatted + ' remaining';
+
+                // Update Status Badge
+                const statusBadge = document.getElementById('status-badge');
+                const statusValue = document.getElementById('statusValue');
+                if (statusBadge && statusValue) {{
+                    if (isActive) {{
+                        statusBadge.className = 'status-badge active';
+                        statusBadge.innerHTML = '<span class="status-dot active"></span> Active';
+                        statusValue.textContent = 'Active';
+                        statusValue.className = 'detail-value text-xs sm:text-sm font-mono text-emerald-400 font-semibold';
+                    }} else {{
+                        statusBadge.className = 'status-badge inactive';
+                        statusBadge.innerHTML = '<span class="status-dot inactive"></span> Inactive';
+                        statusValue.textContent = 'Inactive';
+                        statusValue.className = 'detail-value text-xs sm:text-sm font-mono text-red-400 font-semibold';
                     }}
-                }});
+                }}
 
                 // Update last update time
                 document.getElementById('lastUpdateTime').textContent = new Date().toLocaleTimeString();
@@ -2595,13 +2594,18 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                 countdown = 30;
                 updateTimer();
 
-                showToast('Page updated', 'info');
+                // Don't show toast for every update - only if there was a change
+                // showToast('Updated', 'info');
 
             }} catch (error) {{
                 console.error('Update error:', error);
-                showToast('Update failed: ' + error.message, 'error');
+                // Only show error toast if not first load
+                if (!isFirstLoad) {{
+                    showToast('Update failed: ' + error.message, 'error');
+                }}
             }} finally {{
                 isUpdating = false;
+                isFirstLoad = false;
                 indicator.classList.remove('updating');
                 spinner.style.display = 'none';
                 text.textContent = 'Auto';
@@ -2628,13 +2632,10 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             }}, 1000);
         }}
 
-        // Start auto-update
+        // Start auto-update (only timer, no immediate page reload)
         function startAutoUpdate() {{
             isPaused = false;
-            // Update immediately on load
-            setTimeout(updateSubscriptionData, 1000);
-            
-            // Start timer
+            // Start timer (first update will happen after 30 seconds)
             startTimer();
         }}
 
@@ -2667,25 +2668,22 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                 }});
             }}
 
-            // Start auto-update
-            startAutoUpdate();
-
-            // Update status badge initially
+            // Set initial status badge
             const statusBadge = document.getElementById('status-badge');
             const statusValue = document.getElementById('statusValue');
             if (statusValue) {{
                 const isActive = statusValue.textContent.trim().toLowerCase().includes('active');
-                const dot = statusBadge.querySelector('.status-dot');
                 if (isActive) {{
                     statusBadge.className = 'status-badge active';
-                    dot.style.backgroundColor = '#22c55e';
-                    statusBadge.innerHTML = '<span class="status-dot" style="background-color:#22c55e;"></span> Active';
+                    statusBadge.innerHTML = '<span class="status-dot active"></span> Active';
                 }} else {{
                     statusBadge.className = 'status-badge inactive';
-                    dot.style.backgroundColor = '#ef4444';
-                    statusBadge.innerHTML = '<span class="status-dot" style="background-color:#ef4444;"></span> Inactive';
+                    statusBadge.innerHTML = '<span class="status-dot inactive"></span> Inactive';
                 }}
             }}
+
+            // Start auto-update (first update after 30 seconds)
+            startAutoUpdate();
         }});
 
         // Keyboard shortcuts
@@ -2715,14 +2713,15 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             }}
         }});
 
-        // Handle page visibility change - pause updates when tab is hidden
+        // Handle page visibility change - DO NOT force update when tab becomes visible
         document.addEventListener('visibilitychange', function() {{
             if (document.hidden) {{
                 stopAutoUpdate();
             }} else {{
-                resumeAutoUpdate();
-                // Force immediate update when tab becomes visible
-                setTimeout(updateSubscriptionData, 500);
+                // Just resume the timer, don't force an update
+                if (isPaused) {{
+                    resumeAutoUpdate();
+                }}
             }}
         }});
 
