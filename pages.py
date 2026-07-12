@@ -1412,85 +1412,102 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     </div>
 
     <!-- ===== MODAL: SETTINGS ===== -->
-    <div id="settingsModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
-            <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
-                <div class="flex items-center space-x-3 min-w-0">
-                    <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20 shrink-0"><i data-lucide="settings" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
-                    <div class="min-w-0">
-                        <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate font-english">Settings</h3>
-                        <p class="text-[10px] sm:text-xs text-slate-400 truncate font-english">Manage dashboard paths and security</p>
-                    </div>
-                </div>
-                <button onclick="toggleModal('settingsModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all duration-300"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
-            </div>
-            <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-6">
-                <!-- Change Password Section -->
-                <div>
-                    <h4 class="text-xs sm:text-sm font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2 font-english">
-                        <i data-lucide="key" class="w-3 h-3 sm:w-4 sm:h-4 text-blue-400"></i>
-                        Change Password
-                    </h4>
-                    <div class="space-y-3 sm:space-y-4">
-                        <div>
-                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Current Password</label>
-                            <input type="password" id="settings-current-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english" placeholder="Enter current password">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">New Password</label>
-                            <input type="password" id="settings-new-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english" placeholder="At least 4 characters">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Confirm New Password</label>
-                            <input type="password" id="settings-confirm-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english" placeholder="Repeat new password">
-                        </div>
-                        <div id="settingsError" class="text-[10px] sm:text-xs text-red-400 hidden font-english"></div>
-                        <button onclick="changePassword()" class="w-full py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25 font-english">
-                            Update Password
-                        </button>
-                    </div>
-                </div>
-                <div class="border-t border-slate-800/60"></div>
-                <!-- Path Settings Section -->
-                <div>
-                    <h4 class="text-xs sm:text-sm font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2 font-english">
-                        <i data-lucide="folder-tree" class="w-3 h-3 sm:w-4 sm:h-4 text-purple-400"></i>
-                        Dashboard Paths
-                    </h4>
-                    <div class="space-y-3 sm:space-y-4">
-                        <div>
-                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Dashboard Path</label>
-                            <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="settings-dashboard-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple font-english" placeholder="/dashboard">
-                                <button onclick="updatePath('dashboard')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25 font-english">Update</button>
-                            </div>
-                            <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1 font-english">Current: <span id="current-dashboard-path" class="text-slate-400 font-mono font-english">/dashboard</span></p>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Login Path</label>
-                            <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="settings-login-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple font-english" placeholder="/login">
-                                <button onclick="updatePath('login')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25 font-english">Update</button>
-                            </div>
-                            <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1 font-english">Current: <span id="current-login-path" class="text-slate-400 font-mono font-english">/login</span></p>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Subscription Path</label>
-                            <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="settings-sub-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple font-english" placeholder="/sub">
-                                <button onclick="updatePath('sub')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25 font-english">Update</button>
-                            </div>
-                            <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1 font-english">Current: <span id="current-sub-path" class="text-slate-400 font-mono font-english">/sub</span></p>
-                        </div>
-                        <div id="pathSettingsError" class="text-[10px] sm:text-xs text-red-400 hidden font-english"></div>
-                    </div>
+    <!-- ===== MODAL: SETTINGS ===== -->
+<div id="settingsModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
+        <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
+            <div class="flex items-center space-x-3 min-w-0">
+                <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20 shrink-0"><i data-lucide="settings" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
+                <div class="min-w-0">
+                    <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate font-english">Settings</h3>
+                    <p class="text-[10px] sm:text-xs text-slate-400 truncate font-english">Manage dashboard paths and security</p>
                 </div>
             </div>
-            <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end shrink-0">
-                <button onclick="toggleModal('settingsModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 font-english">Close</button>
+            <button onclick="toggleModal('settingsModal', false)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all duration-300"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
+        </div>
+        <div class="p-4 sm:p-6 overflow-y-auto flex-1 scrollable-modal-content space-y-4 sm:space-y-6">
+            <!-- Change Password Section -->
+            <div>
+                <h4 class="text-xs sm:text-sm font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2 font-english">
+                    <i data-lucide="key" class="w-3 h-3 sm:w-4 sm:h-4 text-blue-400"></i>
+                    Change Password
+                </h4>
+                <div class="space-y-3 sm:space-y-4">
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Current Password</label>
+                        <input type="password" id="settings-current-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english" placeholder="Enter current password">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">New Password</label>
+                        <input type="password" id="settings-new-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english" placeholder="At least 4 characters">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Confirm New Password</label>
+                        <input type="password" id="settings-confirm-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-all duration-300 input-focus-ring font-english" placeholder="Repeat new password">
+                    </div>
+                    <div id="settingsError" class="text-[10px] sm:text-xs text-red-400 hidden font-english"></div>
+                    <button onclick="changePassword()" class="w-full py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25 font-english">
+                        Update Password
+                    </button>
+                </div>
+            </div>
+            <div class="border-t border-slate-800/60"></div>
+            <!-- Path Settings Section -->
+            <div>
+                <h4 class="text-xs sm:text-sm font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2 font-english">
+                    <i data-lucide="folder-tree" class="w-3 h-3 sm:w-4 sm:h-4 text-purple-400"></i>
+                    Dashboard Paths
+                </h4>
+                <div class="space-y-3 sm:space-y-4">
+                    <!-- Dashboard Path -->
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Dashboard Path</label>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input type="text" id="settings-dashboard-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple font-english" placeholder="/dashboard">
+                            <button onclick="updatePath('dashboard')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25 font-english">Update</button>
+                        </div>
+                        <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1 font-english">Current: <span id="current-dashboard-path" class="text-slate-400 font-mono font-english">/dashboard</span></p>
+                    </div>
+                    
+                    <!-- Login Path -->
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Login Path</label>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input type="text" id="settings-login-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple font-english" placeholder="/login">
+                            <button onclick="updatePath('login')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25 font-english">Update</button>
+                        </div>
+                        <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1 font-english">Current: <span id="current-login-path" class="text-slate-400 font-mono font-english">/login</span></p>
+                    </div>
+                    
+                    <!-- Subscription Path -->
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Subscription Path</label>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input type="text" id="settings-sub-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple font-english" placeholder="/sub">
+                            <button onclick="updatePath('sub')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25 font-english">Update</button>
+                        </div>
+                        <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1 font-english">Current: <span id="current-sub-path" class="text-slate-400 font-mono font-english">/sub</span></p>
+                    </div>
+                    
+                    <!-- Setup Path - NEW -->
+                    <div>
+                        <label class="block text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2 font-english">Setup Path</label>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input type="text" id="settings-setup-path" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs sm:text-sm font-mono text-slate-200 focus:outline-none focus:border-purple-500 transition-all duration-300 input-focus-ring-purple font-english" placeholder="/setup">
+                            <button onclick="updatePath('setup')" class="sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-purple-600/10 hover:shadow-purple-600/25 font-english">Update</button>
+                        </div>
+                        <p class="text-[9px] sm:text-[10px] text-slate-500 mt-1 font-english">Current: <span id="current-setup-path" class="text-slate-400 font-mono font-english">/setup</span></p>
+                    </div>
+                    
+                    <div id="pathSettingsError" class="text-[10px] sm:text-xs text-red-400 hidden font-english"></div>
+                </div>
             </div>
         </div>
+        <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end shrink-0">
+            <button onclick="toggleModal('settingsModal', false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-all duration-300 font-english">Close</button>
+        </div>
     </div>
+</div>
 
     <!-- ===== MODAL: ALERT ===== -->
     <div id="customAlert" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80">
@@ -2009,78 +2026,87 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
         // ---- Settings: update paths ----
         async function updatePath(type) {
-            const errEl = document.getElementById('pathSettingsError');
-            errEl.classList.add('hidden');
+    const errEl = document.getElementById('pathSettingsError');
+    errEl.classList.add('hidden');
 
-            let pathInput;
-            if (type === 'dashboard') {
-                pathInput = document.getElementById('settings-dashboard-path');
-            } else if (type === 'login') {
-                pathInput = document.getElementById('settings-login-path');
-            } else if (type === 'sub') {
-                pathInput = document.getElementById('settings-sub-path');
-            }
+    let pathInput;
+    if (type === 'dashboard') {
+        pathInput = document.getElementById('settings-dashboard-path');
+    } else if (type === 'login') {
+        pathInput = document.getElementById('settings-login-path');
+    } else if (type === 'sub') {
+        pathInput = document.getElementById('settings-sub-path');
+    } else if (type === 'setup') {  // جدید
+        pathInput = document.getElementById('settings-setup-path');
+    }
 
-            let newPath = pathInput.value.trim();
-            if (!newPath) {
-                errEl.textContent = 'Path cannot be empty.';
-                errEl.classList.remove('hidden');
-                return;
-            }
-            if (!newPath.startsWith('/')) {
-                newPath = '/' + newPath;
-            }
-            if (!/^\/[a-zA-Z0-9\-_/]*$/.test(newPath)) {
-                errEl.textContent = 'Path must start with / and contain only letters, numbers, hyphens, underscores, and slashes.';
-                errEl.classList.remove('hidden');
-                return;
-            }
+    let newPath = pathInput.value.trim();
+    if (!newPath) {
+        errEl.textContent = 'Path cannot be empty.';
+        errEl.classList.remove('hidden');
+        return;
+    }
+    if (!newPath.startsWith('/')) {
+        newPath = '/' + newPath;
+    }
+    if (!/^\/[a-zA-Z0-9\-_/]*$/.test(newPath)) {
+        errEl.textContent = 'Path must start with / and contain only letters, numbers, hyphens, underscores, and slashes.';
+        errEl.classList.remove('hidden');
+        return;
+    }
 
-            try {
-                const res = await fetch('/api/update-path', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ path_type: type, new_path: newPath })
-                });
-                const data = await res.json().catch(() => ({}));
-                if (!res.ok) throw new Error(data.detail || 'Failed to update path');
+    try {
+        const res = await fetch('/api/update-path', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path_type: type, new_path: newPath })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.detail || 'Failed to update path');
 
-                document.getElementById('current-' + type + '-path').textContent = newPath;
-                pathInput.value = '';
-                triggerAlert('Path Updated', type.charAt(0).toUpperCase() + type.slice(1) + ' path changed to: ' + newPath, 'check-circle');
+        document.getElementById('current-' + type + '-path').textContent = newPath;
+        pathInput.value = '';
+        triggerAlert('Path Updated', type.charAt(0).toUpperCase() + type.slice(1) + ' path changed to: ' + newPath, 'check-circle');
 
-                if (type === 'dashboard') {
-                    setTimeout(() => {
-                        location.href = newPath;
-                    }, 1500);
-                }
-            } catch (e) {
-                errEl.textContent = e.message;
-                errEl.classList.remove('hidden');
-            }
+        if (type === 'dashboard') {
+            setTimeout(() => {
+                location.href = newPath;
+            }, 1500);
         }
-
+        if (type === 'setup') {
+            setTimeout(() => {
+                location.href = newPath;
+            }, 1500);
+        }
+    } catch (e) {
+        errEl.textContent = e.message;
+        errEl.classList.remove('hidden');
+    }
+}
         // ---- Load current paths ----
         async function loadSettingsPaths() {
-            try {
-                const res = await fetch('/api/get-paths');
-                const data = await res.json();
+    try {
+        const res = await fetch('/api/get-paths');
+        const data = await res.json();
 
-                document.getElementById('current-dashboard-path').textContent = data.dashboard_path || '/dashboard';
-                document.getElementById('current-login-path').textContent = data.login_path || '/login';
-                document.getElementById('current-sub-path').textContent = data.sub_path || '/sub';
+        document.getElementById('current-dashboard-path').textContent = data.dashboard_path || '/dashboard';
+        document.getElementById('current-login-path').textContent = data.login_path || '/login';
+        document.getElementById('current-sub-path').textContent = data.sub_path || '/sub';
+        document.getElementById('current-setup-path').textContent = data.setup_path || '/setup';  // جدید
 
-                const dashboardInput = document.getElementById('settings-dashboard-path');
-                const loginInput = document.getElementById('settings-login-path');
-                const subInput = document.getElementById('settings-sub-path');
+        const dashboardInput = document.getElementById('settings-dashboard-path');
+        const loginInput = document.getElementById('settings-login-path');
+        const subInput = document.getElementById('settings-sub-path');
+        const setupInput = document.getElementById('settings-setup-path');  // جدید
 
-                if (dashboardInput) dashboardInput.placeholder = data.dashboard_path || '/dashboard';
-                if (loginInput) loginInput.placeholder = data.login_path || '/login';
-                if (subInput) subInput.placeholder = data.sub_path || '/sub';
-            } catch (e) {
-                console.error('Error loading paths:', e);
-            }
-        }
+        if (dashboardInput) dashboardInput.placeholder = data.dashboard_path || '/dashboard';
+        if (loginInput) loginInput.placeholder = data.login_path || '/login';
+        if (subInput) subInput.placeholder = data.sub_path || '/sub';
+        if (setupInput) setupInput.placeholder = data.setup_path || '/setup';  // جدید
+    } catch (e) {
+        console.error('Error loading paths:', e);
+    }
+}
 
         // ---- Reset Traffic ----
         async function resetTraffic(uuid) {
