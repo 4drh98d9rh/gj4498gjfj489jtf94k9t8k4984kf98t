@@ -530,9 +530,6 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         </div>
     </div>
 </div>
-
-<!-- ===== MODAL: QR with 4 items ===== -->
-<!-- ===== MODAL: QR with 4 items and SVG icon ===== -->
 <!-- ===== MODAL: QR with 4 items and custom SVG icon ===== -->
 <div id="qrModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75">
     <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow p-6 space-y-5">
@@ -541,9 +538,9 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <!-- Custom SVG Icon behind QR Codes text -->
                 <div class="relative">
                     <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                         width="48" height="48" viewBox="0 0 512.000000 512.000000"
+                         width="56" height="56" viewBox="0 0 512.000000 512.000000"
                          preserveAspectRatio="xMidYMid meet"
-                         class="text-blue-500/10 absolute -left-1 -top-1 opacity-20">
+                         class="absolute -left-1 -top-1 text-blue-500/10">
                         <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
                            fill="currentColor" stroke="none">
                             <path d="M545 5104 c-38 -8 -113 -35 -165 -61 -78 -38 -109 -60 -176 -127 -67
@@ -592,11 +589,9 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                             -395 2 c-298 2 -407 -1 -442 -11z"/>
                         </g>
                     </svg>
-                    <div class="relative z-10">
-                        <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
-                            <i data-lucide="qrcode" class="w-5 h-5 text-blue-400"></i>
-                            QR Codes
-                        </h3>
+                    <div class="relative z-10 flex items-center gap-2">
+                        <i data-lucide="qrcode" class="w-5 h-5 text-blue-400"></i>
+                        <h3 class="text-base font-bold text-slate-100">QR Codes</h3>
                     </div>
                 </div>
                 <p class="text-xs text-slate-400 font-mono" id="qrTargetLabel">Default Link</p>
