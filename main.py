@@ -5,13 +5,13 @@ import hashlib
 import secrets
 import time
 import aiofiles
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from urllib.parse import quote, parse_qs
 from collections import deque, defaultdict
 from pathlib import Path
 
 import psutil
-from datetime import datetime, timedelta
 from typing import Optional
 from fastapi import FastAPI, Request, HTTPException, WebSocket, WebSocketDisconnect, Depends, Query
 from fastapi.responses import Response, HTMLResponse, JSONResponse, RedirectResponse
@@ -54,6 +54,9 @@ CONFIG = {
     "port": int(os.environ.get("PORT", 8000)),
     "secret": _load_or_create_secret(),
     "host": os.environ.get("RAILWAY_PUBLIC_DOMAIN", "localhost"),
+    "dashboard_path": "/dashboard",
+    "login_path": "/login",
+    "sub_path": "/sub",
 }
 
 app.add_middleware(
@@ -65,7 +68,7 @@ app.add_middleware(
 )
 
 async def load_state():
-    global LINKS, AUTH
+    global LINKS, AUTH, CONFIG
     try:
         DATA_DIR.mkdir(parents=True, exist_ok=True)
         if DATA_FILE.exists():
@@ -75,6 +78,9 @@ async def load_state():
             LINKS.update(data.get("links", {}))
             if "password_hash" in data:
                 AUTH["password_hash"] = data["password_hash"]
+            if "paths" in data:
+                for key, value in data["paths"].items():
+                    CONFIG[key] = value
             logger.info(f"State loaded: {len(LINKS)} links")
     except Exception as e:
         logger.warning(f"Could not load state: {e}")
@@ -87,6 +93,11 @@ async def save_state():
                 "links": dict(LINKS),
                 "password_hash": AUTH["password_hash"],
                 "saved_at": datetime.now().isoformat(),
+                "paths": {
+                    "dashboard_path": CONFIG.get("dashboard_path", "/dashboard"),
+                    "login_path": CONFIG.get("login_path", "/login"),
+                    "sub_path": CONFIG.get("sub_path", "/sub"),
+                }
             }
             tmp = DATA_FILE.with_suffix(".tmp")
             async with aiofiles.open(tmp, "w", encoding="utf-8") as f:
@@ -384,6 +395,10 @@ async def health():
 # ── Subscription (single link) ────────────────────────────────────────────────
 @app.get("/sub/user")
 async def subscription_user(request: Request, uuid: str = Query(...)):
+    sub_path = CONFIG.get("sub_path", "/sub")
+    if not request.url.path.startswith(sub_path):
+        return RedirectResponse(url=f"{sub_path}/user?uuid={uuid}")
+    
     from pages import SUB_USER_HTML
     async with LINKS_LOCK:
         link = LINKS.get(uuid)
@@ -429,6 +444,10 @@ async def subscription_user(request: Request, uuid: str = Query(...)):
 
 @app.get("/sub/{uuid}")
 async def subscription_single(uuid: str, request: Request):
+    sub_path = CONFIG.get("sub_path", "/sub")
+    if not request.url.path.startswith(sub_path):
+        return RedirectResponse(url=f"{sub_path}/{uuid}")
+    
     import base64
     async with LINKS_LOCK:
         link = LINKS.get(uuid)
@@ -442,6 +461,10 @@ async def subscription_single(uuid: str, request: Request):
 
 @app.get("/sub/{uuid}/info", response_class=HTMLResponse)
 async def subscription_info(uuid: str, request: Request):
+    sub_path = CONFIG.get("sub_path", "/sub")
+    if not request.url.path.startswith(sub_path):
+        return RedirectResponse(url=f"{sub_path}/{uuid}/info")
+    
     from pages import SUB_INFO_HTML
     async with LINKS_LOCK:
         link = LINKS.get(uuid)
@@ -463,6 +486,10 @@ async def subscription_info(uuid: str, request: Request):
 # ── NEW: Public subscription details page ──────────────────────────────────
 @app.get("/sub-all")
 async def subscription_all(request: Request, _=Depends(require_auth)):
+    sub_path = CONFIG.get("sub_path", "/sub")
+    if not request.url.path.startswith(sub_path + "-all"):
+        return RedirectResponse(url=f"{sub_path}-all")
+    
     import base64
     host = get_host(request)
     async with LINKS_LOCK:
@@ -500,6 +527,7 @@ async def api_login(request: Request):
     # لاگ برای دیباگ
     logger.info(f"Login cookie set: secure={secure}, token={token[:8]}...")
     return resp
+
 @app.post("/api/logout")
 async def api_logout(request: Request):
     await destroy_session(request.cookies.get(SESSION_COOKIE))
@@ -527,6 +555,45 @@ async def api_change_password(request: Request, token=Depends(require_auth)):
     await save_state()
     log_activity("auth", "Panel password changed", "ok")
     return {"ok": True}
+
+# ── Settings endpoints ────────────────────────────────────────────────────────
+@app.get("/api/get-paths")
+async def get_paths(_=Depends(require_auth)):
+    return {
+        "dashboard_path": CONFIG.get("dashboard_path", "/dashboard"),
+        "login_path": CONFIG.get("login_path", "/login"),
+        "sub_path": CONFIG.get("sub_path", "/sub"),
+    }
+
+@app.post("/api/update-path")
+async def update_path(request: Request, _=Depends(require_auth)):
+    body = await request.json()
+    path_type = body.get("path_type")
+    new_path = body.get("new_path", "").strip()
+    
+    if not path_type or path_type not in ["dashboard", "login", "sub"]:
+        raise HTTPException(status_code=400, detail="Invalid path type")
+    
+    if not new_path or not new_path.startswith("/"):
+        raise HTTPException(status_code=400, detail="Path must start with /")
+    
+    if not re.match(r'^/[a-zA-Z0-9\-_/]*$', new_path):
+        raise HTTPException(status_code=400, detail="Path contains invalid characters")
+    
+    # Update config
+    CONFIG[f"{path_type}_path"] = new_path
+    
+    # Save to persistent state
+    await save_state()
+    
+    log_activity("settings", f"{path_type} path changed to {new_path}", "ok")
+    return {"ok": True, "path": new_path}
+
+@app.get("/api/is-default-password")
+async def is_default_password():
+    # Check if current password is the default one
+    default_hash = hash_password("MUVIXO")
+    return {"is_default": AUTH["password_hash"] == default_hash}
 
 # ── Stats ─────────────────────────────────────────────────────────────────────
 @app.get("/stats")
@@ -828,20 +895,49 @@ async def http_proxy(target_url: str, request: Request):
 
 # ── HTML Pages ─────────────────────────────────────────────────────────────────
 from pages import LOGIN_HTML, DASHBOARD_HTML
+import re
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
+    login_path = CONFIG.get("login_path", "/login")
+    if request.url.path != login_path:
+        return RedirectResponse(url=login_path)
     if await is_valid_session(request.cookies.get(SESSION_COOKIE)):
-        return RedirectResponse(url="/dashboard")
-    return HTMLResponse(content=LOGIN_HTML)
+        dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
+        return RedirectResponse(url=dashboard_path)
+    
+    # Check if default password is used
+    is_default = AUTH["password_hash"] == hash_password("MUVIXO")
+    login_html = LOGIN_HTML
+    
+    # If default password is changed, show message
+    if not is_default:
+        # Replace the default password display with a message
+        login_html = login_html.replace(
+            '<span class="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20 cursor-pointer hover:bg-blue-500/20 transition" onclick="document.getElementById(\'pw\').value=\'MUVIXO\';document.getElementById(\'pw\').focus()">MUVIXO</span>',
+            '<span class="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20">Password changed</span>'
+        )
+        # Add an indicator that default password is no longer used
+        login_html = login_html.replace(
+            '<span class="text-xs text-slate-400">Default password</span>',
+            '<span class="text-xs text-slate-400">Default password</span><span class="text-xs text-amber-400 ml-2">(changed)</span>'
+        )
+    
+    return HTMLResponse(content=login_html)
+
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request):
+    dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
+    if request.url.path != dashboard_path:
+        return RedirectResponse(url=dashboard_path)
+    
     token = request.cookies.get(SESSION_COOKIE)
     logger.info(f"Dashboard received cookie: {token}")
     valid = await is_valid_session(token)
     logger.info(f"Dashboard session valid: {valid}")
     if not valid:
-        return RedirectResponse(url="/login")
+        login_path = CONFIG.get("login_path", "/login")
+        return RedirectResponse(url=login_path)
     await ensure_default_link()
     return HTMLResponse(content=DASHBOARD_HTML)
 
