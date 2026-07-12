@@ -3232,6 +3232,238 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
     </script>
 </body>
 </html>"""
+
+# ---------- SETUP_HTML (صفحه تنظیم رمز عبور) ----------
+SETUP_HTML = r"""<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup · MX-UI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Vazirmatn', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #070a13;
+        }
+        .glow-effect {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.12);
+        }
+        .input-focus-ring:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .pulse-slow {
+            animation: pulse-slow 2s ease-in-out infinite;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        .font-persian {
+            font-family: 'Vazirmatn', 'Inter', sans-serif;
+        }
+        .font-english {
+            font-family: 'Inter', 'Vazirmatn', sans-serif;
+        }
+        .font-mixed {
+            font-family: 'Inter', 'Vazirmatn', sans-serif;
+        }
+        @media (max-width: 640px) {
+            .mobile-padding {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans text-slate-200 min-h-screen flex items-center justify-center bg-[#070a13] relative antialiased tracking-tight p-4 mobile-padding">
+    
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(59,130,246,0.08),transparent_70%)] pointer-events-none"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_100%,rgba(99,102,241,0.05),transparent_70%)] pointer-events-none"></div>
+    <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(circle at 1px 1px, #3b82f6 1px, transparent 0); background-size: 24px 24px;"></div>
+    
+    <div class="w-full max-w-md relative z-10 fade-in">
+        <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-6 sm:p-8 backdrop-blur-xl glow-effect transition-all duration-300 hover:border-slate-700/80">
+            
+            <!-- Logo & Brand -->
+            <div class="flex items-center gap-3 mb-6">
+                <div class="bg-blue-600 p-2 rounded-xl text-white glow-effect flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <polyline points="9 12 11 14 15 10"/>
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent block truncate font-english">MX-UI PANEL</span>
+                    <span class="text-xs text-slate-500 font-medium font-english">v1.0.0 • Setup</span>
+                </div>
+            </div>
+            
+            <!-- Title -->
+            <h1 class="text-xl font-bold text-slate-100 mb-1 font-english">Welcome! 👋</h1>
+            <p class="text-sm text-slate-400 mb-6 font-english">Set your admin password to secure the panel</p>
+            
+            <!-- Default Password Suggestion -->
+            <div class="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 mb-5">
+                <div class="flex items-start gap-3">
+                    <div class="bg-blue-500/20 p-1.5 rounded-lg flex-shrink-0 mt-0.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <polyline points="9 12 11 14 15 10"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-300 font-english">Default password is <span class="font-mono font-bold text-blue-400 bg-blue-500/20 px-2 py-0.5 rounded">MUVIXO</span></p>
+                        <p class="text-[10px] text-slate-400 mt-1 font-english">You can use it or set your own custom password below</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Setup Form -->
+            <form id="setupForm">
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 font-english">New Password</label>
+                    <input type="password" id="new-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring font-english" placeholder="Enter your password (min 4 chars)" autofocus required minlength="4">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 font-english">Confirm Password</label>
+                    <input type="password" id="confirm-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring font-english" placeholder="Confirm your password" required minlength="4">
+                </div>
+                
+                <div class="flex gap-3 mb-4">
+                    <button type="button" onclick="useDefaultPassword()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-sm font-medium rounded-xl transition-all duration-300 font-english">
+                        Use Default
+                    </button>
+                    <button type="submit" id="setupButton" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition duration-200 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25 flex items-center justify-center gap-2 font-english">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                            <polyline points="10 17 15 12 10 7"/>
+                            <line x1="15" y1="12" x2="3" y2="12"/>
+                        </svg>
+                        Set Password
+                    </button>
+                </div>
+                
+                <div id="errorMsg" class="text-sm text-red-400 hidden font-english"></div>
+                <div id="successMsg" class="text-sm text-emerald-400 hidden font-english"></div>
+            </form>
+            
+            <!-- Footer -->
+            <div class="mt-6 pt-4 border-t border-slate-800/60 text-center text-xs text-slate-500 font-english">
+                Created by Muvixo
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Use default password (MUVIXO)
+        function useDefaultPassword() {
+            document.getElementById('new-pw').value = 'MUVIXO';
+            document.getElementById('confirm-pw').value = 'MUVIXO';
+            
+            // Trigger submit
+            document.getElementById('setupForm').dispatchEvent(new Event('submit'));
+        }
+
+        document.getElementById('setupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('setupButton');
+            const err = document.getElementById('errorMsg');
+            const success = document.getElementById('successMsg');
+            
+            err.classList.add('hidden');
+            success.classList.add('hidden');
+            btn.disabled = true;
+            
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Setting...';
+            
+            const password = document.getElementById('new-pw').value;
+            const confirm = document.getElementById('confirm-pw').value;
+            
+            // Validate
+            if (password.length < 4) {
+                err.textContent = 'Password must be at least 4 characters';
+                err.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+                return;
+            }
+            
+            if (password !== confirm) {
+                err.textContent = 'Passwords do not match';
+                err.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/setup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: password })
+                });
+                
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data.detail || 'Setup failed');
+                }
+                
+                success.textContent = '✅ Password set successfully! Redirecting to login...';
+                success.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    location.href = '/login';
+                }, 1500);
+                
+            } catch (e) {
+                err.textContent = e.message || 'Setup failed. Please try again.';
+                err.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            }
+        });
+
+        // Enter key support
+        document.getElementById('new-pw').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('confirm-pw').focus();
+            }
+        });
+        
+        document.getElementById('confirm-pw').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('setupForm').dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>"""
 # Helper function for SUB_INFO_HTML's status display
 def _status_display(active):
     return 'Active' if active else 'Inactive'
