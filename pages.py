@@ -532,17 +532,35 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 </div>
 
 <!-- ===== MODAL: QR with 4 items ===== -->
+<!-- ===== MODAL: QR with 4 items and SVG icon ===== -->
 <div id="qrModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75">
     <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow p-6 space-y-5">
         <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-            <div>
-                <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
-                    <i data-lucide="qrcode" class="w-5 h-5 text-blue-400"></i>
-                    QR Codes
-                </h3>
-                <p class="text-xs text-slate-400 font-mono" id="qrTargetLabel">Node-Mapping</p>
+            <div class="flex items-center gap-3">
+                <!-- SVG Icon behind QR Codes text -->
+                <div class="relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-blue-500/20 absolute -left-1 -top-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="7" height="7" rx="1"/>
+                        <rect x="15" y="2" width="7" height="7" rx="1"/>
+                        <rect x="2" y="15" width="7" height="7" rx="1"/>
+                        <rect x="15" y="15" width="7" height="7" rx="1"/>
+                        <line x1="6" y1="6" x2="6" y2="6"/>
+                        <line x1="19" y1="6" x2="19" y2="6"/>
+                        <line x1="6" y1="19" x2="6" y2="19"/>
+                        <line x1="19" y1="19" x2="19" y2="19"/>
+                    </svg>
+                    <div class="relative z-10">
+                        <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                            <i data-lucide="qrcode" class="w-5 h-5 text-blue-400"></i>
+                            QR Codes
+                        </h3>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 font-mono" id="qrTargetLabel">Default Link</p>
             </div>
-            <button onclick="toggleModal('qrModal', false)" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition"><i data-lucide="x" class="w-4 h-4"></i></button>
+            <button onclick="toggleModal('qrModal', false)" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
         </div>
         
         <!-- Two columns: Config QR and Sub QR -->
