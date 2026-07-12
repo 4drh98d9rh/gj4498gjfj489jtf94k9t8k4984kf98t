@@ -387,7 +387,8 @@ async def ensure_default_link():
 # ── Basic endpoints ───────────────────────────────────────────────────────────
 @app.get("/")
 async def root():
-    return {"service": "MX-UI", "version": "1.0.0", "status": "active"}
+    dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
+    return RedirectResponse(url=dashboard_path)
 
 @app.get("/health")
 async def health():
@@ -422,7 +423,7 @@ async def subscription_user(request: Request, uuid: str = Query(...)):
     remained = "∞" if limit == 0 else fmt_bytes(max(0, limit - used))
     usage_pct = 0 if limit == 0 else min(100, (used / limit) * 100)
     downloaded = fmt_bytes(used)
-    uploaded = "0 B"  # could be extended later
+    uploaded = "0 B"
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={quote(vless)}"
     return HTMLResponse(content=SUB_USER_HTML.format(
         uuid=uuid,
@@ -514,7 +515,7 @@ async def api_login(request: Request):
     token = await create_session()
     log_activity("auth", f"Successful login from {ip}", "ok")
     
-    secure = False  # برای تست
+    secure = False
     resp = JSONResponse({"ok": True})
     resp.set_cookie(
         SESSION_COOKIE,
@@ -580,12 +581,8 @@ async def update_path(request: Request, _=Depends(require_auth)):
     if not re.match(r'^/[a-zA-Z0-9\-_/]*$', new_path):
         raise HTTPException(status_code=400, detail="Path contains invalid characters")
     
-    # Update config
     CONFIG[f"{path_type}_path"] = new_path
-    
-    # Save to persistent state
     await save_state()
-    
     log_activity("settings", f"{path_type} path changed to {new_path}", "ok")
     return {"ok": True, "path": new_path}
 
@@ -607,7 +604,6 @@ async def get_current_paths():
 async def get_stats(_=Depends(require_auth)):
     async with LINKS_LOCK:
         snap = dict(LINKS)
-    # System stats
     cpu_percent = psutil.cpu_percent(interval=0.1)
     cpu_count = psutil.cpu_count(logical=True)
     ram = psutil.virtual_memory()
@@ -903,53 +899,44 @@ async def http_proxy(target_url: str, request: Request):
 # ── HTML Pages ─────────────────────────────────────────────────────────────────
 from pages import LOGIN_HTML, DASHBOARD_HTML
 
-# Redirect old dashboard to new path
+# Main dashboard handler - handles all dashboard paths
+@app.get("/dash")
 @app.get("/dashboard")
-async def redirect_old_dashboard(request: Request):
-    dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
-    if dashboard_path != "/dashboard":
-        return RedirectResponse(url=dashboard_path)
-    # If path is default, serve dashboard directly
-    token = request.cookies.get(SESSION_COOKIE)
-    valid = await is_valid_session(token)
-    if not valid:
-        login_path = CONFIG.get("login_path", "/login")
-        return RedirectResponse(url=login_path)
-    await ensure_default_link()
-    return HTMLResponse(content=DASHBOARD_HTML)
-
-# New dashboard path (dynamic)
 @app.get(CONFIG.get("dashboard_path", "/dashboard"))
 async def dashboard(request: Request):
     dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
-    if request.url.path != dashboard_path:
+    
+    # If someone visits /dashboard but we're using /dash, redirect
+    if request.url.path == "/dashboard" and dashboard_path != "/dashboard":
         return RedirectResponse(url=dashboard_path)
     
-    token = request.cookies.get(SESSION_COOKIE)
-    logger.info(f"Dashboard received cookie: {token}")
-    valid = await is_valid_session(token)
-    logger.info(f"Dashboard session valid: {valid}")
-    if not valid:
-        login_path = CONFIG.get("login_path", "/login")
-        return RedirectResponse(url=login_path)
-    await ensure_default_link()
-    return HTMLResponse(content=DASHBOARD_HTML)
+    # If someone visits the current dashboard path
+    if request.url.path == dashboard_path:
+        token = request.cookies.get(SESSION_COOKIE)
+        logger.info(f"Dashboard received cookie: {token}")
+        valid = await is_valid_session(token)
+        logger.info(f"Dashboard session valid: {valid}")
+        if not valid:
+            login_path = CONFIG.get("login_path", "/login")
+            return RedirectResponse(url=login_path)
+        await ensure_default_link()
+        return HTMLResponse(content=DASHBOARD_HTML)
+    
+    # If someone visits some other path that starts with /dash but isn't our path
+    if request.url.path.startswith("/dash"):
+        return RedirectResponse(url=dashboard_path)
+    
+    # Fallback - redirect to dashboard
+    return RedirectResponse(url=dashboard_path)
 
-# Redirect old login to new path
+# Login page handler
 @app.get("/login")
-async def redirect_old_login(request: Request):
-    login_path = CONFIG.get("login_path", "/login")
-    if login_path != "/login":
-        return RedirectResponse(url=login_path)
-    # If path is default, serve login directly
-    return await login_page(request)
-
-# New login path (dynamic)
 @app.get(CONFIG.get("login_path", "/login"))
 async def login_page(request: Request):
     login_path = CONFIG.get("login_path", "/login")
-    if request.url.path != login_path:
+    if request.url.path != login_path and request.url.path != "/login":
         return RedirectResponse(url=login_path)
+    
     if await is_valid_session(request.cookies.get(SESSION_COOKIE)):
         dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
         return RedirectResponse(url=dashboard_path)
@@ -971,13 +958,37 @@ async def login_page(request: Request):
     
     return HTMLResponse(content=login_html)
 
-# Redirect old sub paths
+# Sub path handler
 @app.get("/sub")
-async def redirect_old_sub():
+async def sub_path_handler():
     sub_path = CONFIG.get("sub_path", "/sub")
     if sub_path != "/sub":
         return RedirectResponse(url=sub_path)
     return RedirectResponse(url="/sub")
+
+# ── Catch-all route for any unknown path ─────────────────────────────────────
+@app.get("/{path:path}")
+async def catch_all(request: Request, path: str):
+    """Redirect any unknown path to dashboard"""
+    # Skip API routes
+    if path.startswith("api/") or path.startswith("stats") or path.startswith("health"):
+        raise HTTPException(status_code=404, detail="Not Found")
+    
+    # Skip static files and common paths
+    if path.startswith("favicon") or path.startswith("robots") or path.startswith(".well-known"):
+        raise HTTPException(status_code=404, detail="Not Found")
+    
+    # Skip websocket and xhttp paths
+    if path.startswith("ws/") or path.startswith("xhttp-siz10/"):
+        raise HTTPException(status_code=404, detail="Not Found")
+    
+    # Skip proxy paths
+    if path.startswith("proxy/"):
+        raise HTTPException(status_code=404, detail="Not Found")
+    
+    # Redirect to dashboard
+    dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
+    return RedirectResponse(url=dashboard_path)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=CONFIG["port"], log_level="info", workers=1)
