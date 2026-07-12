@@ -570,7 +570,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             <div class="flex items-center space-x-1 sm:space-x-3 flex-shrink-0">
                 <span class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap transition-all duration-300 hover:bg-emerald-500/20">
                     <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    Node Online
+                    Online
                 </span>
                 <button onclick="toggleModal('settingsModal', true)" class="text-slate-400 hover:text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-1 p-1.5 sm:p-0 transition-all duration-300 hover:scale-105">
                     <i data-lucide="settings" class="w-4 h-4"></i>
@@ -849,8 +849,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         <div class="bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden glow-effect transition-all duration-300">
             <div class="p-4 sm:p-6 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-900/40">
                 <div class="min-w-0">
-                    <h2 class="text-lg sm:text-xl font-bold text-slate-100 truncate">V2Ray Inbound Proxies</h2>
-                    <p class="text-xs sm:text-sm text-slate-400 mt-0.5 truncate">Manage virtual server bridges, generate QR structures, or modify framework credentials.</p>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-100 truncate">Configs</h2>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-0.5 truncate">All V2Ray configurations:</p>
                 </div>
                 <button onclick="toggleModal('inboundModal', true)" class="flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/25 hover:scale-105 active:scale-95 shrink-0">
                     <i data-lucide="plus" class="w-3 h-3 sm:w-4 sm:h-4"></i>
