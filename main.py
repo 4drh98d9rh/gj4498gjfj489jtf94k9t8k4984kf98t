@@ -862,7 +862,6 @@ async def create_link(request: Request, _=Depends(require_auth)):
         "sub_url": f"https://{host}/sub/{uid}",
         "info_url": f"https://{host}/sub/{uid}/info",
     }
-
 @app.get("/api/links")
 async def list_links(request: Request, _=Depends(require_auth)):
     host = get_host(request)
@@ -879,7 +878,9 @@ async def list_links(request: Request, _=Depends(require_auth)):
                 if uid in LINKS and LINKS[uid].get("active", True):
                     LINKS[uid]["active"] = False
             await save_state()
-            d = LINKS[uid]  # Refresh data
+            d = LINKS[uid]
+        
+        sub_url = f"https://{host}/sub/{uid}"
         
         result.append({
             "uuid": uid,
@@ -887,13 +888,12 @@ async def list_links(request: Request, _=Depends(require_auth)):
             "protocol": proto,
             "expired": is_link_expired(d),
             "vless_link": vless_link_for_link(d, uid, host),
-            "sub_url": f"https://{host}/sub/{uid}",
+            "sub_url": sub_url,
             "info_url": f"https://{host}/sub/{uid}/info",
             "connected_ips": len(unique_ips_for_uuid(uid)),
         })
     result.sort(key=lambda x: x["created_at"], reverse=True)
     return {"links": result}
-
 @app.patch("/api/links/{uid}")
 async def update_link(uid: str, request: Request, _=Depends(require_auth)):
     body = await request.json()

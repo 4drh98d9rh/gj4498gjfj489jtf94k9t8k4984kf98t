@@ -133,6 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </html>"""
 # ---------- DASHBOARD_HTML (escaped braces) ----------
 # ---------- DASHBOARD_HTML (escaped braces) ----------
+# ---------- DASHBOARD_HTML (escaped braces) ----------
 DASHBOARD_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -202,6 +203,12 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         }
         .status-dot.active { background-color: #22c55e; }
         .status-dot.inactive { background-color: #ef4444; }
+        .qr-code-container {
+            transition: all 0.3s ease;
+        }
+        .qr-code-container:hover {
+            transform: scale(1.02);
+        }
     </style>
 </head>
 <body class="font-sans text-slate-200 min-h-screen flex flex-col justify-between relative antialiased tracking-tight">
@@ -524,24 +531,76 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     </div>
 </div>
 
-<!-- ===== MODAL: QR ===== -->
+<!-- ===== MODAL: QR with 4 items ===== -->
 <div id="qrModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl overflow-hidden modal-glow p-6 text-center space-y-5">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3 text-left">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow p-6 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
             <div>
-                <h3 class="text-base font-bold text-slate-100">Client Bridge Mapping</h3>
+                <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                    <i data-lucide="qrcode" class="w-5 h-5 text-blue-400"></i>
+                    QR Codes
+                </h3>
                 <p class="text-xs text-slate-400 font-mono" id="qrTargetLabel">Node-Mapping</p>
             </div>
             <button onclick="toggleModal('qrModal', false)" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
-        <div class="mx-auto w-48 h-48 bg-white p-3 rounded-xl shadow-inner flex items-center justify-center border-4 border-slate-800">
-            <img id="qrImage" src="" alt="QR Code" class="w-full h-full object-contain">
+        
+        <!-- Two columns: Config QR and Sub QR -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Config QR -->
+            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-4 text-center qr-code-container">
+                <p class="text-xs text-slate-400 mb-3 font-medium flex items-center justify-center gap-1">
+                    <i data-lucide="link" class="w-3 h-3"></i>
+                    Config Link QR
+                </p>
+                <div class="mx-auto w-40 h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50">
+                    <img id="qrImage" src="" alt="Config QR Code" class="w-full h-full object-contain">
+                </div>
+                <div class="mt-3">
+                    <button onclick="copyText(document.getElementById('qrTextPayload').textContent)" class="text-xs text-blue-400 hover:text-blue-300 transition flex items-center justify-center gap-1">
+                        <i data-lucide="copy" class="w-3 h-3"></i>
+                        Copy Config Link
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Subscription QR -->
+            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-4 text-center qr-code-container">
+                <p class="text-xs text-slate-400 mb-3 font-medium flex items-center justify-center gap-1">
+                    <i data-lucide="folder-tree" class="w-3 h-3"></i>
+                    Subscription Link QR
+                </p>
+                <div class="mx-auto w-40 h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50">
+                    <img id="qrSubImage" src="" alt="Subscription QR Code" class="w-full h-full object-contain">
+                </div>
+                <div class="mt-3">
+                    <button onclick="copyText(document.getElementById('qrSubPayload').textContent)" class="text-xs text-blue-400 hover:text-blue-300 transition flex items-center justify-center gap-1">
+                        <i data-lucide="copy" class="w-3 h-3"></i>
+                        Copy Sub Link
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="bg-slate-950 border border-slate-800/60 rounded-xl p-3 text-left">
-            <span class="text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1">Target Sync URI Payload</span>
-            <p id="qrTextPayload" class="text-[11px] font-mono text-slate-400 break-all line-clamp-2 select-all"></p>
+        
+        <!-- Links display -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3">
+                <span class="text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1 flex items-center gap-1">
+                    <i data-lucide="link" class="w-3 h-3"></i>
+                    Config Link
+                </span>
+                <p id="qrTextPayload" class="text-[10px] font-mono text-slate-400 break-all select-all truncate"></p>
+            </div>
+            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3">
+                <span class="text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1 flex items-center gap-1">
+                    <i data-lucide="folder-tree" class="w-3 h-3"></i>
+                    Subscription Link
+                </span>
+                <p id="qrSubPayload" class="text-[10px] font-mono text-slate-400 break-all select-all truncate"></p>
+            </div>
         </div>
-        <button onclick="toggleModal('qrModal', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition">Close View</button>
+        
+        <button onclick="toggleModal('qrModal', false)" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition">Close</button>
     </div>
 </div>
 
@@ -733,13 +792,51 @@ function triggerAlert(title, message, iconName) {
     toggleModal('customAlert', true);
 }
 
-// QR
-function openQrModal(label, uriPayload) {
+// QR Modal - now shows both config and subscription QR codes
+function openQrModal(label, uriPayload, subUrl) {
     document.getElementById('qrTargetLabel').textContent = label;
+    
+    // Config QR
     document.getElementById('qrTextPayload').textContent = uriPayload;
     const qrImg = document.getElementById('qrImage');
     qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(uriPayload);
+    
+    // Subscription QR
+    document.getElementById('qrSubPayload').textContent = subUrl;
+    const qrSubImg = document.getElementById('qrSubImage');
+    qrSubImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(subUrl);
+    
     toggleModal('qrModal', true);
+}
+
+// Copy text function
+function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            toast('Copied to clipboard!', 'success');
+        }).catch(() => {
+            fallbackCopyText(text);
+        });
+    } else {
+        fallbackCopyText(text);
+    }
+}
+
+function fallbackCopyText(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        toast('Copied to clipboard!', 'success');
+    } catch (e) {
+        toast('Failed to copy', 'error');
+    }
+    document.body.removeChild(textarea);
 }
 
 // Edit modal
@@ -783,8 +880,7 @@ async function logout() {
     }
 }
 
-// ---- Settings: change password ----
-// ---- Settings: change password ----
+// ---- Settings: change password with auto logout ----
 async function changePassword() {
     const cur = document.getElementById('settings-current-pw').value;
     const nw = document.getElementById('settings-new-pw').value;
@@ -821,7 +917,7 @@ async function changePassword() {
         toggleModal('settingsModal', false);
         
         // Show success message
-        triggerAlert('Password Updated', 'Your password has been changed. You will be logged out automatically.', 'check-circle');
+        triggerAlert('Password Updated', 'Your password has been changed successfully. You will be logged out automatically.', 'check-circle');
         
         // Auto logout after 2 seconds
         setTimeout(async () => {
@@ -839,6 +935,7 @@ async function changePassword() {
         errEl.classList.remove('hidden');
     }
 }
+
 // ---- Settings: update paths ----
 async function updatePath(type) {
     const errEl = document.getElementById('pathSettingsError');
@@ -993,7 +1090,7 @@ async function loadConfigs() {
                             <input type="text" id="uri-${l.uuid}" readonly value="${l.vless_link}" class="w-full bg-slate-950 border border-slate-800/80 rounded-xl px-3 py-2 pr-10 text-xs font-mono text-slate-400 focus:outline-none select-all truncate">
                             <button onclick="copyLink('uri-${l.uuid}')" class="absolute right-2 top-1.5 p-1 text-slate-500 hover:text-slate-300 transition" title="Copy URI"><i data-lucide="copy" class="w-4 h-4"></i></button>
                         </div>
-                        <button onclick="openQrModal('${label}', '${l.vless_link}')" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="QR"><i data-lucide="qr-code" class="w-4 h-4"></i></button>
+                        <button onclick="openQrModal('${label}', '${l.vless_link}', '${l.sub_url}')" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="QR"><i data-lucide="qr-code" class="w-4 h-4"></i></button>
                         <button onclick="window.open('/sub/user?uuid=${l.uuid}', '_blank')" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Subscription Page"><i data-lucide="external-link" class="w-4 h-4"></i></button>
                         <button onclick="openEditModal('${label}','${proto}','${l.fingerprint||'chrome'}','${l.alpn||''}',${l.limit_bytes ? (l.limit_bytes / 1024 / 1024) : 0},${l.expires_at ? Math.ceil((new Date(l.expires_at) - Date.now()) / (86400000)) : 0},${l.ip_limit||0},${l.speed_limit_bytes ? (l.speed_limit_bytes * 8 / 1024 / 1024) : 0},'${l.speed_limit_unit || 'MBIT'}','${l.uuid}')" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl transition" title="Edit"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
                         <button onclick="resetTraffic('${l.uuid}')" class="p-2 bg-blue-800/20 hover:bg-blue-800/40 border border-blue-700/30 text-blue-300 rounded-xl transition" title="Reset Traffic"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
@@ -1169,7 +1266,6 @@ setInterval(loadConfigs, 15000);
 </script>
 </body>
 </html>"""
-# ---------- SUB_INFO_HTML (fixed) ----------
 # ---------- SUB_USER_HTML (for /sub/user) ----------
 SUB_USER_HTML = r"""<!DOCTYPE html>
 <html lang="en">
