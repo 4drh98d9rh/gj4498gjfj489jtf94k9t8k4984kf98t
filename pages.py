@@ -1048,6 +1048,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         </div>
     </div>
     <!-- ===== MODAL: QR ===== -->
+        <!-- ===== MODAL: QR ===== -->
     <div id="qrModal" class="custom-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl overflow-hidden modal-glow max-h-[95vh] flex flex-col transition-all duration-300 transform scale-95 opacity-0 active:scale-100 active:opacity-100">
             <!-- Header -->
@@ -1071,13 +1072,17 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <!-- QR Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4">
                     <!-- Config QR -->
-                    <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-4 text-center qr-code-container transition-all duration-300 hover:border-blue-500/30">
+                    <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-4 text-center qr-code-container transition-all duration-300 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5">
                         <p class="text-[10px] sm:text-xs text-slate-400 mb-3 font-medium flex items-center justify-center gap-2">
                             <i data-lucide="link" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                             Config Link
                         </p>
-                        <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50 transition-all duration-300 hover:border-blue-500/50">
+                        <div class="relative mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50 transition-all duration-300 hover:border-blue-500/50">
                             <img id="qrImage" src="" alt="Config QR Code" class="w-full h-full object-contain">
+                            <!-- Small icon overlay on QR -->
+                            <div class="absolute bottom-1 right-1 bg-slate-900/80 rounded-full p-1 border border-slate-700/50">
+                                <i data-lucide="link" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-400"></i>
+                            </div>
                         </div>
                         <button onclick="copyText(document.getElementById('qrTextPayload').textContent)" class="mt-3 text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center justify-center gap-1.5 mx-auto hover:scale-105">
                             <i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i>
@@ -1086,13 +1091,17 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                     </div>
 
                     <!-- Subscription QR -->
-                    <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-4 text-center qr-code-container transition-all duration-300 hover:border-blue-500/30">
+                    <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-4 text-center qr-code-container transition-all duration-300 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5">
                         <p class="text-[10px] sm:text-xs text-slate-400 mb-3 font-medium flex items-center justify-center gap-2">
                             <i data-lucide="folder-tree" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                             Subscription Link
                         </p>
-                        <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50 transition-all duration-300 hover:border-blue-500/50">
+                        <div class="relative mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50 transition-all duration-300 hover:border-blue-500/50">
                             <img id="qrSubImage" src="" alt="Subscription QR Code" class="w-full h-full object-contain">
+                            <!-- Small icon overlay on QR -->
+                            <div class="absolute bottom-1 right-1 bg-slate-900/80 rounded-full p-1 border border-slate-700/50">
+                                <i data-lucide="folder-tree" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-400"></i>
+                            </div>
                         </div>
                         <button onclick="copyText(document.getElementById('qrSubPayload').textContent)" class="mt-3 text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center justify-center gap-1.5 mx-auto hover:scale-105">
                             <i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i>
@@ -1103,14 +1112,14 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
                 <!-- Links Display -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3">
+                    <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3 transition-all duration-300 hover:border-blue-500/20">
                         <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5">
                             <i data-lucide="link" class="w-3 h-3"></i>
                             Config Link
                         </span>
                         <p id="qrTextPayload" class="text-[8px] sm:text-[10px] font-mono text-slate-400 break-all select-all truncate bg-slate-950/50 p-1.5 rounded border border-slate-800/40">https://example.com/config</p>
                     </div>
-                    <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3">
+                    <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3 transition-all duration-300 hover:border-blue-500/20">
                         <span class="text-[8px] sm:text-[10px] text-slate-500 block uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5">
                             <i data-lucide="folder-tree" class="w-3 h-3"></i>
                             Subscription Link
