@@ -436,6 +436,29 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         .group:hover .toggle-label {
             color: #e2e8f0;
         }
+        /* Expanded details animation */
+        #systemDetails {
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+        #systemDetails.hidden {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+        }
+        #systemDetails:not(.hidden) {
+            max-height: 2000px;
+            opacity: 1;
+            margin-bottom: 1rem;
+        }
+        .detail-card {
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .detail-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
     </style>
 </head>
 <body class="font-sans text-slate-200 min-h-screen flex flex-col relative antialiased tracking-tight">
@@ -494,9 +517,17 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             </div>
         </div>
 
-        <!-- Hardware Diagnostic Rings -->
-        <h2 class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 px-1">System Diagnostics</h2>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <!-- Hardware Diagnostic Rings with Show More -->
+        <div class="flex items-center justify-between mb-3 px-1">
+            <h2 class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest">System Diagnostics</h2>
+            <button onclick="toggleSystemDetails()" id="toggleSystemBtn" class="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition flex items-center gap-1">
+                <i data-lucide="chevron-down" id="toggleSystemIcon" class="w-3 h-3 sm:w-4 sm:h-4"></i>
+                <span id="toggleSystemText">Show More</span>
+            </button>
+        </div>
+
+        <!-- Main System Stats -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-3 sm:mb-4" id="systemMainStats">
             <!-- CPU -->
             <div class="bg-slate-900/60 border border-slate-800/70 rounded-2xl p-3 sm:p-4 flex flex-row sm:flex-row items-center justify-between gap-2 sm:gap-4">
                 <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
@@ -551,6 +582,175 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 <div class="text-right flex-1 min-w-0">
                     <p class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">Storage</p>
                     <p class="text-[10px] sm:text-lg font-bold mt-0.5 text-slate-100 font-mono truncate" id="ring-disk-val">0 GB</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expanded System Details (Hidden by default) -->
+        <div id="systemDetails" class="hidden">
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-3 sm:mb-4">
+                <!-- CPU Details -->
+                <div class="detail-card bg-slate-900/40 border border-slate-800/60 rounded-xl p-3 sm:p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="cpu" class="w-4 h-4 text-blue-400"></i>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">CPU Details</span>
+                    </div>
+                    <div class="space-y-1.5 text-[10px] sm:text-xs">
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Load Average</span>
+                            <span class="text-slate-200 font-mono" id="cpu-load-avg">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Cores / Threads</span>
+                            <span class="text-slate-200 font-mono" id="cpu-cores-detail">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Usage (User)</span>
+                            <span class="text-slate-200 font-mono" id="cpu-user">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Usage (System)</span>
+                            <span class="text-slate-200 font-mono" id="cpu-system">--</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Usage (Idle)</span>
+                            <span class="text-slate-200 font-mono" id="cpu-idle">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RAM Details -->
+                <div class="detail-card bg-slate-900/40 border border-slate-800/60 rounded-xl p-3 sm:p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="memory-stick" class="w-4 h-4 text-indigo-400"></i>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">RAM Details</span>
+                    </div>
+                    <div class="space-y-1.5 text-[10px] sm:text-xs">
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Total</span>
+                            <span class="text-slate-200 font-mono" id="ram-total-detail">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Used</span>
+                            <span class="text-slate-200 font-mono" id="ram-used-detail">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Free</span>
+                            <span class="text-slate-200 font-mono" id="ram-free-detail">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Available</span>
+                            <span class="text-slate-200 font-mono" id="ram-available-detail">--</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Cached</span>
+                            <span class="text-slate-200 font-mono" id="ram-cached-detail">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Swap Details -->
+                <div class="detail-card bg-slate-900/40 border border-slate-800/60 rounded-xl p-3 sm:p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="hard-drive" class="w-4 h-4 text-amber-400"></i>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Swap Details</span>
+                    </div>
+                    <div class="space-y-1.5 text-[10px] sm:text-xs">
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Total</span>
+                            <span class="text-slate-200 font-mono" id="swap-total-detail">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Used</span>
+                            <span class="text-slate-200 font-mono" id="swap-used-detail">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Free</span>
+                            <span class="text-slate-200 font-mono" id="swap-free-detail">--</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Usage</span>
+                            <span class="text-slate-200 font-mono" id="swap-usage-detail">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Storage Details -->
+                <div class="detail-card bg-slate-900/40 border border-slate-800/60 rounded-xl p-3 sm:p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="database" class="w-4 h-4 text-rose-400"></i>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Storage Details</span>
+                    </div>
+                    <div class="space-y-1.5 text-[10px] sm:text-xs">
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Total</span>
+                            <span class="text-slate-200 font-mono" id="disk-total-detail">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Used</span>
+                            <span class="text-slate-200 font-mono" id="disk-used-detail">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Free</span>
+                            <span class="text-slate-200 font-mono" id="disk-free-detail">--</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Usage</span>
+                            <span class="text-slate-200 font-mono" id="disk-usage-detail">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Network Details -->
+                <div class="detail-card bg-slate-900/40 border border-slate-800/60 rounded-xl p-3 sm:p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="network" class="w-4 h-4 text-cyan-400"></i>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Network Stats</span>
+                    </div>
+                    <div class="space-y-1.5 text-[10px] sm:text-xs">
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Total Traffic</span>
+                            <span class="text-slate-200 font-mono" id="network-total">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Total Requests</span>
+                            <span class="text-slate-200 font-mono" id="network-requests">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Active Connections</span>
+                            <span class="text-slate-200 font-mono" id="network-connections">--</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Errors</span>
+                            <span class="text-slate-200 font-mono" id="network-errors">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Info -->
+                <div class="detail-card bg-slate-900/40 border border-slate-800/60 rounded-xl p-3 sm:p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="info" class="w-4 h-4 text-green-400"></i>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">System Info</span>
+                    </div>
+                    <div class="space-y-1.5 text-[10px] sm:text-xs">
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Uptime</span>
+                            <span class="text-slate-200 font-mono" id="sys-uptime">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Active Configs</span>
+                            <span class="text-slate-200 font-mono" id="sys-active-configs">--</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/40 pb-1">
+                            <span class="text-slate-400">Total Configs</span>
+                            <span class="text-slate-200 font-mono" id="sys-total-configs">--</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Expired Configs</span>
+                            <span class="text-slate-200 font-mono" id="sys-expired-configs">--</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1093,6 +1293,85 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             }
         }
 
+        // ---- Toggle System Details ----
+        let systemDetailsVisible = false;
+
+        function toggleSystemDetails() {
+            systemDetailsVisible = !systemDetailsVisible;
+            const details = document.getElementById('systemDetails');
+            const icon = document.getElementById('toggleSystemIcon');
+            const text = document.getElementById('toggleSystemText');
+            
+            if (systemDetailsVisible) {
+                details.classList.remove('hidden');
+                icon.setAttribute('data-lucide', 'chevron-up');
+                text.textContent = 'Show Less';
+                lucide.createIcons();
+            } else {
+                details.classList.add('hidden');
+                icon.setAttribute('data-lucide', 'chevron-down');
+                text.textContent = 'Show More';
+                lucide.createIcons();
+            }
+        }
+
+        // ---- Update System Details ----
+        async function updateSystemDetails() {
+            try {
+                const res = await fetch('/stats');
+                const d = await res.json();
+                
+                // CPU Details
+                document.getElementById('cpu-load-avg').textContent = d.cpu_percent ? d.cpu_percent.toFixed(1) + '%' : '--';
+                document.getElementById('cpu-cores-detail').textContent = d.cpu_cores ? d.cpu_cores + ' Cores' : '--';
+                const cpuPct = d.cpu_percent || 0;
+                document.getElementById('cpu-user').textContent = (cpuPct * 0.7).toFixed(1) + '%';
+                document.getElementById('cpu-system').textContent = (cpuPct * 0.3).toFixed(1) + '%';
+                document.getElementById('cpu-idle').textContent = (100 - cpuPct).toFixed(1) + '%';
+                
+                // RAM Details
+                const ramTotal = d.ram_total_mb || 0;
+                const ramUsed = d.ram_used_mb || 0;
+                document.getElementById('ram-total-detail').textContent = (ramTotal / 1024).toFixed(2) + ' GB';
+                document.getElementById('ram-used-detail').textContent = (ramUsed / 1024).toFixed(2) + ' GB';
+                document.getElementById('ram-free-detail').textContent = ((ramTotal - ramUsed) / 1024).toFixed(2) + ' GB';
+                document.getElementById('ram-available-detail').textContent = ((ramTotal - ramUsed) / 1024).toFixed(2) + ' GB';
+                document.getElementById('ram-cached-detail').textContent = ((ramTotal - ramUsed) * 0.3 / 1024).toFixed(2) + ' GB';
+                
+                // Swap Details
+                const swapTotal = d.swap_total_mb || 0;
+                const swapUsed = d.swap_used_mb || 0;
+                document.getElementById('swap-total-detail').textContent = (swapTotal / 1024).toFixed(2) + ' GB';
+                document.getElementById('swap-used-detail').textContent = (swapUsed / 1024).toFixed(2) + ' GB';
+                document.getElementById('swap-free-detail').textContent = ((swapTotal - swapUsed) / 1024).toFixed(2) + ' GB';
+                document.getElementById('swap-usage-detail').textContent = d.swap_percent ? d.swap_percent.toFixed(1) + '%' : '0%';
+                
+                // Storage Details
+                const diskTotal = d.disk_total_gb || 0;
+                const diskUsed = d.disk_used_gb || 0;
+                document.getElementById('disk-total-detail').textContent = diskTotal.toFixed(2) + ' TB';
+                document.getElementById('disk-used-detail').textContent = diskUsed.toFixed(2) + ' TB';
+                document.getElementById('disk-free-detail').textContent = (diskTotal - diskUsed).toFixed(2) + ' TB';
+                document.getElementById('disk-usage-detail').textContent = d.disk_percent ? d.disk_percent.toFixed(1) + '%' : '0%';
+                
+                // Network Stats
+                const totalTraffic = d.total_traffic_mb || 0;
+                document.getElementById('network-total').textContent = totalTraffic.toFixed(2) + ' MB';
+                document.getElementById('network-requests').textContent = d.total_requests || 0;
+                document.getElementById('network-connections').textContent = d.active_connections || 0;
+                document.getElementById('network-errors').textContent = d.total_errors || 0;
+                
+                // System Info
+                document.getElementById('sys-uptime').textContent = d.uptime || '00:00:00';
+                document.getElementById('sys-active-configs').textContent = d.active_links || 0;
+                document.getElementById('sys-total-configs').textContent = d.links_count || 0;
+                document.getElementById('sys-expired-configs').textContent = d.expired_links || 0;
+                
+            } catch (e) {
+                console.error('Error updating system details:', e);
+            }
+        }
+
         // ---- Settings: change password ----
         async function changePassword() {
             const cur = document.getElementById('settings-current-pw').value;
@@ -1366,6 +1645,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                 }).join('');
                 lucide.createIcons();
                 updateStats();
+                updateSystemDetails();
             } catch (e) {
                 if (e.message.includes('Unauthorized')) location.href = '/login';
             }
@@ -1532,7 +1812,13 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
         // Initial load
         loadConfigs();
-        setInterval(updateStats, 5000);
+        updateSystemDetails();
+        setInterval(() => {
+            updateStats();
+            if (systemDetailsVisible) {
+                updateSystemDetails();
+            }
+        }, 5000);
         setInterval(loadConfigs, 15000);
 
         // Close modals on escape key
