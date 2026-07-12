@@ -1054,7 +1054,27 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/40 shrink-0">
                 <div class="flex items-center space-x-3 min-w-0">
                     <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400 border border-blue-500/20 shrink-0">
-                        <i data-lucide="qrcode" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                        <!-- SVG QR Code Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="7" height="7" rx="1"></rect>
+                            <rect x="15" y="2" width="7" height="7" rx="1"></rect>
+                            <rect x="2" y="15" width="7" height="7" rx="1"></rect>
+                            <line x1="22" y1="11" x2="22" y2="13"></line>
+                            <line x1="2" y1="11" x2="2" y2="13"></line>
+                            <line x1="11" y1="2" x2="13" y2="2"></line>
+                            <line x1="11" y1="22" x2="13" y2="22"></line>
+                            <line x1="15" y1="15" x2="22" y2="22"></line>
+                            <line x1="22" y1="15" x2="15" y2="22"></line>
+                            <rect x="15" y="15" width="2" height="2"></rect>
+                            <rect x="19" y="15" width="2" height="2"></rect>
+                            <rect x="15" y="19" width="2" height="2"></rect>
+                            <rect x="19" y="19" width="2" height="2"></rect>
+                            <rect x="11" y="11" width="2" height="2"></rect>
+                            <rect x="11" y="15" width="2" height="2"></rect>
+                            <rect x="11" y="19" width="2" height="2"></rect>
+                            <rect x="15" y="11" width="2" height="2"></rect>
+                            <rect x="19" y="11" width="2" height="2"></rect>
+                        </svg>
                     </div>
                     <div class="min-w-0">
                         <h3 class="text-base sm:text-lg font-bold text-slate-100 truncate">QR Codes</h3>
@@ -1076,31 +1096,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                             <i data-lucide="link" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                             Config Link
                         </p>
-                        <div class="relative mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50 transition-all duration-300 hover:border-blue-500/50">
+                        <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50 transition-all duration-300 hover:border-blue-500/50">
                             <img id="qrImage" src="" alt="Config QR Code" class="w-full h-full object-contain">
-                            <!-- Small QR Code icon overlay -->
-                            <div class="absolute bottom-1 right-1 bg-slate-900/90 rounded-full p-1.5 border border-slate-700/50 shadow-lg">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="2" y="2" width="7" height="7" rx="1"></rect>
-                                    <rect x="15" y="2" width="7" height="7" rx="1"></rect>
-                                    <rect x="2" y="15" width="7" height="7" rx="1"></rect>
-                                    <line x1="22" y1="11" x2="22" y2="13"></line>
-                                    <line x1="2" y1="11" x2="2" y2="13"></line>
-                                    <line x1="11" y1="2" x2="13" y2="2"></line>
-                                    <line x1="11" y1="22" x2="13" y2="22"></line>
-                                    <line x1="15" y1="15" x2="22" y2="22"></line>
-                                    <line x1="22" y1="15" x2="15" y2="22"></line>
-                                    <rect x="15" y="15" width="2" height="2"></rect>
-                                    <rect x="19" y="15" width="2" height="2"></rect>
-                                    <rect x="15" y="19" width="2" height="2"></rect>
-                                    <rect x="19" y="19" width="2" height="2"></rect>
-                                    <rect x="11" y="11" width="2" height="2"></rect>
-                                    <rect x="11" y="15" width="2" height="2"></rect>
-                                    <rect x="11" y="19" width="2" height="2"></rect>
-                                    <rect x="15" y="11" width="2" height="2"></rect>
-                                    <rect x="19" y="11" width="2" height="2"></rect>
-                                </svg>
-                            </div>
                         </div>
                         <button onclick="copyText(document.getElementById('qrTextPayload').textContent)" class="mt-3 text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center justify-center gap-1.5 mx-auto hover:scale-105">
                             <i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i>
@@ -1114,31 +1111,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
                             <i data-lucide="folder-tree" class="w-3 h-3 sm:w-4 sm:h-4"></i>
                             Subscription Link
                         </p>
-                        <div class="relative mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50 transition-all duration-300 hover:border-blue-500/50">
+                        <div class="mx-auto w-32 h-32 sm:w-40 sm:h-40 bg-white p-2 rounded-xl shadow-inner flex items-center justify-center border-2 border-slate-700/50 transition-all duration-300 hover:border-blue-500/50">
                             <img id="qrSubImage" src="" alt="Subscription QR Code" class="w-full h-full object-contain">
-                            <!-- Small QR Code icon overlay -->
-                            <div class="absolute bottom-1 right-1 bg-slate-900/90 rounded-full p-1.5 border border-slate-700/50 shadow-lg">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="2" y="2" width="7" height="7" rx="1"></rect>
-                                    <rect x="15" y="2" width="7" height="7" rx="1"></rect>
-                                    <rect x="2" y="15" width="7" height="7" rx="1"></rect>
-                                    <line x1="22" y1="11" x2="22" y2="13"></line>
-                                    <line x1="2" y1="11" x2="2" y2="13"></line>
-                                    <line x1="11" y1="2" x2="13" y2="2"></line>
-                                    <line x1="11" y1="22" x2="13" y2="22"></line>
-                                    <line x1="15" y1="15" x2="22" y2="22"></line>
-                                    <line x1="22" y1="15" x2="15" y2="22"></line>
-                                    <rect x="15" y="15" width="2" height="2"></rect>
-                                    <rect x="19" y="15" width="2" height="2"></rect>
-                                    <rect x="15" y="19" width="2" height="2"></rect>
-                                    <rect x="19" y="19" width="2" height="2"></rect>
-                                    <rect x="11" y="11" width="2" height="2"></rect>
-                                    <rect x="11" y="15" width="2" height="2"></rect>
-                                    <rect x="11" y="19" width="2" height="2"></rect>
-                                    <rect x="15" y="11" width="2" height="2"></rect>
-                                    <rect x="19" y="11" width="2" height="2"></rect>
-                                </svg>
-                            </div>
                         </div>
                         <button onclick="copyText(document.getElementById('qrSubPayload').textContent)" class="mt-3 text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 transition-all duration-300 flex items-center justify-center gap-1.5 mx-auto hover:scale-105">
                             <i data-lucide="copy" class="w-3 h-3 sm:w-4 sm:h-4"></i>
