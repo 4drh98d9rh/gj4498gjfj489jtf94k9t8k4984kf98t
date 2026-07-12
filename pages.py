@@ -3234,6 +3234,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
 </html>"""
 
 # ---------- SETUP_HTML (صفحه تنظیم رمز عبور) ----------
+# ---------- SETUP_HTML (Setup Page - Fully Fixed) ----------
 SETUP_HTML = r"""<!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -3280,6 +3281,7 @@ SETUP_HTML = r"""<!DOCTYPE html>
         .fade-in {
             animation: fadeIn 0.5s ease-out;
         }
+        /* Font classes */
         .font-persian {
             font-family: 'Vazirmatn', 'Inter', sans-serif;
         }
@@ -3295,6 +3297,36 @@ SETUP_HTML = r"""<!DOCTYPE html>
                 padding-right: 1rem;
             }
         }
+        /* Password strength indicator */
+        .strength-bar {
+            height: 3px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        .strength-bar.weak {
+            background: #ef4444;
+            width: 25%;
+        }
+        .strength-bar.medium {
+            background: #f59e0b;
+            width: 50%;
+        }
+        .strength-bar.strong {
+            background: #22c55e;
+            width: 75%;
+        }
+        .strength-bar.very-strong {
+            background: #22c55e;
+            width: 100%;
+        }
+        .strength-text {
+            font-size: 10px;
+            transition: all 0.3s ease;
+        }
+        .strength-text.weak { color: #ef4444; }
+        .strength-text.medium { color: #f59e0b; }
+        .strength-text.strong { color: #22c55e; }
+        .strength-text.very-strong { color: #22c55e; }
     </style>
 </head>
 <body class="font-sans text-slate-200 min-h-screen flex items-center justify-center bg-[#070a13] relative antialiased tracking-tight p-4 mobile-padding">
@@ -3334,7 +3366,7 @@ SETUP_HTML = r"""<!DOCTYPE html>
                         </svg>
                     </div>
                     <div>
-                        <p class="text-xs text-slate-300 font-english">Default password is <span class="font-mono font-bold text-blue-400 bg-blue-500/20 px-2 py-0.5 rounded">MUVIXO</span></p>
+                        <p class="text-xs text-slate-300 font-english">Default password is <span class="font-mono font-bold text-blue-400 bg-blue-500/20 px-2 py-0.5 rounded font-english">MUVIXO</span></p>
                         <p class="text-[10px] text-slate-400 mt-1 font-english">You can use it or set your own custom password below</p>
                     </div>
                 </div>
@@ -3342,13 +3374,23 @@ SETUP_HTML = r"""<!DOCTYPE html>
             
             <!-- Setup Form -->
             <form id="setupForm">
-                <div class="mb-4">
+                <div class="mb-3">
                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 font-english">New Password</label>
                     <input type="password" id="new-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring font-english" placeholder="Enter your password (min 4 chars)" autofocus required minlength="4">
                 </div>
-                <div class="mb-4">
+                <div class="mb-1">
                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 font-english">Confirm Password</label>
                     <input type="password" id="confirm-pw" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition input-focus-ring font-english" placeholder="Confirm your password" required minlength="4">
+                </div>
+                
+                <!-- Password Strength Indicator -->
+                <div class="mt-3 mb-4">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
+                            <div class="strength-bar" id="strengthBar"></div>
+                        </div>
+                        <span class="strength-text font-english" id="strengthText">—</span>
+                    </div>
                 </div>
                 
                 <div class="flex gap-3 mb-4">
@@ -3377,10 +3419,63 @@ SETUP_HTML = r"""<!DOCTYPE html>
     </div>
 
     <script>
+        // Password strength checker
+        function checkPasswordStrength(password) {
+            let score = 0;
+            if (password.length >= 4) score++;
+            if (password.length >= 8) score++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+            if (/\d/.test(password)) score++;
+            if (/[^a-zA-Z0-9]/.test(password)) score++;
+            return score;
+        }
+
+        function updateStrengthIndicator(password) {
+            const bar = document.getElementById('strengthBar');
+            const text = document.getElementById('strengthText');
+            
+            if (password.length === 0) {
+                bar.className = 'strength-bar';
+                text.textContent = '—';
+                text.className = 'strength-text font-english';
+                return;
+            }
+            
+            const score = checkPasswordStrength(password);
+            
+            // Remove all classes
+            bar.className = 'strength-bar';
+            text.className = 'strength-text font-english';
+            
+            if (score <= 1) {
+                bar.classList.add('weak');
+                text.classList.add('weak');
+                text.textContent = 'Weak';
+            } else if (score === 2) {
+                bar.classList.add('medium');
+                text.classList.add('medium');
+                text.textContent = 'Medium';
+            } else if (score === 3) {
+                bar.classList.add('strong');
+                text.classList.add('strong');
+                text.textContent = 'Strong';
+            } else {
+                bar.classList.add('very-strong');
+                text.classList.add('very-strong');
+                text.textContent = 'Very Strong';
+            }
+        }
+
+        // Password input listeners
+        document.getElementById('new-pw').addEventListener('input', function() {
+            updateStrengthIndicator(this.value);
+        });
+
         // Use default password (MUVIXO)
         function useDefaultPassword() {
             document.getElementById('new-pw').value = 'MUVIXO';
             document.getElementById('confirm-pw').value = 'MUVIXO';
+            updateStrengthIndicator('MUVIXO');
             
             // Trigger submit
             document.getElementById('setupForm').dispatchEvent(new Event('submit'));
@@ -3435,6 +3530,8 @@ SETUP_HTML = r"""<!DOCTYPE html>
                 success.textContent = '✅ Password set successfully! Redirecting to login...';
                 success.classList.remove('hidden');
                 
+                btn.innerHTML = '✅ Done!';
+                
                 setTimeout(() => {
                     location.href = '/login';
                 }, 1500);
@@ -3460,6 +3557,13 @@ SETUP_HTML = r"""<!DOCTYPE html>
                 e.preventDefault();
                 document.getElementById('setupForm').dispatchEvent(new Event('submit'));
             }
+        });
+
+        // Focus on load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.getElementById('new-pw').focus();
+            }, 300);
         });
     </script>
 </body>
