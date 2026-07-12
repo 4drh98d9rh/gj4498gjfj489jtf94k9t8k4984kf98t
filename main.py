@@ -375,9 +375,9 @@ def generate_emoji_label(base_label: str, limit_bytes: int, speed_limit_bytes: i
     """Generate a formatted label with emojis - clean and proper format"""
     import re
     
-    # Clean the base label - remove all emojis and special characters
-    emoji_pattern = re.compile(r'[🇦-🇿🌍-🌏🎌🏁🚩🇺🇸🇬🇧🇩🇪🇫🇷🇮🇹🇪🇸🇵🇹🇳🇱🇧🇪🇨🇭🇦🇹🇸🇪🇳🇴🇩🇰🇫🇮🇮🇪🇬🇷🇹🇷🇷🇺🇺🇦🇵🇱🇨🇿🇭🇺🇷🇴🇧🇬🇭🇷🇷🇸🇸🇰🇸🇮🇱🇹🇱🇻🇪🇪🇨🇦🇲🇽🇧🇷🇦🇷🇨🇱🇨🇴🇵🇪🇻🇪🇯🇵🇰🇷🇨🇳🇹🇼🇭🇰🇸🇬🇲🇾🇮🇩🇵🇭🇻🇳🇹🇭🇮🇳🇵🇰🇧🇩🇦🇪🇸🇦🇮🇱🇪🇬🇿🇦🇳🇬🇦🇺🇳🇿🌸🌺🌻🌹🌷🌿🍀🌴🌳🎋💎🌟✨🎯🏆🔥💨🚀⭐💫🌈⚡🎉🎊💝🌊🍃♾️📦🌌🐢]')
-    clean_label = emoji_pattern.sub('', base_label).strip()
+    # Clean the base label - remove all emojis, numbers, and special characters
+    # Keep only letters, spaces, and basic punctuation
+    clean_label = re.sub(r'[^a-zA-Z\s\-\.]', '', base_label).strip()
     
     # If label is empty after cleaning, use default
     if not clean_label:
@@ -1132,10 +1132,9 @@ async def make_link(
         fingerprint = DEFAULT_FINGERPRINT
     uid = generate_uuid()
     
-    # Clean the label - remove all emojis and special characters
+    # Clean the label - keep only letters, spaces, hyphens, and dots
     import re
-    emoji_pattern = re.compile(r'[🇦-🇿🌍-🌏🎌🏁🚩🇺🇸🇬🇧🇩🇪🇫🇷🇮🇹🇪🇸🇵🇹🇳🇱🇧🇪🇨🇭🇦🇹🇸🇪🇳🇴🇩🇰🇫🇮🇮🇪🇬🇷🇹🇷🇷🇺🇺🇦🇵🇱🇨🇿🇭🇺🇷🇴🇧🇬🇭🇷🇷🇸🇸🇰🇸🇮🇱🇹🇱🇻🇪🇪🇨🇦🇲🇽🇧🇷🇦🇷🇨🇱🇨🇴🇵🇪🇻🇪🇯🇵🇰🇷🇨🇳🇹🇼🇭🇰🇸🇬🇲🇾🇮🇩🇵🇭🇻🇳🇹🇭🇮🇳🇵🇰🇧🇩🇦🇪🇸🇦🇮🇱🇪🇬🇿🇦🇳🇬🇦🇺🇳🇿🌸🌺🌻🌹🌷🌿🍀🌴🌳🎋💎🌟✨🎯🏆🔥💨🚀⭐💫🌈⚡🎉🎊💝🌊🍃♾️📦🌌🐢]')
-    clean_label = emoji_pattern.sub('', label).strip()
+    clean_label = re.sub(r'[^a-zA-Z\s\-\.]', '', label).strip()
     
     # If label is empty after cleaning, use default
     if not clean_label:
@@ -1213,7 +1212,6 @@ async def set_link_active(uid: str, active: bool) -> dict | None:
     log_activity("link", f"Config «{label}» {'activated' if active else 'deactivated'}", "ok" if active else "warn")
     asyncio.create_task(save_state())
     return LINKS[uid]
-
 @app.post("/api/links")
 async def create_link(request: Request, _=Depends(require_auth)):
     body = await request.json()
@@ -1235,8 +1233,19 @@ async def create_link(request: Request, _=Depends(require_auth)):
     su = body.get("speed_limit_unit") or "MBIT"
     speed_limit_bytes = 0 if sv <= 0 else parse_speed_to_bytes(sv, su)
 
+    # Get base label and clean it
+    raw_label = body.get("label") or "Config"
+    
+    # Clean the label - keep only letters, spaces, hyphens, and dots
+    import re
+    clean_label = re.sub(r'[^a-zA-Z\s\-\.]', '', raw_label).strip()
+    
+    # If label is empty after cleaning, use default
+    if not clean_label:
+        clean_label = "Config"
+
     uid, link = await make_link(
-        label=body.get("label") or "New Config",
+        label=clean_label,
         limit_bytes=limit_bytes,
         expires_at=expires_at,
         note=body.get("note") or "",
