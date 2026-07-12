@@ -456,7 +456,6 @@ async def export_database(_=Depends(require_auth)):
             }
         }
     return data
-
 @app.post("/api/database/restore")
 async def restore_database(request: Request, _=Depends(require_auth)):
     """Restore database from JSON backup"""
@@ -466,7 +465,7 @@ async def restore_database(request: Request, _=Depends(require_auth)):
         raise HTTPException(status_code=400, detail="Invalid JSON data")
     
     # Validate data
-    if "links" not in data or "password_hash" not in data:
+    if "links" not in data:
         raise HTTPException(status_code=400, detail="Invalid database format")
     
     if not isinstance(data["links"], dict):
@@ -477,21 +476,24 @@ async def restore_database(request: Request, _=Depends(require_auth)):
         LINKS.clear()
         # Restore links
         LINKS.update(data.get("links", {}))
-        # Restore password hash
-        AUTH["password_hash"] = data["password_hash"]
+        
+        # Reset password to default MUVIXO
+        # Because the old password_hash was created with a different SECRET_KEY
+        AUTH["password_hash"] = hash_password("MUVIXO")
+        
         # Restore paths if present
         if "paths" in data:
             for key, value in data["paths"].items():
                 if key in CONFIG:
                     CONFIG[key] = value
     
-    # Clear all sessions to force re-login with new password
+    # Clear all sessions to force re-login
     await clear_all_sessions()
     
     await save_state()
-    log_activity("database", f"Database restored from backup ({len(LINKS)} links)", "ok")
+    log_activity("database", f"Database restored from backup ({len(LINKS)} links). Password reset to MUVIXO", "ok")
     
-    return {"ok": True, "restored": len(LINKS), "requires_login": True}
+    return {"ok": True, "restored": len(LINKS), "requires_login": True, "password_reset": True}
 
 # ── Subscription endpoints ────────────────────────────────────────────────────
 @app.get("/sub/user")

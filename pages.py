@@ -1701,51 +1701,66 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
         // Restore Database
         function restoreDatabase() {
-            if (!selectedFile) {
-                toast('Please select a file first', 'error');
+    if (!selectedFile) {
+        toast('Please select a file first', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            
+            if (!data.links) {
+                toast('Invalid database file format', 'error');
                 return;
             }
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    
-                    // Validate the data structure
-                    if (!data.links && !data.password_hash) {
-                        toast('Invalid database file format', 'error');
-                        return;
-                    }
-
-                    fetch('/api/database/restore', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    })
-                    .then(res => {
-                        if (!res.ok) throw new Error('Restore failed');
-                        return res.json();
-                    })
-                    .then(result => {
-                        toast('Database restored successfully!', 'success');
-                        document.getElementById('restoreBtn').disabled = true;
-                        document.getElementById('dropZone').classList.remove('has-file');
-                        document.getElementById('fileName').textContent = 'No file selected';
-                        selectedFile = null;
-                        loadDatabaseInfo();
-                        loadConfigs();
-                        // Reload stats
-                        setTimeout(updateStats, 500);
-                    })
-                    .catch(err => {
-                        toast('Restore failed: ' + err.message, 'error');
-                    });
-                } catch (err) {
-                    toast('Invalid JSON file: ' + err.message, 'error');
+            fetch('/api/database/restore', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Restore failed');
+                return res.json();
+            })
+            .then(result => {
+                if (result.password_reset) {
+                    toast('✅ Database restored! Password reset to: MUVIXO', 'success');
+                } else {
+                    toast('✅ Database restored successfully!', 'success');
                 }
-            };
-            reader.readAsText(selectedFile);
+                
+                document.getElementById('restoreBtn').disabled = true;
+                document.getElementById('dropZone').classList.remove('has-file');
+                document.getElementById('fileName').textContent = 'No file selected';
+                selectedFile = null;
+                loadDatabaseInfo();
+                loadConfigs();
+                setTimeout(updateStats, 500);
+                
+                if (result.requires_login) {
+                    setTimeout(async () => {
+                        try {
+                            await fetch('/api/logout', { method: 'POST' });
+                            const paths = await getCurrentPaths();
+                            location.href = paths.login;
+                        } catch (e) {
+                            location.href = '/login';
+                        }
+                    }, 3000);
+                }
+            })
+            .catch(err => {
+                toast('❌ Restore failed: ' + err.message, 'error');
+            });
+        } catch (err) {
+            toast('❌ Invalid JSON file: ' + err.message, 'error');
         }
+    };
+    reader.readAsText(selectedFile);
+}
 
         // QR Modal
         function openQrModal(label, uriPayload, subUrl) {
@@ -1929,57 +1944,58 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             }
         }
 
-        // ---- Settings: change password ----
-        async function changePassword() {
-            const cur = document.getElementById('settings-current-pw').value;
-            const nw = document.getElementById('settings-new-pw').value;
-            const confirmPw = document.getElementById('settings-confirm-pw').value;
-            const errEl = document.getElementById('settingsError');
-            errEl.classList.add('hidden');
+        
+// Change Password - Updated
+async function changePassword() {
+    const cur = document.getElementById('settings-current-pw').value;
+    const nw = document.getElementById('settings-new-pw').value;
+    const confirmPw = document.getElementById('settings-confirm-pw').value;
+    const errEl = document.getElementById('settingsError');
+    errEl.classList.add('hidden');
 
-            if (!cur || !nw || !confirmPw) {
-                errEl.textContent = 'All fields are required.';
-                errEl.classList.remove('hidden');
-                return;
-            }
-            if (nw.length < 4) {
-                errEl.textContent = 'New password must be at least 4 characters.';
-                errEl.classList.remove('hidden');
-                return;
-            }
-            if (nw !== confirmPw) {
-                errEl.textContent = 'New password and confirmation do not match.';
-                errEl.classList.remove('hidden');
-                return;
-            }
+    if (!cur || !nw || !confirmPw) {
+        errEl.textContent = 'All fields are required.';
+        errEl.classList.remove('hidden');
+        return;
+    }
+    if (nw.length < 4) {
+        errEl.textContent = 'New password must be at least 4 characters.';
+        errEl.classList.remove('hidden');
+        return;
+    }
+    if (nw !== confirmPw) {
+        errEl.textContent = 'New password and confirmation do not match.';
+        errEl.classList.remove('hidden');
+        return;
+    }
 
+    try {
+        const res = await fetch('/api/change-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ current_password: cur, new_password: nw })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.detail || 'Failed to update password');
+
+        toggleModal('settingsModal', false);
+        triggerAlert('Password Updated', 'Your password has been changed successfully. You will be logged out.', 'check-circle');
+
+        setTimeout(async () => {
             try {
-                const res = await fetch('/api/change-password', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ current_password: cur, new_password: nw })
-                });
-                const data = await res.json().catch(() => ({}));
-                if (!res.ok) throw new Error(data.detail || 'Failed to update password');
-
-                toggleModal('settingsModal', false);
-                triggerAlert('Password Updated', 'Your password has been changed successfully. You will be logged out automatically.', 'check-circle');
-
-                setTimeout(async () => {
-                    try {
-                        await fetch('/api/logout', { method: 'POST' });
-                        const paths = await getCurrentPaths();
-                        location.href = paths.login;
-                    } catch (e) {
-                        location.href = '/login';
-                    }
-                }, 2000);
-
+                await fetch('/api/logout', { method: 'POST' });
+                const paths = await getCurrentPaths();
+                location.href = paths.login;
             } catch (e) {
-                errEl.textContent = e.message;
-                errEl.classList.remove('hidden');
+                location.href = '/login';
             }
-        }
+        }, 2000);
+
+    } catch (e) {
+        errEl.textContent = e.message;
+        errEl.classList.remove('hidden');
+    }
+}
 
         // ---- Settings: update paths ----
         async function updatePath(type) {
