@@ -1996,6 +1996,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 </html>"""
 
 # ---------- SUB_USER_HTML (for /sub/user with clean QR) ----------
+# ---------- SUB_USER_HTML (for /sub/user with auto-update) ----------
 SUB_USER_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2063,6 +2064,106 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
         .detail-row:hover {{
             background-color: rgba(30, 41, 59, 0.3);
         }}
+        @keyframes pulse-dot {{
+            0%, 100% {{ opacity: 1; }}
+            50% {{ opacity: 0.3; }}
+        }}
+        .updating {{
+            animation: pulse-dot 0.8s ease-in-out 3;
+        }}
+        .toast {{
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            color: #e2e8f0;
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-family: Inter, sans-serif;
+            opacity: 0;
+            transition: opacity 0.25s, transform 0.25s;
+            z-index: 9999;
+            pointer-events: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            max-width: 90vw;
+            text-align: center;
+        }}
+        .toast.show {{
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }}
+        .toast.success {{
+            border-color: #22c55e;
+            color: #86efac;
+        }}
+        .toast.error {{
+            border-color: #ef4444;
+            color: #fca5a5;
+        }}
+        .toast.info {{
+            border-color: #3b82f6;
+            color: #93c5fd;
+        }}
+        .status-badge {{
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+            transition: all 0.3s ease;
+        }}
+        .status-badge.active {{
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }}
+        .status-badge.inactive {{
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }}
+        .status-badge.loading {{
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }}
+        .qr-image {{
+            max-width: 100%;
+            height: auto;
+            transition: all 0.3s ease;
+        }}
+        .qr-image.loading {{
+            opacity: 0.5;
+            filter: blur(2px);
+        }}
+        .update-indicator {{
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: #64748b;
+            transition: all 0.3s ease;
+        }}
+        .update-indicator.updating {{
+            color: #60a5fa;
+        }}
+        .update-spinner {{
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #1e293b;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }}
+        @keyframes spin {{
+            to {{ transform: rotate(360deg); }}
+        }}
         @media (max-width: 640px) {{
             .mobile-stack {{
                 flex-direction: column;
@@ -2104,61 +2205,6 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
         .input-focus-ring:focus {{
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }}
-        .toast {{
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background: #0f172a;
-            border: 1px solid #1e293b;
-            color: #e2e8f0;
-            padding: 8px 18px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-family: Inter, sans-serif;
-            opacity: 0;
-            transition: opacity 0.25s, transform 0.25s;
-            z-index: 9999;
-            pointer-events: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            max-width: 90vw;
-            text-align: center;
-        }}
-        .toast.show {{
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }}
-        .toast.success {{
-            border-color: #22c55e;
-            color: #86efac;
-        }}
-        .toast.error {{
-            border-color: #ef4444;
-            color: #fca5a5;
-        }}
-        .status-badge {{
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.025em;
-        }}
-        .status-badge.active {{
-            background-color: rgba(34, 197, 94, 0.1);
-            color: #4ade80;
-            border: 1px solid rgba(34, 197, 94, 0.2);
-        }}
-        .status-badge.inactive {{
-            background-color: rgba(239, 68, 68, 0.1);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }}
-        .qr-image {{
-            max-width: 100%;
-            height: auto;
-        }}
     </style>
 </head>
 <body class="font-sans text-slate-200 min-h-screen flex flex-col justify-between relative antialiased tracking-tight">
@@ -2169,7 +2215,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
         <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5 sm:p-8 backdrop-blur-xl glow-effect transition-all duration-300 hover:border-slate-700/80">
             
             <!-- Header -->
-            <div class="flex items-center gap-3 mb-6">
+            <div class="flex items-center gap-3 mb-4">
                 <div class="bg-blue-600 p-2 rounded-xl text-white glow-effect flex-shrink-0">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -2180,108 +2226,113 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                     <span class="font-bold text-base sm:text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent block truncate">MX-UI PANEL</span>
                     <span class="text-[10px] sm:text-xs text-slate-500 font-medium block truncate">v1.0.0</span>
                 </div>
+                <!-- Auto-Update Indicator -->
+                <div class="update-indicator" id="updateIndicator">
+                    <span class="update-spinner" id="updateSpinner"></span>
+                    <span id="updateText">Updating...</span>
+                </div>
             </div>
 
             <!-- Title Section -->
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 sm:mb-6">
                 <div class="min-w-0">
                     <h2 class="text-xl sm:text-2xl font-bold text-slate-100 truncate">Subscription Info</h2>
-                    <p class="text-xs sm:text-sm text-slate-400 truncate">Details for your configuration</p>
+                    <p class="text-xs sm:text-sm text-slate-400 truncate">Live updates every 30 seconds</p>
                 </div>
-                <span id="status-badge" class="status-badge active shrink-0 self-start sm:self-center">
-                    <span class="status-dot active"></span>
+                <span id="status-badge" class="status-badge loading shrink-0 self-start sm:self-center">
+                    <span class="status-dot" style="background-color: #60a5fa;"></span>
                     Loading...
                 </span>
             </div>
 
             <!-- QR Code - Clean without text -->
             <div class="mb-5 sm:mb-6 flex justify-center">
-                <div class="qr-container p-2 sm:p-3 shadow-lg border-2 border-slate-700/50">
-                    <img src="{qr_url}" alt="QR Code" class="qr-image w-36 h-36 sm:w-48 sm:h-48 object-contain">
+                <div class="qr-container p-2 sm:p-3 shadow-lg border-2 border-slate-700/50 transition-all duration-300 hover:border-blue-500/50">
+                    <img src="{qr_url}" alt="QR Code" class="qr-image w-36 h-36 sm:w-48 sm:h-48 object-contain" id="qrImage">
                 </div>
             </div>
 
             <!-- Details Grid -->
-            <div class="space-y-1.5 sm:space-y-2 mb-5 sm:mb-6">
+            <div class="space-y-1.5 sm:space-y-2 mb-5 sm:mb-6" id="detailsGrid">
                 <!-- Label -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
                     <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Label</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-200 font-semibold truncate">{label}</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-200 font-semibold truncate" id="labelValue">{label}</span>
                 </div>
                 
                 <!-- Subscription ID -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
                     <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Subscription ID</span>
-                    <span class="detail-value text-[10px] sm:text-xs font-mono text-slate-200 truncate">{uuid}</span>
+                    <span class="detail-value text-[10px] sm:text-xs font-mono text-slate-200 truncate" id="uuidValue">{uuid}</span>
                 </div>
                 
                 <!-- Status -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
                     <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Status</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono font-semibold">{status}</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono font-semibold" id="statusValue">{status}</span>
                 </div>
                 
                 <!-- Downloaded -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
                     <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Downloaded</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-blue-300 font-semibold">{downloaded}</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-blue-300 font-semibold" id="downloadedValue">{downloaded}</span>
                 </div>
                 
                 <!-- Uploaded -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
                     <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Uploaded</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-purple-300 font-semibold">{uploaded}</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-purple-300 font-semibold" id="uploadedValue">{uploaded}</span>
                 </div>
                 
                 <!-- Usage -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
                     <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Usage</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-amber-300 font-semibold">{usage} / {total_quota}</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-amber-300 font-semibold" id="usageValue">{usage} / {total_quota}</span>
                 </div>
                 
                 <!-- Total Quota -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
                     <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Total Quota</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-200 font-semibold">{total_quota}</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-200 font-semibold" id="totalQuotaValue">{total_quota}</span>
                 </div>
                 
                 <!-- Remained -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
                     <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Remained</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-emerald-300 font-semibold">{remained}</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-emerald-300 font-semibold" id="remainedValue">{remained}</span>
                 </div>
                 
                 <!-- Last Online -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
                     <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Last Online</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-300">{last_online}</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-slate-300" id="lastOnlineValue">{last_online}</span>
                 </div>
                 
                 <!-- Expiry -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
                     <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">Expiry</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-rose-300 font-semibold">{expiry}</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-rose-300 font-semibold" id="expiryValue">{expiry}</span>
                 </div>
                 
                 <!-- IPs Connected -->
                 <div class="detail-row flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-slate-800/60 py-2 px-1 rounded-lg gap-1 sm:gap-0">
                     <span class="detail-label text-[10px] sm:text-xs text-slate-400 font-medium uppercase tracking-wider">IP(s) Connected</span>
-                    <span class="detail-value text-xs sm:text-sm font-mono text-cyan-300">{ips}</span>
+                    <span class="detail-value text-xs sm:text-sm font-mono text-cyan-300" id="ipsValue">{ips}</span>
                 </div>
             </div>
 
             <!-- Progress Bar Section -->
             <div class="mt-5 sm:mt-6 p-4 sm:p-5 bg-slate-950/60 border border-slate-800/60 rounded-xl">
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 mb-2">
-                    <span class="text-xs sm:text-sm text-slate-300 font-medium truncate">{label}</span>
-                    <span class="text-[10px] sm:text-xs text-slate-400 font-mono">{used_fmt} / {limit_fmt}</span>
+                    <span class="text-xs sm:text-sm text-slate-300 font-medium truncate" id="progressLabel">{label}</span>
+                    <span class="text-[10px] sm:text-xs text-slate-400 font-mono" id="progressText">{used_fmt} / {limit_fmt}</span>
                 </div>
                 <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full progress-bar-fill" style="width: {usage_pct}%;"></div>
+                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full progress-bar-fill" id="progressBar" style="width: {usage_pct}%;"></div>
                 </div>
                 <div class="flex flex-col xs:flex-row xs:justify-between gap-0.5 xs:gap-0 mt-1.5">
-                    <span class="text-[10px] sm:text-xs text-slate-500">{usage_pct}% used</span>
-                    <span class="text-[10px] sm:text-xs text-slate-500">{remained} remaining</span>
+                    <span class="text-[10px] sm:text-xs text-slate-500" id="usagePercent">{usage_pct}% used</span>
+                    <span class="text-[10px] sm:text-xs text-slate-500" id="remainedText">{remained} remaining</span>
                 </div>
             </div>
 
@@ -2306,14 +2357,26 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                 </div>
             </div>
 
+            <!-- Auto-Update Status Footer -->
+            <div class="mt-4 flex items-center justify-between text-[9px] sm:text-[10px] text-slate-500 border-t border-slate-800/60 pt-3">
+                <span>Last updated: <span id="lastUpdateTime">just now</span></span>
+                <span>Auto-update every 30s</span>
+            </div>
+
             <!-- Footer -->
-            <div class="mt-6 sm:mt-8 text-center text-[10px] sm:text-xs text-slate-500 border-t border-slate-800/60 pt-4">
+            <div class="mt-2 text-center text-[10px] sm:text-xs text-slate-500">
                 {watermark}
             </div>
         </div>
     </div>
 
     <script>
+        // Store current UUID for updates
+        const CURRENT_UUID = '{uuid}';
+        let updateInterval = null;
+        let isUpdating = false;
+
+        // Toast notification system
         function showToast(message, type) {{
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -2324,6 +2387,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             }}, 3000);
         }}
 
+        // Copy to clipboard with fallback
         function copyToClipboard(text) {{
             if (navigator.clipboard && navigator.clipboard.writeText) {{
                 navigator.clipboard.writeText(text).then(() => {{
@@ -2354,6 +2418,135 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             document.body.removeChild(textarea);
         }}
 
+        // Format bytes
+        function fmtBytes(b) {{
+            if (b === 0) return '0 B';
+            if (b < 1024) return b + ' B';
+            if (b < 1024 ** 2) return (b / 1024).toFixed(1) + ' KB';
+            if (b < 1024 ** 3) return (b / 1024 ** 2).toFixed(2) + ' MB';
+            return (b / 1024 ** 3).toFixed(2) + ' GB';
+        }}
+
+        // Update the subscription page data
+        async function updateSubscriptionData() {{
+            if (isUpdating) return;
+            isUpdating = true;
+
+            const indicator = document.getElementById('updateIndicator');
+            const spinner = document.getElementById('updateSpinner');
+            const text = document.getElementById('updateText');
+            const qrImage = document.getElementById('qrImage');
+
+            // Show updating state
+            indicator.classList.add('updating');
+            spinner.style.display = 'inline-block';
+            text.textContent = 'Updating...';
+            qrImage.classList.add('loading');
+
+            try {{
+                // Fetch fresh data from the same endpoint with a cache-busting parameter
+                const response = await fetch(window.location.pathname + '?uuid=' + CURRENT_UUID + '&_t=' + Date.now());
+                
+                if (!response.ok) {{
+                    throw new Error('Failed to fetch updates');
+                }}
+
+                const html = await response.text();
+                
+                // Parse the HTML response to extract updated data
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                // Update all elements with new data
+                const elements = {{
+                    'labelValue': doc.getElementById('labelValue')?.textContent || '{label}',
+                    'uuidValue': doc.getElementById('uuidValue')?.textContent || '{uuid}',
+                    'statusValue': doc.getElementById('statusValue')?.innerHTML || '{status}',
+                    'downloadedValue': doc.getElementById('downloadedValue')?.textContent || '{downloaded}',
+                    'uploadedValue': doc.getElementById('uploadedValue')?.textContent || '{uploaded}',
+                    'usageValue': doc.getElementById('usageValue')?.textContent || '{usage} / {total_quota}',
+                    'totalQuotaValue': doc.getElementById('totalQuotaValue')?.textContent || '{total_quota}',
+                    'remainedValue': doc.getElementById('remainedValue')?.textContent || '{remained}',
+                    'lastOnlineValue': doc.getElementById('lastOnlineValue')?.textContent || '{last_online}',
+                    'expiryValue': doc.getElementById('expiryValue')?.textContent || '{expiry}',
+                    'ipsValue': doc.getElementById('ipsValue')?.textContent || '{ips}',
+                    'progressLabel': doc.getElementById('progressLabel')?.textContent || '{label}',
+                    'progressText': doc.getElementById('progressText')?.textContent || '{used_fmt} / {limit_fmt}',
+                    'usagePercent': doc.getElementById('usagePercent')?.textContent || '{usage_pct}% used',
+                    'remainedText': doc.getElementById('remainedText')?.textContent || '{remained} remaining',
+                    'vlessLink': doc.getElementById('vless-link-input')?.value || '{vless_link}',
+                }};
+
+                // Update status badge
+                const newStatusBadge = doc.getElementById('status-badge');
+                const statusBadge = document.getElementById('status-badge');
+                if (newStatusBadge) {{
+                    statusBadge.className = newStatusBadge.className;
+                    statusBadge.innerHTML = newStatusBadge.innerHTML;
+                }}
+
+                // Update progress bar width
+                const newProgressBar = doc.getElementById('progressBar');
+                const progressBar = document.getElementById('progressBar');
+                if (newProgressBar) {{
+                    progressBar.style.width = newProgressBar.style.width;
+                }}
+
+                // Update QR image (only if URL changed)
+                const newQrImg = doc.getElementById('qrImage');
+                if (newQrImg && newQrImg.src !== qrImage.src) {{
+                    qrImage.src = newQrImg.src;
+                }}
+
+                // Update all text elements
+                Object.keys(elements).forEach(id => {{
+                    const el = document.getElementById(id);
+                    if (el) {{
+                        if (id === 'vlessLink') {{
+                            el.value = elements[id];
+                        }} else if (id === 'statusValue') {{
+                            el.innerHTML = elements[id];
+                        }} else {{
+                            el.textContent = elements[id];
+                        }}
+                    }}
+                }});
+
+                // Update last update time
+                document.getElementById('lastUpdateTime').textContent = new Date().toLocaleTimeString();
+
+                showToast('Page updated successfully', 'info');
+
+            }} catch (error) {{
+                console.error('Update error:', error);
+                showToast('Update failed: ' + error.message, 'error');
+            }} finally {{
+                isUpdating = false;
+                indicator.classList.remove('updating');
+                spinner.style.display = 'none';
+                text.textContent = 'Auto-update';
+                qrImage.classList.remove('loading');
+            }}
+        }}
+
+        // Start auto-update
+        function startAutoUpdate() {{
+            // Update immediately on load
+            setTimeout(updateSubscriptionData, 1000);
+            
+            // Then every 30 seconds
+            updateInterval = setInterval(updateSubscriptionData, 30000);
+        }}
+
+        // Stop auto-update
+        function stopAutoUpdate() {{
+            if (updateInterval) {{
+                clearInterval(updateInterval);
+                updateInterval = null;
+            }}
+        }}
+
+        // Auto-select input on click
         document.addEventListener('DOMContentLoaded', function() {{
             const input = document.getElementById('vless-link-input');
             if (input) {{
@@ -2365,32 +2558,66 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                 }});
             }}
 
+            // Start auto-update
+            startAutoUpdate();
+
+            // Update status badge initially
             const statusBadge = document.getElementById('status-badge');
-            const statusValue = document.querySelector('.detail-row:nth-child(3) .detail-value');
+            const statusValue = document.getElementById('statusValue');
             if (statusValue) {{
                 const isActive = statusValue.textContent.trim().toLowerCase().includes('active');
                 const dot = statusBadge.querySelector('.status-dot');
                 if (isActive) {{
                     statusBadge.className = 'status-badge active';
-                    dot.className = 'status-dot active';
-                    statusBadge.innerHTML = '<span class="status-dot active"></span> Active';
+                    dot.style.backgroundColor = '#22c55e';
+                    statusBadge.innerHTML = '<span class="status-dot" style="background-color:#22c55e;"></span> Active';
                 }} else {{
                     statusBadge.className = 'status-badge inactive';
-                    dot.className = 'status-dot inactive';
-                    statusBadge.innerHTML = '<span class="status-dot inactive"></span> Inactive';
+                    dot.style.backgroundColor = '#ef4444';
+                    statusBadge.innerHTML = '<span class="status-dot" style="background-color:#ef4444;"></span> Inactive';
                 }}
             }}
         }});
 
+        // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {{
+            // Ctrl+U or Cmd+U to manually update
+            if ((e.ctrlKey || e.metaKey) && e.key === 'u') {{
+                e.preventDefault();
+                updateSubscriptionData();
+            }}
+            // Ctrl+C or Cmd+C to copy VLESS link
             if ((e.ctrlKey || e.metaKey) && e.key === 'c') {{
                 const input = document.getElementById('vless-link-input');
                 if (document.activeElement === input) {{
                     copyToClipboard(input.value);
                 }}
             }}
+            // Escape to stop auto-update (temporary)
+            if (e.key === 'Escape') {{
+                stopAutoUpdate();
+                showToast('Auto-update paused', 'info');
+                setTimeout(startAutoUpdate, 60000); // Restart after 60s
+            }}
         }});
 
+        // Handle page visibility change - pause updates when tab is hidden
+        document.addEventListener('visibilitychange', function() {{
+            if (document.hidden) {{
+                stopAutoUpdate();
+            }} else {{
+                startAutoUpdate();
+                // Force immediate update when tab becomes visible
+                setTimeout(updateSubscriptionData, 500);
+            }}
+        }});
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', function() {{
+            stopAutoUpdate();
+        }});
+
+        // Touch feedback for copy button
         document.querySelector('.copy-btn')?.addEventListener('touchstart', function() {{
             this.style.transform = 'scale(0.95)';
         }}, {{ passive: true }});
@@ -2401,50 +2628,6 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
     </script>
 </body>
 </html>"""
-
-# ---------- SUB_INFO_HTML ----------
-SUB_INFO_HTML = r"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subscription Info · MX-UI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #070a13; }
-        .glow-effect { box-shadow: 0 0 25px rgba(59, 130, 246, 0.12); }
-        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
-        .status-dot.active { background-color: #22c55e; }
-        .status-dot.inactive { background-color: #ef4444; }
-        @media (max-width: 640px) { .mobile-padding { padding-left: 0.75rem; padding-right: 0.75rem; } }
-    </style>
-</head>
-<body class="font-sans text-slate-200 min-h-screen flex items-center justify-center p-4 mobile-padding relative antialiased">
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(59,130,246,0.06),transparent_70%)] pointer-events-none"></div>
-    <div class="w-full max-w-2xl relative z-10">
-        <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-6 sm:p-8 backdrop-blur-xl glow-effect">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="bg-blue-600 p-2 rounded-xl text-white glow-effect flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-                </div>
-                <div><span class="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">MX-UI</span></div>
-            </div>
-            <h1 class="text-2xl font-bold mb-1">Subscription: {label}</h1>
-            <p class="text-sm text-slate-400 mb-6">UUID: <span class="font-mono text-xs">{uuid}</span></p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="bg-slate-800/40 rounded-xl p-4 border border-slate-700/50"><span class="text-slate-400 text-sm">Status</span><div class="text-lg font-semibold mt-1"><span class="status-dot {'active' if active else 'inactive'}"></span>{'Active' if active else 'Inactive'}</div></div>
-                <div class="bg-slate-800/40 rounded-xl p-4 border border-slate-700/50"><span class="text-slate-400 text-sm">Usage</span><div class="text-lg font-semibold mt-1 font-mono">{used_fmt} / {limit_fmt}</div></div>
-                <div class="bg-slate-800/40 rounded-xl p-4 border border-slate-700/50"><span class="text-slate-400 text-sm">Expires</span><div class="text-lg font-semibold mt-1">{expires_at}</div></div>
-                <div class="bg-slate-800/40 rounded-xl p-4 border border-slate-700/50"><span class="text-slate-400 text-sm">Subscription Link</span><div class="text-xs font-mono text-blue-400 break-all mt-1"><a href="{sub_url}" target="_blank">{sub_url}</a></div></div>
-            </div>
-            <div class="mt-6 p-4 bg-slate-800/40 rounded-xl border border-slate-700/50"><span class="text-slate-400 text-sm block mb-2">VLESS Link</span><div class="text-xs font-mono text-slate-300 break-all">{vless_link}</div></div>
-            <div class="mt-6 text-center text-xs text-slate-500 border-t border-slate-800/60 pt-4">{watermark}</div>
-        </div>
-    </div>
-</body>
-</html>"""
-
 # Helper function for SUB_INFO_HTML's status display
 def _status_display(active):
     return 'Active' if active else 'Inactive'
