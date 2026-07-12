@@ -1994,11 +1994,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     </script>
 </body>
 </html>"""
-
-# ---------- SUB_USER_HTML (for /sub/user with clean QR) ----------
-# ---------- SUB_USER_HTML (for /sub/user with auto-update) ----------
-# ---------- SUB_USER_HTML (for /sub/user with auto-update and timer) ----------
-# ---------- SUB_USER_HTML (for /sub/user with auto-update every 30s) ----------
+# ---------- SUB_USER_HTML (for /sub/user with auto-update every 30s - NO TAB RESET) ----------
 SUB_USER_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2422,6 +2418,9 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
         let countdown = 30;
         let isPaused = false;
         let isFirstLoad = true;
+        let lastUpdateTime = Date.now();
+        let tabHiddenTime = 0;
+        let totalHiddenTime = 0;
 
         // Toast notification system
         function showToast(message, type) {{
@@ -2531,7 +2530,6 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                 const data = await response.json();
                 
                 // Update ONLY the data fields
-                // Update usage values
                 const usedBytes = data.used_bytes || 0;
                 const limitBytes = data.limit_bytes || 0;
                 const usagePercent = data.usage_percent || 0;
@@ -2588,18 +2586,15 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                 }}
 
                 // Update last update time
+                lastUpdateTime = Date.now();
                 document.getElementById('lastUpdateTime').textContent = new Date().toLocaleTimeString();
 
                 // Reset countdown after successful update
                 countdown = 30;
                 updateTimer();
 
-                // Don't show toast for every update - only if there was a change
-                // showToast('Updated', 'info');
-
             }} catch (error) {{
                 console.error('Update error:', error);
-                // Only show error toast if not first load
                 if (!isFirstLoad) {{
                     showToast('Update failed: ' + error.message, 'error');
                 }}
@@ -2632,10 +2627,10 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             }}, 1000);
         }}
 
-        // Start auto-update (only timer, no immediate page reload)
+        // Start auto-update
         function startAutoUpdate() {{
             isPaused = false;
-            // Start timer (first update will happen after 30 seconds)
+            // Start timer
             startTimer();
         }}
 
@@ -2651,8 +2646,8 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
         // Resume auto-update
         function resumeAutoUpdate() {{
             isPaused = false;
-            countdown = 30;
-            updateTimer();
+            // Calculate remaining time based on elapsed time
+            // Don't reset, just continue from where we left off
             startTimer();
         }}
 
@@ -2682,7 +2677,7 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
                 }}
             }}
 
-            // Start auto-update (first update after 30 seconds)
+            // Start auto-update
             startAutoUpdate();
         }});
 
@@ -2713,12 +2708,32 @@ SUB_USER_HTML = r"""<!DOCTYPE html>
             }}
         }});
 
-        // Handle page visibility change - DO NOT force update when tab becomes visible
+        // Handle page visibility change - DO NOT reset timer
         document.addEventListener('visibilitychange', function() {{
             if (document.hidden) {{
+                // Tab is hidden - just pause
+                tabHiddenTime = Date.now();
                 stopAutoUpdate();
             }} else {{
-                // Just resume the timer, don't force an update
+                // Tab is visible again - resume from where we left off
+                // Calculate how long we were hidden
+                const hiddenDuration = Date.now() - tabHiddenTime;
+                
+                // Adjust countdown based on hidden time
+                // Subtract the hidden time from countdown
+                const hiddenSeconds = Math.floor(hiddenDuration / 1000);
+                countdown = Math.max(1, countdown - hiddenSeconds);
+                
+                // If countdown reached 0 or below, trigger immediate update
+                if (countdown <= 0) {{
+                    countdown = 30;
+                    updateTimer();
+                    updateSubscriptionData();
+                }} else {{
+                    updateTimer();
+                }}
+                
+                // Resume timer
                 if (isPaused) {{
                     resumeAutoUpdate();
                 }}
