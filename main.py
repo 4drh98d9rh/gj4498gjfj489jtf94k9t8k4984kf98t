@@ -399,7 +399,10 @@ async def root(request: Request):
     # If dashboard path is "/", render directly (avoid loop)
     if dashboard_path == "/":
         return await render_dashboard(request)
-    return RedirectResponse(url=dashboard_path, status_code=302)
+    # If requesting root and dashboard path is different, redirect
+    if dashboard_path != "/":
+        return RedirectResponse(url=dashboard_path, status_code=302)
+    return await render_dashboard(request)
 
 @app.get("/health")
 async def health():
@@ -456,6 +459,7 @@ async def export_database(_=Depends(require_auth)):
             }
         }
     return data
+
 @app.post("/api/database/restore")
 async def restore_database(request: Request, _=Depends(require_auth)):
     """Restore database from JSON backup"""
@@ -477,15 +481,16 @@ async def restore_database(request: Request, _=Depends(require_auth)):
         # Restore links
         LINKS.update(data.get("links", {}))
         
-        # Reset password to default MUVIXO
-        # Because the old password_hash was created with a different SECRET_KEY
+        # Reset password to default MUVIXO because old hash was created with different SECRET_KEY
         AUTH["password_hash"] = hash_password("MUVIXO")
         
-        # Restore paths if present
+        # Restore paths if present (only if they are valid)
         if "paths" in data:
             for key, value in data["paths"].items():
-                if key in CONFIG:
-                    CONFIG[key] = value
+                if key in CONFIG and value and isinstance(value, str):
+                    # Validate path before restoring
+                    if value.startswith("/") and len(value) >= 2:
+                        CONFIG[key] = value
     
     # Clear all sessions to force re-login
     await clear_all_sessions()
@@ -721,7 +726,7 @@ async def api_change_password(request: Request, token=Depends(require_auth)):
 
 @app.post("/api/force-logout")
 async def force_logout(request: Request):
-    """Force logout all users (used after password change)"""
+    """Force logout all users"""
     await clear_all_sessions()
     resp = JSONResponse({"ok": True})
     secure = request.url.scheme == "https"
@@ -749,8 +754,35 @@ async def update_path(request: Request, _=Depends(require_auth)):
     if not new_path or not new_path.startswith("/"):
         raise HTTPException(status_code=400, detail="Path must start with /")
     
-    if not re.match(r'^/[a-zA-Z0-9\-_/]*$', new_path):
-        raise HTTPException(status_code=400, detail="Path contains invalid characters")
+    if len(new_path) < 2:
+        raise HTTPException(status_code=400, detail="Path must be at least 2 characters")
+    
+    # Reserved paths that cannot be used
+    reserved_paths = ["/api", "/stats", "/health", "/dash", "/", "/proxy", "/ws", "/xhttp-siz10", "/sub-all", "/favicon", "/robots"]
+    if new_path in reserved_paths:
+        raise HTTPException(status_code=400, detail=f"Path '{new_path}' is reserved")
+    
+    # Prevent paths that start with reserved prefixes
+    if new_path.startswith("/api/") or new_path.startswith("/stats/") or new_path.startswith("/health/"):
+        raise HTTPException(status_code=400, detail="Path cannot start with /api/, /stats/, or /health/")
+    
+    # Check if the new path conflicts with other configured paths
+    other_paths = {
+        "dashboard": CONFIG.get("dashboard_path", "/dashboard"),
+        "login": CONFIG.get("login_path", "/login"),
+        "sub": CONFIG.get("sub_path", "/sub"),
+    }
+    for key, value in other_paths.items():
+        if key != path_type and value == new_path:
+            raise HTTPException(status_code=400, detail=f"Path conflicts with {key} path: {value}")
+    
+    # Validate characters
+    if not re.match(r'^/[a-zA-Z0-9\-_]+$', new_path):
+        raise HTTPException(status_code=400, detail="Path must contain only letters, numbers, hyphens, and underscores")
+    
+    # Prevent changing dashboard path to /login or /sub
+    if path_type == "dashboard" and (new_path == CONFIG.get("login_path") or new_path == CONFIG.get("sub_path")):
+        raise HTTPException(status_code=400, detail="Dashboard path cannot be the same as login or sub path")
     
     CONFIG[f"{path_type}_path"] = new_path
     await save_state()
@@ -1222,13 +1254,11 @@ async def dynamic_path_handler(request: Request, path: str):
     
     # Check if it's a sub path with uuid
     if request.url.path.startswith(sub_path + "/"):
-        # Extract uuid from path
         parts = request.url.path.split("/")
         if len(parts) >= 2:
             uuid = parts[-1]
             if uuid and uuid not in ["user", "info", "all"]:
                 return await subscription_single_handler(uuid, request)
-        # If it's /sub/{uuid}/info
         if len(parts) >= 3 and parts[-1] == "info":
             uuid = parts[-2]
             if uuid:
@@ -1244,7 +1274,6 @@ async def dynamic_path_handler(request: Request, path: str):
     
     # If it's /dash, redirect to dashboard path
     if request.url.path == "/dash":
-        # If dashboard path is "/dash", render directly (avoid loop)
         if dashboard_path == "/dash":
             return await render_dashboard(request)
         return RedirectResponse(url=dashboard_path, status_code=302)
