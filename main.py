@@ -1028,7 +1028,6 @@ async def create_link(request: Request, _=Depends(require_auth)):
         "sub_url": f"https://{host}/sub/{uid}",
         "info_url": f"https://{host}/sub/{uid}/info",
     }
-
 @app.get("/api/links")
 async def list_links(request: Request, _=Depends(require_auth)):
     host = get_host(request)
@@ -1058,6 +1057,7 @@ async def list_links(request: Request, _=Depends(require_auth)):
             "sub_url": sub_url,
             "info_url": f"https://{host}/sub/{uid}/info",
             "connected_ips": len(unique_ips_for_uuid(uid)),
+            "is_default": d.get("is_default", False),  # اضافه شدن این خط
         })
     result.sort(key=lambda x: x["created_at"], reverse=True)
     return {"links": result}
@@ -1068,51 +1068,67 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
     async with LINKS_LOCK:
         if uid not in LINKS:
             raise HTTPException(status_code=404, detail="link not found")
+        
         link = LINKS[uid]
+        
+        # Prevent modifying default configuration
+        if link.get("is_default", False):
+            raise HTTPException(status_code=403, detail="Default configuration cannot be modified")
+        
         label = link.get("label")
+        
         if "active" in body:
             link["active"] = bool(body["active"])
             log_activity("link", f"Config «{label}» {'activated' if link['active'] else 'deactivated'}", "ok" if link["active"] else "warn")
+        
         if "label" in body:
             link["label"] = str(body["label"])[:60]
+        
         if "note" in body:
             link["note"] = str(body["note"])[:200]
+        
         if "reset_usage" in body and body["reset_usage"]:
             link["used_bytes"] = 0
             # Reactivate if it was deactivated due to quota
             if not link.get("active", True):
                 link["active"] = True
             log_activity("link", f"Usage reset for «{label}»", "info")
+        
         if "limit_value" in body:
             lv = float(body.get("limit_value") or 0)
             lu = body.get("limit_unit") or "GB"
             link["limit_bytes"] = 0 if lv <= 0 else parse_size_to_bytes(lv, lu)
+        
         if "expires_days" in body:
             ed = int(body["expires_days"] or 0)
             link["expires_at"] = (datetime.now() + timedelta(days=ed)).isoformat() if ed > 0 else None
+        
         if "fingerprint" in body:
             fp = str(body.get("fingerprint") or DEFAULT_FINGERPRINT).strip().lower()
             link["fingerprint"] = fp if fp in FINGERPRINTS else DEFAULT_FINGERPRINT
+        
         if "alpn" in body:
             link["alpn"] = str(body.get("alpn") or "").strip()[:100]
+        
         if "ip_limit" in body:
             try:
                 il = int(body.get("ip_limit") or 0)
             except (TypeError, ValueError):
                 il = 0
             link["ip_limit"] = max(0, il)
+        
         if "speed_limit_value" in body:
             sv = float(body.get("speed_limit_value") or 0)
             su = body.get("speed_limit_unit") or "MBIT"
             link["speed_limit_bytes"] = 0 if sv <= 0 else parse_speed_to_bytes(sv, su)
             from speed_limit import reset_bucket
             reset_bucket(uid)
+        
         if any(k in body for k in ("label", "note", "limit_value", "expires_days", "fingerprint", "alpn", "ip_limit", "speed_limit_value")):
             log_activity("link", f"Config «{link['label']}» updated", "info")
+    
     asyncio.create_task(save_state())
     return {"ok": True}
-
-# --- Toggle link active status ---
 @app.patch("/api/links/{uid}/toggle")
 async def toggle_link_status(uid: str, request: Request, _=Depends(require_auth)):
     """Toggle the active status of a link"""
@@ -1122,6 +1138,11 @@ async def toggle_link_status(uid: str, request: Request, _=Depends(require_auth)
     async with LINKS_LOCK:
         if uid not in LINKS:
             raise HTTPException(status_code=404, detail="link not found")
+        
+        # جلوگیری از تغییر وضعیت کانفیگ پیش‌فرض
+        if LINKS[uid].get("is_default", False):
+            raise HTTPException(status_code=403, detail="Default configuration status cannot be changed")
+        
         LINKS[uid]["active"] = bool(active)
         label = LINKS[uid]["label"]
     
@@ -1129,25 +1150,43 @@ async def toggle_link_status(uid: str, request: Request, _=Depends(require_auth)
     asyncio.create_task(save_state())
     
     return {"ok": True, "uuid": uid, "active": bool(active)}
-
-@app.delete("/api/links/{uid}")
-async def delete_link(uid: str, _=Depends(require_auth)):
-    label = await remove_link(uid)
-    if label is None:
-        raise HTTPException(status_code=404, detail="link not found")
-    return {"ok": True, "deleted": uid}
-
-# ── Reset traffic endpoint ───────────────────────────────────────────────────
+@app.patch("/api/links/{uid}/toggle")
+async def toggle_link_status(uid: str, request: Request, _=Depends(require_auth)):
+    """Toggle the active status of a link"""
+    body = await request.json()
+    active = body.get("active", True)
+    
+    async with LINKS_LOCK:
+        if uid not in LINKS:
+            raise HTTPException(status_code=404, detail="link not found")
+        
+        # Prevent toggling default configuration
+        if LINKS[uid].get("is_default", False):
+            raise HTTPException(status_code=403, detail="Default configuration status cannot be changed")
+        
+        LINKS[uid]["active"] = bool(active)
+        label = LINKS[uid]["label"]
+    
+    log_activity("link", f"Config «{label}» {'activated' if active else 'deactivated'}", "ok" if active else "warn")
+    asyncio.create_task(save_state())
+    
+    return {"ok": True, "uuid": uid, "active": bool(active)}
 @app.post("/api/links/{uid}/reset-traffic")
 async def reset_link_traffic(uid: str, _=Depends(require_auth)):
     async with LINKS_LOCK:
         if uid not in LINKS:
             raise HTTPException(status_code=404, detail="link not found")
+        
+        # Prevent resetting default configuration
+        if LINKS[uid].get("is_default", False):
+            raise HTTPException(status_code=403, detail="Default configuration traffic cannot be reset")
+        
         LINKS[uid]["used_bytes"] = 0
         # Reactivate if it was deactivated
         if not LINKS[uid].get("active", True):
             LINKS[uid]["active"] = True
         label = LINKS[uid]["label"]
+    
     asyncio.create_task(save_state())
     log_activity("link", f"Traffic reset for «{label}»", "info")
     return {"ok": True, "message": f"Traffic reset for {label}"}
