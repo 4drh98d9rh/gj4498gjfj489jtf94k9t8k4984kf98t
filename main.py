@@ -391,7 +391,10 @@ async def ensure_default_link():
 @app.get("/")
 async def root():
     dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
-    return RedirectResponse(url=dashboard_path)
+    # If dashboard path is "/", avoid loop
+    if dashboard_path == "/":
+        return await render_dashboard(request)
+    return RedirectResponse(url=dashboard_path, status_code=302)
 
 @app.get("/health")
 async def health():
@@ -1143,6 +1146,7 @@ async def http_proxy(target_url: str, request: Request):
         raise HTTPException(status_code=502, detail=f"Proxy error: {exc}")
 
 # ── HTML Pages ─────────────────────────────────────────────────────────────────
+# ── HTML Pages ─────────────────────────────────────────────────────────────────
 from pages import LOGIN_HTML, DASHBOARD_HTML
 
 # Dashboard and Login handlers
@@ -1150,14 +1154,18 @@ from pages import LOGIN_HTML, DASHBOARD_HTML
 async def dash_redirect():
     """Redirect /dash to current dashboard path"""
     dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
-    return RedirectResponse(url=dashboard_path)
+    # Don't redirect if it's the same path (avoid loop)
+    if dashboard_path == "/dash":
+        return await render_dashboard(request)
+    return RedirectResponse(url=dashboard_path, status_code=302)
 
 @app.get("/dashboard")
 async def dashboard_default(request: Request):
     """Handle /dashboard"""
     dashboard_path = CONFIG.get("dashboard_path", "/dashboard")
+    # If dashboard path was changed, redirect to new path
     if dashboard_path != "/dashboard":
-        return RedirectResponse(url=dashboard_path)
+        return RedirectResponse(url=dashboard_path, status_code=302)
     return await render_dashboard(request)
 
 @app.get("/login")
@@ -1165,7 +1173,7 @@ async def login_default(request: Request):
     """Handle /login"""
     login_path = CONFIG.get("login_path", "/login")
     if login_path != "/login":
-        return RedirectResponse(url=login_path)
+        return RedirectResponse(url=login_path, status_code=302)
     return await render_login(request)
 
 @app.get("/sub")
@@ -1173,8 +1181,8 @@ async def sub_default():
     """Handle /sub"""
     sub_path = CONFIG.get("sub_path", "/sub")
     if sub_path != "/sub":
-        return RedirectResponse(url=sub_path)
-    return RedirectResponse(url=sub_path + "/user")
+        return RedirectResponse(url=sub_path, status_code=302)
+    return RedirectResponse(url=sub_path + "/user", status_code=302)
 
 # Dynamic path handler for custom paths
 @app.get("/{path:path}")
@@ -1202,7 +1210,7 @@ async def dynamic_path_handler(request: Request, path: str):
         return await render_login(request)
     
     if request.url.path == sub_path:
-        return RedirectResponse(url=sub_path + "/user")
+        return RedirectResponse(url=sub_path + "/user", status_code=302)
     
     # Check if it's a sub path with user or uuid
     if request.url.path.startswith(sub_path + "/user"):
@@ -1214,7 +1222,7 @@ async def dynamic_path_handler(request: Request, path: str):
         parts = request.url.path.split("/")
         if len(parts) >= 2:
             uuid = parts[-1]
-            if uuid and not uuid in ["user", "info", "all"]:
+            if uuid and uuid not in ["user", "info", "all"]:
                 return await subscription_single_handler(uuid, request)
         # If it's /sub/{uuid}/info
         if len(parts) >= 3 and parts[-1] == "info":
@@ -1222,20 +1230,23 @@ async def dynamic_path_handler(request: Request, path: str):
             if uuid:
                 return await subscription_info_handler(uuid, request)
     
-    # If it's the default paths but they've been changed, redirect
+    # If it's the default paths but they've been changed, redirect with 302
     if request.url.path == "/dashboard" and dashboard_path != "/dashboard":
-        return RedirectResponse(url=dashboard_path)
+        return RedirectResponse(url=dashboard_path, status_code=302)
     if request.url.path == "/login" and login_path != "/login":
-        return RedirectResponse(url=login_path)
+        return RedirectResponse(url=login_path, status_code=302)
     if request.url.path == "/sub" and sub_path != "/sub":
-        return RedirectResponse(url=sub_path)
+        return RedirectResponse(url=sub_path, status_code=302)
     
-    # If it's /dash, redirect
+    # If it's /dash, redirect to dashboard path
     if request.url.path == "/dash":
-        return RedirectResponse(url=dashboard_path)
+        # If dashboard path is "/dash", render directly (avoid loop)
+        if dashboard_path == "/dash":
+            return await render_dashboard(request)
+        return RedirectResponse(url=dashboard_path, status_code=302)
     
     # Default: redirect to dashboard
-    return RedirectResponse(url=dashboard_path)
+    return RedirectResponse(url=dashboard_path, status_code=302)
 
 async def render_dashboard(request: Request):
     """Render the dashboard page"""
@@ -1245,7 +1256,7 @@ async def render_dashboard(request: Request):
     logger.info(f"Dashboard session valid: {valid}")
     if not valid:
         login_path = CONFIG.get("login_path", "/login")
-        return RedirectResponse(url=login_path)
+        return RedirectResponse(url=login_path, status_code=302)
     await ensure_default_link()
     return HTMLResponse(content=DASHBOARD_HTML)
 
