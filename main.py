@@ -407,24 +407,45 @@ async def subscription_user(request: Request, uuid: str = Query(...)):
         link = LINKS.get(uuid)
     if not link:
         raise HTTPException(status_code=404, detail="not found")
+    
     host = get_host(request)
     vless = vless_link_for_link(link, uuid, host)
     used = link.get("used_bytes", 0)
     limit = link.get("limit_bytes", 0)
+    
+    # Check if quota is exceeded
+    quota_exceeded = limit > 0 and used >= limit
+    
+    # If quota exceeded, deactivate the link
+    if quota_exceeded and link.get("active", True):
+        async with LINKS_LOCK:
+            LINKS[uuid]["active"] = False
+        await save_state()
+        log_activity("link", f"Config «{link.get('label', 'Unknown')}» auto-deactivated (quota exceeded)", "warn")
+        # Re-fetch link after update
+        async with LINKS_LOCK:
+            link = LINKS.get(uuid)
+    
+    # Check active status
     active = is_link_allowed(link)
+    
     expiry = link.get("expires_at", "No expiry")
     last_online = link.get("last_used", "Never")
     ips = unique_ips_for_uuid(uuid)
     ip_display = ", ".join(ips) if ips else "No active connections"
+    
     status_text = "Active" if active else "Inactive"
     status_color = "text-emerald-400" if active else "text-red-400"
-    status_html = f'<span class="{status_color} font-semibold">{status_text}</span>'
+    status_dot = "active" if active else "inactive"
+    status_html = f'<span class="status-dot {status_dot}"></span><span class="{status_color} font-semibold">{status_text}</span>'
+    
     quota_str = "∞" if limit == 0 else fmt_bytes(limit)
     remained = "∞" if limit == 0 else fmt_bytes(max(0, limit - used))
     usage_pct = 0 if limit == 0 else min(100, (used / limit) * 100)
     downloaded = fmt_bytes(used)
     uploaded = "0 B"
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={quote(vless)}"
+    
     return HTMLResponse(content=SUB_USER_HTML.format(
         uuid=uuid,
         label=link.get("label", "Unknown"),
@@ -599,11 +620,46 @@ async def get_current_paths():
         "sub": CONFIG.get("sub_path", "/sub"),
     }
 
+@app.get("/api/link-status/{uuid}")
+async def get_link_status(uuid: str):
+    async with LINKS_LOCK:
+        link = LINKS.get(uuid)
+    if not link:
+        raise HTTPException(status_code=404, detail="not found")
+    
+    used = link.get("used_bytes", 0)
+    limit = link.get("limit_bytes", 0)
+    active = is_link_allowed(link)
+    
+    # If quota exceeded
+    if limit > 0 and used >= limit:
+        active = False
+    
+    return {
+        "uuid": uuid,
+        "active": active,
+        "used_bytes": used,
+        "limit_bytes": limit,
+        "usage_percent": 0 if limit == 0 else min(100, (used / limit) * 100)
+    }
+
 # ── Stats ─────────────────────────────────────────────────────────────────────
 @app.get("/stats")
 async def get_stats(_=Depends(require_auth)):
     async with LINKS_LOCK:
         snap = dict(LINKS)
+    
+    # Check and auto-deactivate links that exceeded quota
+    for uid, link in snap.items():
+        limit = link.get("limit_bytes", 0)
+        used = link.get("used_bytes", 0)
+        if limit > 0 and used >= limit and link.get("active", True):
+            async with LINKS_LOCK:
+                if uid in LINKS and LINKS[uid].get("active", True):
+                    LINKS[uid]["active"] = False
+            await save_state()
+            log_activity("link", f"Config «{link.get('label', 'Unknown')}» auto-deactivated (quota exceeded)", "warn")
+    
     cpu_percent = psutil.cpu_percent(interval=0.1)
     cpu_count = psutil.cpu_count(logical=True)
     ram = psutil.virtual_memory()
@@ -799,6 +855,16 @@ async def list_links(request: Request, _=Depends(require_auth)):
     result = []
     for uid, d in snap.items():
         proto = d.get("protocol", DEFAULT_PROTOCOL)
+        # Check if quota exceeded
+        limit = d.get("limit_bytes", 0)
+        used = d.get("used_bytes", 0)
+        if limit > 0 and used >= limit and d.get("active", True):
+            async with LINKS_LOCK:
+                if uid in LINKS and LINKS[uid].get("active", True):
+                    LINKS[uid]["active"] = False
+            await save_state()
+            d = LINKS[uid]  # Refresh data
+        
         result.append({
             "uuid": uid,
             **d,
@@ -829,6 +895,9 @@ async def update_link(uid: str, request: Request, _=Depends(require_auth)):
             link["note"] = str(body["note"])[:200]
         if "reset_usage" in body and body["reset_usage"]:
             link["used_bytes"] = 0
+            # Reactivate if it was deactivated due to quota
+            if not link.get("active", True):
+                link["active"] = True
             log_activity("link", f"Usage reset for «{label}»", "info")
         if "limit_value" in body:
             lv = float(body.get("limit_value") or 0)
@@ -873,6 +942,9 @@ async def reset_link_traffic(uid: str, _=Depends(require_auth)):
         if uid not in LINKS:
             raise HTTPException(status_code=404, detail="link not found")
         LINKS[uid]["used_bytes"] = 0
+        # Reactivate if it was deactivated
+        if not LINKS[uid].get("active", True):
+            LINKS[uid]["active"] = True
         label = LINKS[uid]["label"]
     asyncio.create_task(save_state())
     log_activity("link", f"Traffic reset for «{label}»", "info")

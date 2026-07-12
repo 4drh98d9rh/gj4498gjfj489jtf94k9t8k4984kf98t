@@ -1247,6 +1247,8 @@ body {{ background-color: #070a13; }}
 </div>
 </body>
 </html>"""
+
+# ---------- SUB_USER_HTML (for /sub/user) ----------
 # ---------- SUB_USER_HTML (for /sub/user) ----------
 SUB_USER_HTML = r"""<!DOCTYPE html>
 <html lang="en">
@@ -1457,3 +1459,6 @@ document.addEventListener('DOMContentLoaded', function() {{
 </script>
 </body>
 </html>"""
+# Helper function for SUB_INFO_HTML's status display
+def _status_display(active):
+    return 'Active' if active else 'Inactive'
